@@ -8,7 +8,8 @@ const AddUser = () => {
     email: '',
     phone: '',
     password: '',
-    department: ''
+    department: '',
+    profilePicture: null // State to hold the profile picture
   });
   const [departments, setDepartments] = useState([]); // State to hold department list
   const navigate = useNavigate();
@@ -27,16 +28,30 @@ const AddUser = () => {
     }));
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUser((prevUser) => ({
+          ...prevUser,
+          profilePicture: reader.result // Save the image as a base64 string
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const newUser = { ...user };
-    
+
     // Get existing users from localStorage
     const existingUsers = JSON.parse(localStorage.getItem('visitors')) || [];
-    
+
     // Add the new user to the existing array
     existingUsers.push(newUser);
-    
+
     // Update localStorage
     localStorage.setItem('visitors', JSON.stringify(existingUsers));
 
@@ -46,7 +61,7 @@ const AddUser = () => {
 
   return (
     <div className="container my-4">
-      <div className="p-3 border rounded shadow" style={{ maxWidth: '700px', margin: '0 auto' }}> {/* Set a max width and center */}
+      <div className="p-3 border rounded shadow" style={{ maxWidth: '700px', margin: '0 auto' }}>
         <form onSubmit={handleSubmit}>
           <p className="fw-bold text-center">TAMBAH USER</p>
 
@@ -112,6 +127,16 @@ const AddUser = () => {
               value={user.password}
               onChange={handleInputChange}
               required
+            />
+          </div>
+
+          {/* Profile Picture Upload */}
+          <div className="mb-2">
+            <label className="form-label">Foto Profil</label>
+            <input
+              type="file"
+              className="form-control border border-dark"
+              onChange={handleImageChange}
             />
           </div>
 

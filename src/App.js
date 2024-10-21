@@ -6,6 +6,7 @@ import VisitorForm from './components/VisitorForm';
 import VisitorData from './components/VisitorData';
 import Footer from './components/Footer';
 import Loader from './components/Loader';
+import Profile from './components/Profile';
 import StatistikData from './components/StatistikData';
 import MiniSidebar from './components/MiniSidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -88,6 +89,8 @@ function App() {
 
                 {/* Rute untuk tambah visitor */}
                 <Route path="/add" element={<VisitorForm onNavigate={handleNavigation} />} />
+                {/* Rute untuk tambah visitor */}
+                <Route path="/profile" element={<Profile onNavigate={handleNavigation}/>} />
 
                 {/* Rute untuk edit visitor */}
                 <Route path="/edit/:index" element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" />} />
