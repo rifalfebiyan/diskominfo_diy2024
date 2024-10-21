@@ -8,12 +8,19 @@ function Login({ onLogin }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Simulasi login dan token (Anda bisa mengganti ini dengan API yang sebenarnya)
+    let token = '';
+    
     // Login for admin
     if (username === 'admin@gmail.com' && password === 'admin') {
+      token = 'admin_token'; // Ganti dengan token yang valid
+      localStorage.setItem('token', token); // Simpan token di localStorage
       onLogin(true, 'admin'); // Passing 'admin' as role
     } 
     // Login for user
     else if (username === 'user@gmail.com' && password === 'user') {
+      token = 'user_token'; // Ganti dengan token yang valid
+      localStorage.setItem('token', token); // Simpan token di localStorage
       onLogin(true, 'user'); // Passing 'user' as role
     } 
     // Error handling for invalid credentials
@@ -74,7 +81,7 @@ function Login({ onLogin }) {
                   required
                   style={{ fontSize: '18px', padding: '10px' }}
                 />
-              </div>
+              </ div>
 
               <div className="mb-4">
                 <p>PASSWORD</p>
@@ -95,11 +102,11 @@ function Login({ onLogin }) {
                 <button 
                   type="submit" 
                   className="btn btn-primary" 
-                  style={{ 
-                    fontSize: '18px', 
-                    padding: '10px 0', 
-                    backgroundColor: '#A83427', 
-                    borderColor: '#A83427' 
+                  style={{
+                    fontSize: '18px',
+                    padding: '10px 0',
+                    backgroundColor: '#A83427',
+                    borderColor: '#A83427'
                   }}
                 >
                   LOGIN
@@ -109,7 +116,9 @@ function Login({ onLogin }) {
 
             {/* Optional Footer */}
             <div className="text-center mt-4">
-              <a href="#" className="text-secondary">Google</a>
+              <button className="text-secondary" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                Google
+              </button>
             </div>
           </div>
         </div>

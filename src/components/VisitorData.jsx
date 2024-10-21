@@ -7,13 +7,28 @@ function VisitorData() {
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [currentPage, setCurrentPage] = useState(1);
-  const [visitorsPerPage, setVisitorsPerPage] = useState(5); // Jumlah baris per halaman, default 5
+  const [visitorsPerPage, setVisitorsPerPage] = useState(5);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedVisitors = JSON.parse(localStorage.getItem('visitors')) || [];
-    setVisitors(storedVisitors);
+    fetchVisitors();
   }, []);
+  
+  const fetchVisitors = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/visitors', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      console.log("Received visitors data:", data);
+      setVisitors(data);
+    } catch (error) {
+      console.error('Error fetching visitors:', error);
+    }
+  };
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -42,7 +57,6 @@ function VisitorData() {
     );
   });
 
-  // Pagination Logic
   const indexOfLastVisitor = currentPage * visitorsPerPage;
   const indexOfFirstVisitor = indexOfLastVisitor - visitorsPerPage;
   const currentVisitors = filteredVisitors.slice(indexOfFirstVisitor, indexOfLastVisitor);
@@ -59,25 +73,39 @@ function VisitorData() {
     }
   };
 
-  const handleEdit = (index) => {
-    const visitorToEdit = visitors[index];
-    navigate(`/edit/${index}`, { state: { visitor: visitorToEdit, index } });
+  const handleEdit = (id) => {
+    navigate(`/edit/${id}`);
   };
 
-  const handleDelete = (index) => {
-    const updatedVisitors = visitors.filter((_, i) => i !== index);
-    setVisitors(updatedVisitors);
-    localStorage.setItem('visitors', JSON.stringify(updatedVisitors));
+  const handleDelete = async (id) => {
+    if (window.confirm('Apakah Anda yakin ingin menghapus data tamu ini?')) {
+      try {
+        const response = await fetch(`http://localhost:8080/api/visitors/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete visitor');
+        }
+
+        setVisitors(visitors.filter(visitor => visitor.id !== id));
+        alert('Data tamu berhasil dihapus');
+      } catch (error) {
+        console.error('Error deleting visitor:', error);
+        alert('Gagal menghapus data tamu');
+      }
+    }
   };
 
-  // Handle changing rows per page
   const handleRowsPerPageChange = (e) => {
     setVisitorsPerPage(Number(e.target.value));
-    setCurrentPage(1); // Reset to first page when changing rows per page
+    setCurrentPage(1);
   };
 
-  return (
-    <div className="container mt-3">
+  return ( <div className="container mt-3">
       <h3>Data Tamu</h3>
       <div className="row mb-3">
         <div className="col-12 col-md-6 mb-2 mb-md-0">
@@ -105,17 +133,14 @@ function VisitorData() {
         </div>
       </div>
 
-      {/* Dropdown for selecting number of rows per page */}
-     
-<div className="mb-3">
-  <label className="form-label">Tampilkan Baris:</label>
-  <select className="form-select form-select-sm" value={visitorsPerPage} onChange={handleRowsPerPageChange}>
-    <option value={5}>5</option>
-    <option value={10}>10</option>
-    <option value={15}>15</option>
-  </select>
-</div>
-
+      <div className="mb-3">
+        <label className="form-label">Tampilkan Baris:</label>
+        <select className="form-select form-select-sm" value={visitorsPerPage} onChange={handleRowsPerPageChange}>
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={15}>15</option>
+        </select>
+      </div>
 
       <div className="card">
         <div className="card-header">
@@ -140,7 +165,7 @@ function VisitorData() {
               </thead>
               <tbody>
                 {currentVisitors.map((visitor, index) => (
-                  <tr key={index}>
+                  <tr key={visitor.id}>
                     <td>{indexOfFirstVisitor + index + 1}</td>
                     <td>{visitor.name}</td>
                     <td>{visitor.institution}</td>
@@ -152,10 +177,10 @@ function VisitorData() {
                     <td>{visitor.visitDate}</td>
                     <td>
                       <div className="d-flex">
-                        <button className="btn btn-warning btn-sm me-2" onClick={() => handleEdit(index)}>
+                        <button className="btn btn-warning btn-sm me-2" onClick={() => handleEdit(visitor.id)}>
                           Edit
                         </button>
-                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(index)}>
+                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(visitor.id)}>
                           Hapus
                         </button>
                       </div>
@@ -168,7 +193,6 @@ function VisitorData() {
         </div>
       </div>
 
-      {/* Pagination Controls */}
       <nav aria-label="Page navigation">
         <ul className="pagination justify-content-center mt-4">
           <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>

@@ -11,25 +11,25 @@ function StatistikData() {
 
   useEffect(() => {
     const storedVisitors = JSON.parse(localStorage.getItem('visitors')) || [];
-    setVisitors(storedVisitors);
+    // Filter out visitors without valid visitDate
+    const validVisitors = storedVisitors.filter(visitor => visitor && visitor.visitDate);
+    setVisitors(validVisitors);
   }, []);
 
   // Helper functions to filter data by date
   const filterByDay = (date) => {
-    return (
-      new Date(date).toLocaleDateString() === currentDate.toLocaleDateString()
-    );
+    return date && (new Date(date).toLocaleDateString() === currentDate.toLocaleDateString());
   };
 
   const filterByMonth = (date) => {
-    return (
+    return date && (
       new Date(date).getMonth() === currentDate.getMonth() &&
       new Date(date).getFullYear() === currentDate.getFullYear()
     );
   };
 
   const filterByYear = (date) => {
-    return new Date(date).getFullYear() === currentDate.getFullYear();
+    return date && (new Date(date).getFullYear() === currentDate.getFullYear());
   };
 
   // Calculate totals for today, this month, and this year
@@ -40,17 +40,22 @@ function StatistikData() {
   // Prepare monthly statistics for the chart
   const monthlyVisitorCounts = new Array(12).fill(0);
   visitors.forEach((visitor) => {
-    const visitMonth = new Date(visitor.visitDate).getMonth();
-    const visitYear = new Date(visitor.visitDate).getFullYear();
-    if (visitYear === currentDate.getFullYear()) {
-      monthlyVisitorCounts[visitMonth]++;
+    if (visitor.visitDate) {
+      const visitDate = new Date(visitor.visitDate);
+      const visitMonth = visitDate.getMonth();
+      const visitYear = visitDate.getFullYear();
+      if (visitYear === currentDate.getFullYear()) {
+        monthlyVisitorCounts[visitMonth]++;
+      }
     }
   });
 
   // Prepare yearly statistics for the chart
   const yearlyVisitorCounts = visitors.reduce((acc, visitor) => {
-    const visitYear = new Date(visitor.visitDate).getFullYear();
-    acc[visitYear] = (acc[visitYear] || 0) + 1;
+    if (visitor.visitDate) {
+      const visitYear = new Date(visitor.visitDate).getFullYear();
+      acc[visitYear] = (acc[visitYear] || 0) + 1;
+    }
     return acc;
   }, {});
 
