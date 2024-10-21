@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUserPlus, FaClipboardList } from 'react-icons/fa';
+import axios from 'axios';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -16,9 +17,21 @@ const Admin = () => {
   const [isHovered, setIsHovered] = useState(false); // State for hover animation
 
   useEffect(() => {
-    const storedDepartments = JSON.parse(localStorage.getItem('departments')) || [];
-    setDepartments(storedDepartments);
+    fetchDepartments();
   }, []);
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/departments', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setDepartments(response.data);
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+    }
+  };
 
   const handleDeleteUser = (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
@@ -30,11 +43,19 @@ const Admin = () => {
     setShowDepartmentsTable(!showDepartmentsTable);
   };
 
-  const handleDeleteDepartment = (index) => {
+  const handleDeleteDepartment = async (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus bidang ini?')) {
-      const updatedDepartments = departments.filter((_, i) => i !== index);
-      setDepartments(updatedDepartments);
-      localStorage.setItem('departments', JSON.stringify(updatedDepartments));
+      try {
+        await axios.delete(`http://localhost:8080/api/departments/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        fetchDepartments(); // Refresh data setelah menghapus
+      } catch (error) {
+        console.error('Error deleting department:', error);
+        alert('Failed to delete department');
+      }
     }
   };
 

@@ -14,7 +14,8 @@ function Login({ onLogin }) {
     // Login for admin
     if (username === 'admin@gmail.com' && password === 'admin') {
       token = 'admin_token'; // Ganti dengan token yang valid
-      localStorage.setItem('token', token); // Simpan token di localStorage
+      //localStorage.setItem('token', token); // Simpan token di localStorage
+      localStorage.setItem('role', 'admin'); // atau 'user' tergantung pada login
       onLogin(true, 'admin'); // Passing 'admin' as role
     } 
     // Login for user

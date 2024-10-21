@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 
-function MiniSidebar({ onLogout }) {
+function MiniSidebar({ onLogout, userRole }) {
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -12,7 +12,8 @@ function MiniSidebar({ onLogout }) {
 
   useEffect(() => {
     const storedRole = localStorage.getItem('role');
-    setRole(storedRole);
+    console.log('Current role:', storedRole);
+    setRole( storedRole );
   }, []);
 
   const handleMouseEnter = (item) => {

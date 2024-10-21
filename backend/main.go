@@ -28,7 +28,7 @@ func main() {
 
 	// CORS configuration
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:3000"} // Adjust this to your frontend URL
+	config.AllowOrigins = []string{"http://localhost:3000"} // Sesuaikan dengan URL frontend Anda
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	config.AllowCredentials = true
@@ -39,7 +39,7 @@ func main() {
 	// Setup routes
 	api := router.Group("/api")
 	routes.VisitorRoutes(api)
-
+	routes.DepartmentRoutes(api)
 	// Start server
 	port := os.Getenv("PORT")
 	if port == "" {

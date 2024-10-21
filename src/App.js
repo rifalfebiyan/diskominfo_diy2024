@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Login from './components/Login';
@@ -17,6 +17,16 @@ import './App.css';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    if (token) {
+      setIsLoggedIn(true);
+      setUserRole(role);
+    }
+  }, []);
+
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -48,7 +58,7 @@ function App() {
 
   return (
     <div className="d-flex">
-      {isLoggedIn && <MiniSidebar onLogout={handleLogout} />}
+      {isLoggedIn && <MiniSidebar onLogout={handleLogout} userRole={userRole} />}
       <div className="d-flex flex-column min-vh-100 flex-grow-1">
         {isLoggedIn && <Header onLogout={handleLogout} />}
         <div className="container-fluid flex-grow-1 p-0">
