@@ -1,25 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
+import { Modal, Button } from 'react-bootstrap';
 
 const Profile = () => {
   const { userId } = useParams();
   const [user, setUser] = useState({
-    name: 'RIFAL', // Hanya contoh, gunakan dari state yang benar
+    name: 'RIFAL',
     nip: '4680543456',
     email: 'rifal123@gmail.com',
     phone: '09217639184712941',
     department: 'APTIKA',
     profilePicture: ''
   });
+  const [newProfilePicture, setNewProfilePicture] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
-    // Fetch users from localStorage and find the specific user by ID
     const storedUsers = JSON.parse(localStorage.getItem('visitors')) || [];
     const currentUser = storedUsers[userId];
     if (currentUser) {
       setUser(currentUser);
     }
   }, [userId]);
+
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewProfilePicture(reader.result);
+        setShowModal(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveProfilePicture = () => {
+    const updatedUser = { ...user, profilePicture: newProfilePicture };
+    setUser(updatedUser);
+    const storedUsers = JSON.parse(localStorage.getItem('visitors')) || [];
+    storedUsers[userId] = updatedUser;
+    localStorage.setItem('visitors', JSON.stringify(storedUsers));
+    setShowModal(false);
+  };
+
+  const handleClickProfilePicture = () => {
+    fileInputRef.current.click();
+  };
 
   return (
     <div className="container my-5">
@@ -34,26 +62,33 @@ const Profile = () => {
               backgroundColor: '#D3B0A6',
               display: 'flex',
               justifyContent: 'center',
-              alignItems: 'center'
+              alignItems: 'center',
+              cursor: 'pointer'
             }}
+            onClick={handleClickProfilePicture}
           >
             {user.profilePicture ? (
               <img
                 src={user.profilePicture}
                 alt="Profile"
                 className="rounded"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                style={{
+                  width: '100%', // Tetap lebar 100%
+                  height: '100%', // Tetap tinggi 100%
+                  objectFit: 'cover', // Memastikan gambar tidak merusak layout
+                  borderRadius: '10px' // Tambahkan radius untuk tampilan lebih halus
+                }}
               />
             ) : (
-              <p className="text-light">Tidak ada foto profil</p>
+              <p className="text-light">Klik untuk ganti foto profil</p>
             )}
           </div>
-          <div className="mt-3 text-start">
-            <p className="text-muted">Terakhir kali diupdate :</p>
-            <p className="fw-bold">28 FEBRUARI 2024</p>
-            <p className="text-muted">Dibuat pada :</p>
-            <p className="fw-bold">25 Februari 2024</p>
-          </div>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleProfilePictureChange}
+          />
         </div>
 
         {/* Profile Information Section */}
@@ -89,6 +124,34 @@ const Profile = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal untuk konfirmasi penggantian foto */}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Konfirmasi Ganti Foto Profil</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Apakah Anda yakin ingin mengganti foto profil?</p>
+          {newProfilePicture && (
+            <div>
+              <p className="text-center">Pratinjau Foto Baru:</p>
+              <img
+                src={newProfilePicture}
+                alt="New Profile"
+                style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '10px' }}
+              />
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Batal
+          </Button>
+          <Button variant="primary" onClick={handleSaveProfilePicture}>
+            Simpan
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
