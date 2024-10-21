@@ -2,16 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-  const { userId } = useParams(); // Assuming userId is passed via URL
+  const { userId } = useParams();
   const [user, setUser] = useState({
-    name: '',
-    nip: '',
-    email: '',
-    phone: '',
-    department: '',
+    name: 'RIFAL', // Hanya contoh, gunakan dari state yang benar
+    nip: '4680543456',
+    email: 'rifal123@gmail.com',
+    phone: '09217639184712941',
+    department: 'APTIKA',
     profilePicture: ''
   });
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch users from localStorage and find the specific user by ID
@@ -22,66 +21,73 @@ const Profile = () => {
     }
   }, [userId]);
 
-  const handleBack = () => {
-    navigate('/');
-  };
-
   return (
-    <div className="container my-4">
-      <div className="card border-0 shadow-lg p-4" style={{ maxWidth: '600px', margin: '0 auto' }}>
-        <div className="text-center mb-4">
-          <h3 className="fw-bold text-primary">Profil Pengguna</h3>
-        </div>
-
-        {/* Profile Picture */}
-        {user.profilePicture ? (
-          <div className="text-center mb-4">
-            <img
-              src={user.profilePicture}
-              alt="Profile"
-              className="rounded-circle shadow-sm"
-              style={{ width: '150px', height: '150px', objectFit: 'cover' }}
-            />
+    <div className="container my-5">
+      <div className="row justify-content-center">
+        {/* Profile Picture Section */}
+        <div className="col-md-3 text-center">
+          <div
+            className="bg-secondary rounded"
+            style={{
+              width: '100%',
+              height: '300px',
+              backgroundColor: '#D3B0A6',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          >
+            {user.profilePicture ? (
+              <img
+                src={user.profilePicture}
+                alt="Profile"
+                className="rounded"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <p className="text-light">Tidak ada foto profil</p>
+            )}
           </div>
-        ) : (
-          <div className="text-center mb-4">
-            <p className="text-muted">Tidak ada foto profil</p>
+          <div className="mt-3 text-start">
+            <p className="text-muted">Terakhir kali diupdate :</p>
+            <p className="fw-bold">28 FEBRUARI 2024</p>
+            <p className="text-muted">Dibuat pada :</p>
+            <p className="fw-bold">25 Februari 2024</p>
           </div>
-        )}
-
-        {/* User Information */}
-        <div className="mb-3">
-          <label className="form-label fw-bold text-secondary">Nama:</label>
-          <p className="fs-5 text-dark">{user.name}</p>
         </div>
 
-        <div className="mb-3">
-          <label className="form-label fw-bold text-secondary">NIP:</label>
-          <p className="fs-5 text-dark">{user.nip}</p>
-        </div>
+        {/* Profile Information Section */}
+        <div className="col-md-7">
+          <h4 className="fw-bold" style={{ backgroundColor: '#A63B2A', color: '#FFF', padding: '10px', borderRadius: '10px 10px 0 0' }}>
+            PROFILE AKUN
+          </h4>
+          <div className="p-4 shadow-sm" style={{ backgroundColor: '#FFFFFF', borderRadius: '0 0 10px 10px' }}>
+            <div className="mb-2">
+              <strong>NIP</strong>
+              <p>{user.nip}</p>
+            </div>
 
-        <div className="mb-3">
-          <label className="form-label fw-bold text-secondary">Email:</label>
-          <p className="fs-5 text-dark">{user.email}</p>
-        </div>
+            <div className="mb-2">
+              <strong>NAMA</strong>
+              <p>{user.name}</p>
+            </div>
 
-        <div className="mb-3">
-          <label className="form-label fw-bold text-secondary">No Telp:</label>
-          <p className="fs-5 text-dark">{user.phone}</p>
-        </div>
+            <div className="mb-2">
+              <strong>NOMOR TELEPON</strong>
+              <p>{user.phone}</p>
+            </div>
 
-        <div className="mb-3">
-          <label className="form-label fw-bold text-secondary">Bidang:</label>
-          <p className="fs-5 text-dark">{user.department}</p>
-        </div>
+            <div className="mb-2">
+              <strong>Email</strong>
+              <p>{user.email}</p>
+            </div>
 
-        <button 
-          className="btn btn-primary w-100 py-2 mt-3" 
-          onClick={handleBack}
-          style={{ fontWeight: 'bold' }}
-        >
-          Kembali
-        </button>
+            <div className="mb-2">
+              <strong>Bidang</strong>
+              <p>{user.department}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
