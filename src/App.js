@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Login from './components/Login';
 import VisitorForm from './components/VisitorForm';
@@ -12,6 +12,7 @@ import EditVisitor from './components/EditVisitor';
 import Admin from './components/Admin';
 import AddUser from './components/AddUser';
 import AddDepartment from './components/AddDepartment';
+import EditDepartment from './components/EditDepartment';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -73,6 +74,7 @@ function App() {
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
             <Route path="/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
             <Route path="/add-department" element={<AdminRoute><AddDepartment /></AdminRoute>} />
+            <Route path="/edit-department/:id" element={<EditDepartment />} />
           </Routes>
           )}
         </div>

@@ -9,12 +9,12 @@ const Admin = () => {
     { id: '4680543456', name: 'ARIJAL', email: 'arijal@qsgmail.com', phone: '09217639184712941', department: 'APTIKA', createdAt: '2 March 2021, 13:45 PM' },
     { id: '4545869856', name: 'RIFAL', email: 'rifal@qsgmail.com', phone: '085645789612', department: 'APTIKA', createdAt: '5 March 2021, 10:15 AM' },
     { id: '#123456789', name: 'PAI', email: 'pai@qsgmail.com', phone: '081234567891', department: 'APTIKA', createdAt: '12 March 2021, 09:30 AM' },
-    { id: '#123456789', name: 'FAHREZA', email: 'fahreza@qsgmail.com', phone: '081234567891', department: 'INFOKOM', createdAt: '20 March 2021, 11:45 AM' },
+    { id: '#123456790', name: 'FAHREZA', email: 'fahreza@qsgmail.com', phone: '081234567891', department: 'INFOKOM', createdAt: '20 March 2021, 11:45 AM' },
   ]);
 
   const [departments, setDepartments] = useState([]);
   const [showDepartmentsTable, setShowDepartmentsTable] = useState(false);
-  const [isHovered, setIsHovered] = useState(false); // State for hover animation
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     fetchDepartments();
@@ -39,24 +39,31 @@ const Admin = () => {
     }
   };
 
-  const handleShowDepartments = () => {
-    setShowDepartmentsTable(!showDepartmentsTable);
-  };
-
   const handleDeleteDepartment = async (id) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus bidang ini?')) {
+    if (window.confirm('Are you sure you want to delete this department?')) {
       try {
-        await axios.delete(`http://localhost:8080/api/departments/${id}`, {
+        const response = await axios.delete(`http://localhost:8080/api/departments/${id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        fetchDepartments(); // Refresh data setelah menghapus
+        
+        if (response.status === 200) {
+          // Hapus department dari state lokal
+          setDepartments(departments.filter(dept => dept.id !== id));
+          alert('Department deleted successfully');
+        } else {
+          throw new Error('Failed to delete department');
+        }
       } catch (error) {
         console.error('Error deleting department:', error);
-        alert('Failed to delete department');
+        alert('Failed to delete department: ' + error.message);
       }
     }
+  };
+
+  const handleShowDepartments = () => {
+    setShowDepartmentsTable(!showDepartmentsTable);
   };
 
   return (
@@ -70,12 +77,12 @@ const Admin = () => {
             style={{
               backgroundColor: '#F8EDED',
               cursor: 'pointer',
-              transform: isHovered ? 'scale(1.1)' : 'scale(1)', // Apply scaling effect
-              transition: 'transform 0.2s ease-in-out' // Smooth transition
+              transform: isHovered ? 'scale(1.1)' : 'scale(1)',
+              transition: 'transform 0 .2s ease-in-out'
             }}
             onClick={handleShowDepartments}
-            onMouseEnter={() => setIsHovered(true)} // Set hover state true
-            onMouseLeave={() => setIsHovered(false)} // Reset hover state
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
           >
             <div className="card-body">
               <h3>Jumlah Bidang</h3>
@@ -131,8 +138,14 @@ const Admin = () => {
                       <td>{department.status}</td>
                       <td>
                         <button
+                          className="btn btn-warning btn-sm me-2"
+                          onClick={() => navigate(`/edit-department/${department.id}`)}
+                        >
+                          Edit
+                        </button>
+                        <button
                           className="btn btn-danger btn-sm"
-                          onClick={() => handleDeleteDepartment(index)}
+                          onClick={() => handleDeleteDepartment(department.id)}
                         >
                           Hapus
                         </button>
@@ -198,7 +211,7 @@ const Admin = () => {
           <li className="page-item active"><a className="page-link" href="#">1</a></li>
           <li className="page-item"><a className="page-link" href="#">2</a></li>
           <li className="page-item"><a className="page-link" href="#">3</a></li>
-          <li className="page-item"><a className="page-link" href="#">Next</a></li>
+          <li className="page-item"><a className="page-link" href="#">Next</a></li >
         </ul>
       </nav>
     </div>

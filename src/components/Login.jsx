@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Login({ onLogin }) {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,19 +17,22 @@ function Login({ onLogin }) {
     // Login for admin
     if (username === 'admin@gmail.com' && password === 'admin') {
       token = 'admin_token'; // Ganti dengan token yang valid
-      //localStorage.setItem('token', token); // Simpan token di localStorage
-      localStorage.setItem('role', 'admin'); // atau 'user' tergantung pada login
-      onLogin(true, 'admin'); // Passing 'admin' as role
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', 'admin');
+      onLogin(true, 'admin');
+      navigate('/'); // Arahkan ke halaman utama setelah login
     } 
     // Login for user
     else if (username === 'user@gmail.com' && password === 'user') {
       token = 'user_token'; // Ganti dengan token yang valid
-      localStorage.setItem('token', token); // Simpan token di localStorage
-      onLogin(true, 'user'); // Passing 'user' as role
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', 'user');
+      onLogin(true, 'user');
+      navigate('/'); // Arahkan ke halaman utama setelah login
     } 
     // Error handling for invalid credentials
     else {
-      alert('Username atau password salah!');
+      setError('Username atau password salah!');
     }
   };
 
@@ -55,7 +61,7 @@ function Login({ onLogin }) {
               maxWidth: '400px', 
               borderRadius: '20px', 
               minHeight: '400px',
-              boxShadow: '20px 4px 12px rgba(0, 0, 0, 0.1)' // Tambahkan shadow di sini
+              boxShadow: '20px 4px 12px rgba(0, 0, 0, 0.1)'
             }}
           > 
             {/* Logo */}
@@ -82,9 +88,9 @@ function Login({ onLogin }) {
                   required
                   style={{ fontSize: '18px', padding: '10px' }}
                 />
-              </ div>
+              </div>
 
-              <div className="mb-4">
+              <div className="mb -4">
                 <p>PASSWORD</p>
                 <input
                   type="password"
