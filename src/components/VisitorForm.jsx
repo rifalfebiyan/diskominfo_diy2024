@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Tambahkan useEffect di sini
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
 
 function VisitorForm() {
   const [formData, setFormData] = useState({
@@ -11,10 +12,28 @@ function VisitorForm() {
     institution: '',
     phone: '',
     department: '',
-    visitDate: ''
+    visitDate: new Date().toISOString().split('T')[0]
   });
 
+  const [departments, setDepartments] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/departments', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setDepartments(response.data);
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -128,18 +147,24 @@ function VisitorForm() {
               required
             >
               <option value="">Pilih Bidang</option>
-              <option value="Bidang APTIKA">Bidang APTIKA</option>
-              <option value="Bidang lainnya">Bidang lainnya</option>
+              {departments.map((dept) => (
+                dept.status === 'Active' && (
+                  <option key={dept.id} value={dept.name}>
+                    {dept.name}
+                  </option>
+                )
+              ))}
             </select>
           </div>
 
           <div className="mb-2">
             <label htmlFor="visitDate" className="form-label">Tanggal Kunjungan*</label>
             <input
-              type="date"
+              type="datetime-local"
               name="visitDate"
               className="form-control border border-dark"
-              onChange={handleChange}
+              value={formData.visitDate}
+              onChange={(e) => setFormData({ ...formData, visitDate: e.target.value })}
               required
             />
           </div>

@@ -19,10 +19,25 @@ function EditVisitor() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
-    fetchVisitor();
-  }, [index]);
+    fetchDepartments();
+    fetchVisitor(); // Tambahkan ini untuk memuat data visitor
+  }, []);
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/departments', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setDepartments(response.data);
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+    }
+  };
 
   const fetchVisitor = async () => {
     try {
@@ -187,15 +202,19 @@ function EditVisitor() {
             <label className="form-label">Bidang*</label>
             <select
               name="department"
-              className="form-select border border-dark" // Border around select
+              className="form-select border border-dark"
               value={visitor.department}
               onChange={handleInputChange}
               required
             >
               <option value="">Pilih Bidang</option>
-              <option value="Bidang IKP">Bidang IKP</option>
-              <option value="Bidang HUMAS">Bidang HUMAS</option>
-              <option value="Bidang APTIKA">Bidang APTIKA</option>
+              {departments.map((dept) => (
+                dept.status === 'Active' && (
+                  <option key ={dept.id} value={dept.name}>
+                    {dept.name}
+                  </option>
+                )
+              ))}
             </select>
           </div>
 

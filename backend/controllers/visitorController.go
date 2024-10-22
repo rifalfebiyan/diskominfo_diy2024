@@ -5,6 +5,7 @@ import (
 	"backend/models"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,7 +13,16 @@ import (
 // Fungsi untuk mendapatkan semua visitor
 func GetVisitors(c *gin.Context) {
 	var visitors []models.Visitor
-	database.DB.Find(&visitors)
+	if err := database.DB.Find(&visitors).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Debug print
+	for _, v := range visitors {
+		fmt.Printf("Visitor ID: %d, Visit Date: %v\n", v.ID, v.VisitDate)
+	}
+
 	c.JSON(http.StatusOK, visitors)
 }
 
@@ -37,9 +47,20 @@ func CreateVisitor(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	// Log data yang diterima
-	fmt.Printf("Received visitor data: %+v\n", visitor)
-	database.DB.Create(&visitor)
+
+	// Set visit date if not provided
+	if visitor.VisitDate.IsZero() {
+		visitor.VisitDate = time.Now()
+	}
+
+	// Debug print
+	fmt.Printf("Creating visitor with date: %v\n", visitor.VisitDate)
+
+	if err := database.DB.Create(&visitor).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusCreated, visitor)
 }
 
