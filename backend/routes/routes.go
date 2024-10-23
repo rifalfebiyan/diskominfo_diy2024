@@ -7,7 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func DepartmentRoutes(router *gin.RouterGroup) {                  ts)p
+func DepartmentRoutes(router *gin.RouterGroup) {
+	router.POST("/departments", controllers.CreateDepartment)
+	router.GET("/departments", controllers.GetDepartments)
 	router.GET("/departments/:id", middleware.AuthMiddleware(), controllers.GetDepartment) // Add this line
 	router.PUT("/departments/:id", controllers.UpdateDepartment)                           // Add this line for updates
 	router.DELETE("/departments/:id", middleware.AuthMiddleware(), controllers.DeleteDepartment)
