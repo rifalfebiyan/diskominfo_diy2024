@@ -164,6 +164,18 @@ function MiniSidebar({ onLogout, userRole }) {
                   {hoveredItem === 'add' && <span>Form Tamu</span>}
                 </Link>
               </li>
+              <li
+                onMouseEnter={() => handleMouseEnter('profile')}
+                onMouseLeave={handleMouseLeave}
+              >
+                <Link
+                  to="/profile"
+                  style={linkStyle(hoveredItem === 'profile')}
+                >
+                  <span style={iconStyle(hoveredItem === 'profile', location.pathname === '/profile')}>&#xf2bd;</span> {/* Ikon profile */}
+                  {hoveredItem === 'profile' && <span>Profile</span>}
+                </Link>
+              </li>
             </>
           )}
           <li>

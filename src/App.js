@@ -11,6 +11,7 @@ import MiniSidebar from './components/MiniSidebar';
 import EditVisitor from './components/EditVisitor';
 import Admin from './components/Admin';
 import AddUser from './components/AddUser';
+import Profile from './components/Profile';
 import AddDepartment from './components/AddDepartment';
 import EditDepartment from './components/EditDepartment';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -70,6 +71,7 @@ function App() {
             <Route path="/" element={<StatistikData />} />
             <Route path="/guest" element={<VisitorData />} />
             <Route path="/add" element={<VisitorForm />} />
+            <Route path="/profile" element={<Profile onNavigate={handleNavigation}/>} />
             <Route path="/edit/:index" element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" />} />
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
             <Route path="/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
