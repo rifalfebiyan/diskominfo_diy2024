@@ -105,13 +105,23 @@ function MiniSidebar({ onLogout, userRole }) {
                 onMouseEnter={() => handleMouseEnter('admin')}
                 onMouseLeave={handleMouseLeave}
               >
-                <Link
-                  to="/admin"
-                  style={linkStyle(hoveredItem === 'admin')}
-                >
-                  <span style={iconStyle(hoveredItem === 'admin', location.pathname === '/admin')}>&#xf013;</span> {/* Ikon settings */}
-                  {hoveredItem === 'admin' && <span>Dashboard Admin</span>}
-                </Link>
+                          <Link
+              to="/admin"
+              style={linkStyle(hoveredItem === 'admin')}
+            >
+              <span 
+                style={iconStyle(
+                  hoveredItem === 'admin', 
+                  ['/admin', '/add-user', '/add-department'].includes(location.pathname)
+                )} 
+              >
+                &#xf013;
+              </span>
+              
+              {hoveredItem === 'admin' && <span>Dashboard Admin</span>}
+            </Link>
+
+
               </li>
               <li
                 onMouseEnter={() => handleMouseEnter('guest')}

@@ -63,21 +63,29 @@ function App() {
       {isLoggedIn && <MiniSidebar onLogout={handleLogout} userRole={userRole} />}
       <div className="d-flex flex-column min-vh-100 flex-grow-1">
         {isLoggedIn && <Header onLogout={handleLogout} />}
+
+        {/* Teks berjalan di bawah header */}
+        {isLoggedIn && (
+          <marquee behavior="scroll" direction="left">
+            Selamat Datang di Buku Tamu Dinas Komunikasi dan Informatika Daerah Istimewa Yogyakarta
+          </marquee>
+        )}
+
         <div className="container-fluid flex-grow-1 p-0">
           {!isLoggedIn ? (
             <Login onLogin={handleLogin} />
           ) : (
-          <Routes>
-            <Route path="/" element={<StatistikData />} />
-            <Route path="/guest" element={<VisitorData />} />
-            <Route path="/add" element={<VisitorForm />} />
-            <Route path="/profile" element={<Profile onNavigate={handleNavigation}/>} />
-            <Route path="/edit/:index" element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" />} />
-            <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
-            <Route path="/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
-            <Route path="/add-department" element={<AdminRoute><AddDepartment /></AdminRoute>} />
-            <Route path="/edit-department/:id" element={<EditDepartment />} />
-          </Routes>
+            <Routes>
+              <Route path="/" element={<StatistikData />} />
+              <Route path="/guest" element={<VisitorData />} />
+              <Route path="/add" element={<VisitorForm />} />
+              <Route path="/profile" element={<Profile onNavigate={handleNavigation}/>} />
+              <Route path="/edit/:index" element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" />} />
+              <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+              <Route path="/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
+              <Route path="/add-department" element={<AdminRoute><AddDepartment /></AdminRoute>} />
+              <Route path="/edit-department/:id" element={<EditDepartment />} />
+            </Routes>
           )}
         </div>
         {isLoggedIn && <Footer />}

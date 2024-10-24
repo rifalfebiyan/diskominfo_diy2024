@@ -228,9 +228,10 @@ function EditVisitor() {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary w-100">
-            Update
-          </button>
+          <button type="submit" className="btn btn-danger w-100">
+          Update
+        </button>
+
         </form>
       </div>
     </div>

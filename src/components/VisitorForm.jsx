@@ -184,7 +184,7 @@ function VisitorForm() {
               onChange={handleChange}
               required
             >
-              <option value="">Pilih Departemen</option>
+              <option value="">Pilih Bidang</option>
               {departments.map((department) => (
                 <option key={department.id} value={department.name}>
                   {department.name}
@@ -205,9 +205,10 @@ function VisitorForm() {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary w-100">
-            Submit
-          </button>
+          <button type="submit" className="btn btn-danger w-100">
+          Simpan
+        </button>
+
         </form>
       </div>
     </div>

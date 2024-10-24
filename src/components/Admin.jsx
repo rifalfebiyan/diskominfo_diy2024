@@ -102,7 +102,7 @@ const Admin = () => {
 
         <div className="col-md-3">
           <button className="btn btn-danger w-100 mb-3" onClick={() => navigate('/add-user')}>
-            <FaUserPlus /> Tambah Admin
+            <FaUserPlus /> Tambah User
           </button>
         </div>
         <div className="col-md-3">
@@ -191,10 +191,16 @@ const Admin = () => {
                         Edit
                       </button>
                       <button
-                        className="btn btn-danger btn-sm"
+                        className="btn btn-danger btn-sm me-2"
                         onClick={() => handleDeleteUser(user.id)}
                       >
                         Hapus
+                      </button>
+                      <button
+                        className="btn btn-info btn-sm"
+                        onClick={() => navigate(`/detail-user/${user.id}`)}
+                      >
+                        Detail
                       </button>
                     </td>
                   </tr>
