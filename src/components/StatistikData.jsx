@@ -116,14 +116,14 @@ function StatistikData() {
             className={`btn ${viewMode === 'monthly' ? 'btn-danger' : 'btn-outline-danger'}`}
             onClick={() => setViewMode('monthly')}
           >
-            Monthly
+            Bulan
           </button>
           <button
             type="button"
             className={`btn ${viewMode === 'yearly' ? 'btn-danger' : 'btn-outline-danger'}`}
             onClick={() => setViewMode('yearly')}
           >
-            Yearly
+            Tahun
           </button>
         </div>
       </div>
