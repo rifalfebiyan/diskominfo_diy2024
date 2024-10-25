@@ -112,7 +112,7 @@ function MiniSidebar({ onLogout, userRole }) {
               <span 
                 style={iconStyle(
                   hoveredItem === 'admin', 
-                  ['/admin', '/add-user', '/add-department'].includes(location.pathname)
+                  ['/admin', '/add-user', '/add-department','/edit-department/:id'].includes(location.pathname)
                 )} 
               >
                 &#xf013;

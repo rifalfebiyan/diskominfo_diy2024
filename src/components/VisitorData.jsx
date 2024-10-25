@@ -140,7 +140,12 @@ function VisitorData() {
 
   return (
     <div className="container mt-3">
-      <h3>Data Tamu</h3>
+      {/* Positioned text at the top-left corner */}
+      <h5 className="position-absolute" style={{ top: 0, left: 0, margin: '10px' }}>
+        Data Tamu / Edit Tamu
+      </h5>
+
+      <h5>Data Tamu</h5>
       <div className="row mb-3">
         <div className="col-12 col-md-6 mb-2 mb-md-0">
           <input
@@ -245,7 +250,7 @@ function VisitorData() {
           <li className="page-item">
             <span className="page-link">{currentPage}</span>
           </li>
-          <li className={`page-item ${currentPage >= Math.ceil(filteredVisitors.length / visitorsPerPage) ? 'disabled' : ''}`}>
+          <li className={`page-item ${currentPage === Math.ceil(filteredVisitors.length / visitorsPerPage) ? 'disabled' : ''}`}>
             <button className="page-link" onClick={handleNextPage}>Next</button>
           </li>
         </ul>

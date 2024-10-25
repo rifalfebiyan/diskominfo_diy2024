@@ -68,7 +68,7 @@ const Admin = () => {
 
   return (
     <div className="container mt-4">
-      <h1 className="text-center mb-4">Admin Dashboard</h1>
+      <h5>Admin Dasboard</h5>
 
       <div className="row mb-4">
         <div className="col-md-3">
