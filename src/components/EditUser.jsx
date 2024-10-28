@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react';
-<<<<<<< HEAD
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
-const EditUser  = () => {
-  const [user, setUser ] = useState({
-=======
-import { useNavigate } from 'react-router-dom';
-
-const EditUser = ({ userData }) => {
+const EditUser = () => {
   const [user, setUser] = useState({
->>>>>>> 97a4a77a4ecde0fcefebdd3ea823ebbacf9e7f69
     name: '',
     nip: '',
     email: '',
@@ -18,9 +11,8 @@ const EditUser = ({ userData }) => {
     password: '',
     department: ''
   });
-  const [departments, setDepartments] = useState([]); // State to hold department list
+  const [departments, setDepartments] = useState([]); 
   const navigate = useNavigate();
-<<<<<<< HEAD
   const { id } = useParams();
 
   useEffect(() => {
@@ -31,7 +23,7 @@ const EditUser = ({ userData }) => {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        setUser (response.data);
+        setUser(response.data);
       } catch (error) {
         console.error('Error fetching user:', error);
       }
@@ -56,34 +48,15 @@ const EditUser = ({ userData }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUser ((prevUser ) => ({
-      ...prevUser ,
-=======
-
-  useEffect(() => {
-    // Fetch departments from localStorage when the component mounts
-    const storedDepartments = JSON.parse(localStorage.getItem('departments')) || [];
-    setDepartments(storedDepartments);
-
-    // If userData is provided, set it as initial state
-    if (userData) {
-      setUser(userData);
-    }
-  }, [userData]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUser((prevUser) => ({
+    setUser(prevUser => ({
       ...prevUser,
->>>>>>> 97a4a77a4ecde0fcefebdd3ea823ebbacf9e7f69
       [name]: value
     }));
   };
 
-<<<<<<< HEAD
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       const response = await axios.put(`http://localhost:8080/api/users/${id}`, user, {
         headers: {
@@ -92,35 +65,13 @@ const EditUser = ({ userData }) => {
         }
       });
       if (response.status === 200) {
-        alert('User  updated successfully');
-        navigate('/admin'); // Navigate back to admin dashboard
+        alert('User updated successfully');
+        navigate('/admin'); 
       }
     } catch (error) {
       console.error('Error updating user:', error);
       alert('Failed to update user: ' + error.message);
     }
-=======
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const updatedUser = { ...user };
-    
-    // Get existing users from localStorage
-    const existingUsers = JSON.parse(localStorage.getItem('visitors')) || [];
-    
-    // Find the index of the user to be updated
-    const userIndex = existingUsers.findIndex(user => user.nip === updatedUser.nip);
-    
-    if (userIndex !== -1) {
-      // Update the user details
-      existingUsers[userIndex] = updatedUser;
-      
-      // Update localStorage
-      localStorage.setItem('visitors', JSON.stringify(existingUsers));
-    }
-
-    // Navigate back to admin dashboard
-    navigate('/');
->>>>>>> 97a4a77a4ecde0fcefebdd3ea823ebbacf9e7f69
   };
 
   return (
@@ -129,7 +80,7 @@ const EditUser = ({ userData }) => {
         <form onSubmit={handleSubmit}>
           <p className="fw-bold text-center">EDIT USER</p>
 
-          {/* Nama Input */}
+          {/* Name Input */}
           <div className="mb-2">
             <label className="form-label">Nama*</label>
             <input
@@ -152,10 +103,7 @@ const EditUser = ({ userData }) => {
               value={user.nip}
               onChange={handleInputChange}
               required
-<<<<<<< HEAD
-=======
-              readOnly // Optional: Prevent editing the NIP
->>>>>>> 97a4a77a4ecde0fcefebdd3ea823ebbacf9e7f69
+              readOnly
             />
           </div>
 
@@ -172,7 +120,7 @@ const EditUser = ({ userData }) => {
             />
           </div>
 
-          {/* No Telp Input */}
+          {/* Phone Input */}
           <div className="mb-2">
             <label className="form-label">No Telp*</label>
             <input
@@ -187,35 +135,39 @@ const EditUser = ({ userData }) => {
 
           {/* Password Input */}
           <div className="mb-2">
-            <label className="form-label">Password*</label>
+            <label className="form-label">Password (Kosongkan jika tidak diubah)</label>
             <input
               type="password"
               className="form-control border border-dark"
               name="password"
               value={user.password}
               onChange={handleInputChange}
-              required
             />
           </div>
 
-          {/* Bidang Dropdown */}
+          {/* Department Dropdown */}
           <div className="mb-2">
             <label className="form-label">Bidang*</label>
             <select
-              name="department"
               className="form-select border border-dark"
+              name="department"
               value={user.department}
               onChange={handleInputChange}
               required
             >
               <option value="">Pilih Bidang</option>
-              {departments.map((dept, index) => (
-                <option key={index} value={dept.name}>{dept.name}</option>
+              {departments.map((dept) => (
+                <option key={dept.id} value={dept.name}>
+                  {dept.name}
+                </option>
               ))}
             </select>
           </div>
 
-          <button type="submit" className="btn btn-danger w-100">Simpan</button>
+          {/* Submit Button */}
+          <button type="submit" className="btn btn-danger w-100">
+            Simpan Perubahan
+          </button>
         </form>
       </div>
     </div>
