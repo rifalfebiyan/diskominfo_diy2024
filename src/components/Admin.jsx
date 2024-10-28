@@ -1,23 +1,19 @@
-import { FaUserPlus, FaClipboardList } from 'react-icons/fa';
+import { FaUserPlus, FaClipboardList } from 'react-icons/fa'; // Perbaiki di sini
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Admin = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState([
-    { id: '4680543456', name: 'ARIJAL', email: 'arijal@qsgmail.com', phone: '09217639184712941', department: 'APTIKA', createdAt: '2 March 2021, 13:45 PM' },
-    { id: '4545869856', name: 'RIFAL', email: 'rifal@qsgmail.com', phone: '085645789612', department: 'APTIKA', createdAt: '5 March 2021, 10:15 AM' },
-    { id: '#123456789', name: 'PAI', email: 'pai@qsgmail.com', phone: '081234567891', department: 'APTIKA', createdAt: '12 March 2021, 09:30 AM' },
-    { id: '#123456790', name: 'FAHREZA', email: 'fahreza@qsgmail.com', phone: '081234567891', department: 'INFOKOM', createdAt: '20 March 2021, 11:45 AM' },
-  ]);
-
+  const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [showDepartmentsTable, setShowDepartmentsTable] = useState(false);
+  const [showUsersTable, setShowUsersTable] = useState(false); 
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     fetchDepartments();
+    fetchUsers();
   }, []);
 
   const fetchDepartments = async () => {
@@ -33,14 +29,43 @@ const Admin = () => {
     }
   };
 
-  const handleDeleteUser = (id) => {
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/users', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  const handleDeleteUser  = async (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
-      setUsers(users.filter(user => user.id !== id));
+      try {
+        const response = await axios.delete(`http://localhost:8080/api/users/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (response.status === 200) {
+          setUsers(users.filter(user => user.id !== id));
+          alert('User  deleted successfully');
+        } else {
+          throw new Error('Failed to delete user');
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        alert('Failed to delete user: ' + error.message);
+      }
     }
   };
 
   const handleDeleteDepartment = async (id) => {
-    if (window.confirm('Are you sure you want to delete this department?')) {
+    if (window.confirm('Apakah Anda yakin ingin menghapus bidang ini?')) {
       try {
         const response = await axios.delete(`http://localhost:8080/api/departments/${id}`, {
           headers: {
@@ -49,8 +74,7 @@ const Admin = () => {
         });
         
         if (response.status === 200) {
-          // Hapus department dari state lokal
-          setDepartments(departments.filter(dept => dept.id !== id));
+          setDepartments(departments.filter(department => department.id !== id));
           alert('Department deleted successfully');
         } else {
           throw new Error('Failed to delete department');
@@ -63,12 +87,16 @@ const Admin = () => {
   };
 
   const handleShowDepartments = () => {
-    setShowDepartmentsTable(!showDepartmentsTable);
+    setShowDepartmentsTable(! showDepartmentsTable);
+  };
+
+  const handleShowUsers = () => {
+    setShowUsersTable(!showUsersTable);
   };
 
   return (
     <div className="container mt-4">
-      <h1 className="text-center mb-4">Admin Dashboard</h1>
+      <h5>Admin Dashboard</h5>
 
       <div className="row mb-4">
         <div className="col-md-3">
@@ -78,7 +106,7 @@ const Admin = () => {
               backgroundColor: '#F8EDED',
               cursor: 'pointer',
               transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-              transition: 'transform 0 .2s ease-in-out'
+              transition: 'transform 0.2s ease-in-out'
             }}
             onClick={handleShowDepartments}
             onMouseEnter={() => setIsHovered(true)}
@@ -105,13 +133,64 @@ const Admin = () => {
             <FaUserPlus /> Tambah User
           </button>
         </div>
-        <div className="col-md-3">
+        <div className="col -md-3">
           <button className="btn btn-danger w-100 mb-3" onClick={() => navigate('/add-department')}>
             <FaClipboardList /> Tambah Bidang
           </button>
         </div>
       </div>
 
+      {/* Tampilkan tabel pengguna */}
+      {showUsersTable && (
+        <div className="card shadow-sm mb -4">
+          <div className="card-body">
+            <h2 className="text-center">Data Pengguna</h2>
+            <div className="table-responsive">
+              <table className="table table-bordered table-hover">
+                <thead className="table-light">
+                  <tr>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>NIP</th>
+                    <th>Email</th>
+                    <th>No Telp</th>
+                    <th>Bidang</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user, index) => (
+                    <tr key={index}>
+                      <td>{index + 1}</td>
+                      <td>{user.name}</td>
+                      <td>{user.nip}</td>
+                      <td>{user.email}</td>
+                      <td>{user.phone}</td>
+                      <td>{user.department}</td>
+                      <td>
+                        <button
+                          className="btn btn-warning btn-sm me-2"
+                          onClick={() => navigate(`/edit-user/${user.id}`)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleDeleteUser   (user.id)}
+                        >
+                          Hapus
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tampilkan tabel bidang */}
       {showDepartmentsTable && (
         <div className="card shadow-sm mb-4">
           <div className="card-body">
@@ -119,7 +198,7 @@ const Admin = () => {
             <div className="table-responsive">
               <table className="table table-bordered table-hover">
                 <thead className="table-light">
-                  <tr style={{ backgroundColor: '#9F2C2C', color: 'white' }}>
+                  <tr>
                     <th>No</th>
                     <th>Nama Bidang</th>
                     <th>Alamat</th>
@@ -150,7 +229,7 @@ const Admin = () => {
                           Hapus
                         </button>
                       </td>
-                    </tr>
+                    </ tr>
                   ))}
                 </tbody>
               </table>
@@ -164,7 +243,7 @@ const Admin = () => {
           <div className="table-responsive">
             <table className="table table-bordered table-hover">
               <thead className="table-light">
-                <tr style={{ backgroundColor: '#9F2C2C', color: 'white' }}>
+                <tr>
                   <th>No</th>
                   <th>Nama</th>
                   <th>Email</th>
@@ -192,12 +271,12 @@ const Admin = () => {
                       </button>
                       <button
                         className="btn btn-danger btn-sm me-2"
-                        onClick={() => handleDeleteUser(user.id)}
+                        onClick={() => handleDeleteUser    (user.id)}
                       >
                         Hapus
                       </button>
                       <button
-                        className="btn btn-info btn-sm"
+                        className=" btn btn-info btn-sm"
                         onClick={() => navigate(`/detail-user/${user.id}`)}
                       >
                         Detail
@@ -213,7 +292,7 @@ const Admin = () => {
 
       <nav aria-label="Page navigation">
         <ul className="pagination justify-content-center mt-4">
-          <li className="page-item"><a className="page-link" href="#">Previous</a></li>
+          <li className="page-item"><a className="page-link" href="#">Previous </a></li>
           <li className="page-item active"><a className="page-link" href="#">1</a></li>
           <li className="page-item"><a className="page-link" href="#">2</a></li>
           <li className="page-item"><a className="page-link" href="#">3</a></li>

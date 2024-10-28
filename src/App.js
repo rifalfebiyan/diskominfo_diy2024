@@ -1,3 +1,4 @@
+// D:\Semester 7\Magang\diskominfo_diy2024-main-edit\src\App.js
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
@@ -14,12 +15,16 @@ import AddUser from './components/AddUser';
 import Profile from './components/Profile';
 import AddDepartment from './components/AddDepartment';
 import EditDepartment from './components/EditDepartment';
+import EditUser from './components/EditUser';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('role');
@@ -28,9 +33,6 @@ function App() {
       setUserRole(role);
     }
   }, []);
-
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -79,12 +81,13 @@ function App() {
               <Route path="/" element={<StatistikData />} />
               <Route path="/guest" element={<VisitorData />} />
               <Route path="/add" element={<VisitorForm />} />
-              <Route path="/profile" element={<Profile onNavigate={handleNavigation}/>} />
-              <Route path="/edit/:index" element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" />} />
+              <Route path="/profile" element={<Profile onNavigate={handleNavigation} />} />
+              <Route path="/edit/:index" element={<EditVisitor />} />
               <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
               <Route path="/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
               <Route path="/add-department" element={<AdminRoute><AddDepartment /></AdminRoute>} />
-              <Route path="/edit-department/:id" element={<EditDepartment />} />
+              <Route path="/edit-department/:id" element={<AdminRoute><EditDepartment /></AdminRoute>} />
+              <Route path="/edit-user/:id" element={<AdminRoute><EditUser /></AdminRoute>} />
             </Routes>
           )}
         </div>

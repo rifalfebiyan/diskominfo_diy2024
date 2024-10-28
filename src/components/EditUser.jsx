@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
-const AddUser  = () => {
+const EditUser  = () => {
   const [user, setUser ] = useState({
     name: '',
     nip: '',
@@ -13,8 +13,22 @@ const AddUser  = () => {
   });
   const [departments, setDepartments] = useState([]); // State to hold department list
   const navigate = useNavigate();
+  const { id } = useParams();
 
   useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/api/users/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        setUser (response.data);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+
     const fetchDepartments = async () => {
       try {
         const response = await axios.get('http://localhost:8080/api/departments', {
@@ -28,8 +42,9 @@ const AddUser  = () => {
       }
     };
 
+    fetchUser();
     fetchDepartments();
-  }, []);
+  }, [id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -43,19 +58,19 @@ const AddUser  = () => {
     e.preventDefault();
     
     try {
-      const response = await axios.post('http://localhost:8080/api/users', user, {
+      const response = await axios.put(`http://localhost:8080/api/users/${id}`, user, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      if (response.status === 201) {
-        alert('User  added successfully');
+      if (response.status === 200) {
+        alert('User  updated successfully');
         navigate('/admin'); // Navigate back to admin dashboard
       }
     } catch (error) {
-      console.error('Error adding user:', error);
-      alert('Failed to add user: ' + error.message);
+      console.error('Error updating user:', error);
+      alert('Failed to update user: ' + error.message);
     }
   };
 
@@ -63,7 +78,7 @@ const AddUser  = () => {
     <div className="container my-4">
       <div className="p-3 border rounded shadow" style={{ maxWidth: '700px', margin: '0 auto' }}>
         <form onSubmit={handleSubmit}>
-          <p className="fw-bold text-center">TAMBAH USER</p>
+          <p className="fw-bold text-center">EDIT USER</p>
 
           {/* Nama Input */}
           <div className="mb-2">
@@ -154,4 +169,4 @@ const AddUser  = () => {
   );
 };
 
-export default AddUser;
+export default EditUser;

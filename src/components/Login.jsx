@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
+
 
 function Login({ onLogin }) {
   const navigate = useNavigate();
@@ -10,30 +12,21 @@ function Login({ onLogin }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Simulasi login dan token (Anda bisa mengganti ini dengan API yang sebenarnya)
-    let token = '';
-    
-    // Login for admin
-    if (username === 'admin@gmail.com' && password === 'admin') {
-      token = 'admin_token'; // Ganti dengan token yang valid
-      localStorage.setItem('token', token);
-      localStorage.setItem('role', 'admin');
-      onLogin(true, 'admin');
-      navigate('/'); // Arahkan ke halaman utama setelah login
-    } 
-    // Login for user
-    else if (username === 'user@gmail.com' && password === 'user') {
-      token = 'user_token'; // Ganti dengan token yang valid
-      localStorage.setItem('token', token);
-      localStorage.setItem('role', 'user');
-      onLogin(true, 'user');
-      navigate('/'); // Arahkan ke halaman utama setelah login
-    } 
-    // Error handling for invalid credentials
-    else {
-      setError('Username atau password salah!');
-    }
+  
+    axios.post('http://localhost:8080/api/login', {
+      email,
+      password
+    })
+      .then((response) => {
+        const token = response.data.token;
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', response.data.role);
+        onLogin(true, response.data.role);
+        navigate('/');
+      })
+      .catch((error) => {
+        setError('Username atau password salah!');
+      });
   };
 
   return (

@@ -22,6 +22,7 @@ func main() {
 	// Initialize database
 	database.Connect()
 	database.DB.AutoMigrate(&models.Visitor{})
+	database.DB.AutoMigrate(&models.Visitor{}, &models.User{})
 
 	// Initialize Gin router
 	router := gin.Default()

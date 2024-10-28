@@ -54,6 +54,7 @@ const EditDepartment = () => {
 
   return (
     <div className="container my-4">
+      {/* <h6 className="text-danger">Admin Dashboard / Edit Bidang</h6> */}
       <div className="p-3 border rounded shadow" style={{ maxWidth: '700px', margin: '0 auto' }}>
         <form onSubmit={handleSubmit}>
           <p className="fw-bold text-center">EDIT BIDANG</p>
@@ -113,7 +114,7 @@ const EditDepartment = () => {
             </select>
           </div>
 
-          <button type="submit" className="btn btn-primary w-100">
+          <button type="submit" className="btn btn-danger w-100">
             Simpan Perubahan
           </button>
         </form>
