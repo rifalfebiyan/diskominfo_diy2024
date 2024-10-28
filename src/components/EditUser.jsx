@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const EditUser  = () => {
   const [user, setUser ] = useState({
+=======
+import { useNavigate } from 'react-router-dom';
+
+const EditUser = ({ userData }) => {
+  const [user, setUser] = useState({
+>>>>>>> 97a4a77a4ecde0fcefebdd3ea823ebbacf9e7f69
     name: '',
     nip: '',
     email: '',
@@ -13,6 +20,7 @@ const EditUser  = () => {
   });
   const [departments, setDepartments] = useState([]); // State to hold department list
   const navigate = useNavigate();
+<<<<<<< HEAD
   const { id } = useParams();
 
   useEffect(() => {
@@ -50,10 +58,29 @@ const EditUser  = () => {
     const { name, value } = e.target;
     setUser ((prevUser ) => ({
       ...prevUser ,
+=======
+
+  useEffect(() => {
+    // Fetch departments from localStorage when the component mounts
+    const storedDepartments = JSON.parse(localStorage.getItem('departments')) || [];
+    setDepartments(storedDepartments);
+
+    // If userData is provided, set it as initial state
+    if (userData) {
+      setUser(userData);
+    }
+  }, [userData]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUser((prevUser) => ({
+      ...prevUser,
+>>>>>>> 97a4a77a4ecde0fcefebdd3ea823ebbacf9e7f69
       [name]: value
     }));
   };
 
+<<<<<<< HEAD
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -72,6 +99,28 @@ const EditUser  = () => {
       console.error('Error updating user:', error);
       alert('Failed to update user: ' + error.message);
     }
+=======
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const updatedUser = { ...user };
+    
+    // Get existing users from localStorage
+    const existingUsers = JSON.parse(localStorage.getItem('visitors')) || [];
+    
+    // Find the index of the user to be updated
+    const userIndex = existingUsers.findIndex(user => user.nip === updatedUser.nip);
+    
+    if (userIndex !== -1) {
+      // Update the user details
+      existingUsers[userIndex] = updatedUser;
+      
+      // Update localStorage
+      localStorage.setItem('visitors', JSON.stringify(existingUsers));
+    }
+
+    // Navigate back to admin dashboard
+    navigate('/');
+>>>>>>> 97a4a77a4ecde0fcefebdd3ea823ebbacf9e7f69
   };
 
   return (
@@ -103,6 +152,10 @@ const EditUser  = () => {
               value={user.nip}
               onChange={handleInputChange}
               required
+<<<<<<< HEAD
+=======
+              readOnly // Optional: Prevent editing the NIP
+>>>>>>> 97a4a77a4ecde0fcefebdd3ea823ebbacf9e7f69
             />
           </div>
 

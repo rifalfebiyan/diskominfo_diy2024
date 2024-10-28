@@ -86,8 +86,13 @@ function App() {
               <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
               <Route path="/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
               <Route path="/add-department" element={<AdminRoute><AddDepartment /></AdminRoute>} />
+<<<<<<< HEAD
               <Route path="/edit-department/:id" element={<AdminRoute><EditDepartment /></AdminRoute>} />
               <Route path="/edit-user/:id" element={<AdminRoute><EditUser /></AdminRoute>} />
+=======
+              <Route path="/edit-department/:id" element={<EditDepartment />} />
+              <Route path="edit-user/:id" element={<EditUser/>} />
+>>>>>>> 97a4a77a4ecde0fcefebdd3ea823ebbacf9e7f69
             </Routes>
           )}
         </div>
