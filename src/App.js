@@ -82,7 +82,7 @@ function App() {
 
   return (
     <div className="d-flex">
-      {isLoggedIn && <MiniSidebar onLogout={handleLogout} />} {/* Pastikan onLogout diteruskan di sini */}
+      {isLoggedIn && <MiniSidebar on Logout={handleLogout} />}
       <div className="d-flex flex-column min-vh-100 flex-grow-1">
         {isLoggedIn && <Header onLogout={handleLogout} />}
 
