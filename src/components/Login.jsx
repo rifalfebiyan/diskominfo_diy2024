@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function Login() {
+function Login({ onLogin }) { // Tambahkan onLogin sebagai prop
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,14 +30,11 @@ function Login() {
         localStorage.setItem('userRole', response.data.user.role);
         localStorage.setItem('userName', response.data.user.name);
         localStorage.setItem('userDepartment', response.data.user.department);
+        
+        // Panggil onLogin dengan status dan role
+        onLogin(true, response.data.user.role);
 
-        // Redirect berdasarkan role setelah data tersimpan
-        if (response.data.user.role === 'admin') {
-          // Gunakan replace: true untuk menghindari history login
-          navigate('/admin', { replace: true });
-        } else {
-          navigate('/', { replace: true });
-        }
+        // Redirect akan ditangani oleh App.js melalui onLogin callback
       }
     } catch (error) {
       console.error('Login error:', error);
