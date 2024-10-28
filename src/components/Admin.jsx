@@ -141,7 +141,7 @@ const Admin = () => {
 
       {/* Tampilkan tabel pengguna */}
       {showUsersTable && (
-        <div className="card shadow-sm mb -4">
+        <div className="card shadow-sm mb-4">
           <div className="card-body">
             <h2 className="text-center">Data Pengguna</h2>
             <div className="table-responsive">
