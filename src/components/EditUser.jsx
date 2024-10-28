@@ -9,9 +9,10 @@ const EditUser = () => {
     email: '',
     phone: '',
     password: '',
-    department: ''
+    department: '',
+    role: ''
   });
-  const [departments, setDepartments] = useState([]); 
+  const [departments, setDepartments] = useState([]);
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -66,7 +67,7 @@ const EditUser = () => {
       });
       if (response.status === 200) {
         alert('User updated successfully');
-        navigate('/admin'); 
+        navigate('/admin');
       }
     } catch (error) {
       console.error('Error updating user:', error);
@@ -161,6 +162,22 @@ const EditUser = () => {
                   {dept.name}
                 </option>
               ))}
+            </select>
+          </div>
+
+          {/* Role Dropdown */}
+          <div className="mb-2">
+            <label className="form-label">Role*</label>
+            <select
+              className="form-select border border-dark"
+              name="role"
+              value={user.role}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Pilih Role</option>
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
             </select>
           </div>
 

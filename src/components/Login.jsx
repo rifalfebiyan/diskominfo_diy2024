@@ -1,62 +1,90 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-
-function Login({ onLogin }) {
+function Login() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    axios.post('http://localhost:8080/api/login', {
-      email,
-      password
-    })
-      .then((response) => {
-        const token = response.data.token;
+    setError(null);
+    setIsLoading(true);
+
+    try {
+        console.log('Attempting login with:', { email, password }); // Debug log
+
+        const response = await axios.post('http://localhost:8080/api/login', {
+            email,
+            password
+        });
+
+        console.log('Login response:', response.data); // Debug log
+
+        const { token, user } = response.data;
+
+        // Simpan token dan data user
         localStorage.setItem('token', token);
-        localStorage.setItem('role', response.data.role);
-        onLogin(true, response.data.role);
-        navigate('/');
-      })
-      .catch((error) => {
-        setError('Username atau password salah!');
-      });
-  };
+        localStorage.setItem('userId', user.id);
+        localStorage.setItem('userRole', user.role);
+        localStorage.setItem('userName', user.name);
+        localStorage.setItem('userDepartment', user.department);
+
+        // Redirect berdasarkan role
+        if (user.role === 'admin') {
+            navigate('/admin');
+        } else {
+            navigate('/');
+        }
+    } catch (error) {
+        console.error('Login error:', error); // Debug log
+        
+        if (error.response) {
+            setError(error.response.data.error || 'Login gagal');
+        } else if (error.request) {
+            setError('Tidak dapat terhubung ke server');
+        } else {
+            setError('Terjadi kesalahan');
+        }
+    } finally {
+        setIsLoading(false);
+    }
+};
 
   return (
     <div className="container-fluid vh-100 d-flex align-items-center justify-content-center p-0 m-0">
       <div className="row w-100 h-100 m-0">
-        {/* Left Section (Info with curve) */}
+        {/* Left Section */}
         <div 
           className="col-md-6 d-flex flex-column justify-content-center"
           style={{
             backgroundColor: '#A83427',
             color: '#fff',
             padding: '50px',
-            clipPath: 'ellipse(100% 100% at 0% 50%)', // Lengkungan di kiri
+            clipPath: 'ellipse(100% 100% at 0% 50%)',
           }}
         >
-          <h2 className="mb-4">Selamat Datang di Aplikasi Buku Tamu Dinas Komunikasi dan Informatika Daerah Istimewa Yogyakarta</h2>
+          <h2 className="mb-4">
+            Selamat Datang di Aplikasi Buku Tamu Dinas Komunikasi dan Informatika 
+            Daerah Istimewa Yogyakarta
+          </h2>
         </div>
 
-        {/* Right Section (Login Form) */}
+        {/* Right Section */}
         <div className="col-md-6 d-flex align-items-center justify-content-center">
           <div 
             className="card shadow-sm p-4" 
             style={{ 
               width: '100%', 
               maxWidth: '400px', 
-              borderRadius: '20px', 
+              borderRadius: '20px',
               minHeight: '400px',
-              boxShadow: '20px 4px 12px rgba(0, 0, 0, 0.1)'
             }}
-          > 
+          >
             {/* Logo */}
             <div className="text-center mb-4">
               <img 
@@ -65,60 +93,56 @@ function Login({ onLogin }) {
                 style={{ width: '100px', height: '100px' }}
               />
             </div>
-            
+
             {/* Form */}
             <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <p>USERNAME OR EMAIL</p>
+              {error && (
+                <div className="alert alert-danger" role="alert">
+                  {error}
+                </div>
+              )}
+
+              <div className="mb-3">
+                <label className="form-label">Email</label>
                 <input
                   type="email"
-                  id="username"
-                  name="username"
                   className="form-control"
-                  placeholder="Masukkan Username atau Email"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
-                  style={{ fontSize: '18px', padding: '10px' }}
+                  disabled={isLoading}
                 />
               </div>
 
-              <div className="mb -4">
-                <p>PASSWORD</p>
+              <div className="mb-3">
+                <label className="form-label">Password</label>
                 <input
                   type="password"
-                  id="password"
-                  name="password"
                   className="form-control"
-                  placeholder="Masukkan Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  style={{ fontSize: '18px', padding: '10px' }}
+                  disabled={isLoading}
                 />
               </div>
 
-              <div className="d-grid mt-4">
-                <button 
-                  type="submit" 
-                  className="btn btn-primary" 
-                  style={{
-                    fontSize: '18px',
-                    padding: '10px 0',
-                    backgroundColor: '#A83427',
-                    borderColor: '#A83427'
-                  }}
-                >
-                  LOGIN
-                </button>
-              </div>
+              <button 
+                type="submit" 
+                className="btn btn-primary w-100"
+                disabled={isLoading}
+                style={{
+                  backgroundColor: '#A83427',
+                  borderColor: '#A83427'
+                }}
+              >
+                {isLoading ? 'Loading...' : 'Login'}
+              </button>
             </form>
 
-            {/* Optional Footer */}
-            <div className="text-center mt-4">
-              <button className="text-secondary" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                Google
-              </button>
+            <div className="text-center mt-3">
+              <p className="text-muted">
+                © 2024 Diskominfo DIY. All rights reserved.
+              </p>
             </div>
           </div>
         </div>

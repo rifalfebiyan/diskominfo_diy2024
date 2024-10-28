@@ -9,7 +9,8 @@ const AddUser  = () => {
     email: '',
     phone: '',
     password: '',
-    department: ''
+    department: '',
+    role: ''
   });
   const [departments, setDepartments] = useState([]); // State to hold department list
   const navigate = useNavigate();
@@ -144,6 +145,22 @@ const AddUser  = () => {
               {departments.map((dept, index) => (
                 <option key={index} value={dept.name}>{dept.name}</option>
               ))}
+            </select>
+          </div>
+
+          {/* Role Dropdown */}
+          <div className="mb-2">
+            <label className="form-label">Role*</label>
+            <select
+              className="form-select border border-dark"
+              name="role"
+              value={user.role}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Pilih Role</option>
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
             </select>
           </div>
 

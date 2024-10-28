@@ -1,16 +1,12 @@
+// models/user.go
 package models
 
-import (
-	"time"
-)
-
 type User struct {
-	ID         uint      `gorm:"primaryKey" json:"id"`
-	Name       string    `json:"name"`
-	Nip        string    `json:"nip"`
-	Email      string    `json:"email"`
-	Phone      string    `json:"phone"`
-	Password   string    `json:"password"`
-	Department string    `json:"department"`
-	CreatedAt  time.Time `json:"created_at"`
+	ID         uint   `json:"id" gorm:"primaryKey"`
+	Name       string `json:"name"`
+	Email      string `json:"email" gorm:"unique"`
+	Password   string `json:"password"`
+	Phone      string `json:"phone"` // Tambahkan field Phone
+	Role       string `json:"role"`
+	Department string `json:"department"`
 }

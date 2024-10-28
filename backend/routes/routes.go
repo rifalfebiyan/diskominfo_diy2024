@@ -1,3 +1,4 @@
+// routes/routes.go
 package routes
 
 import (
@@ -7,32 +8,37 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func DepartmentRoutes(router *gin.RouterGroup) {
-	router.POST("/departments", controllers.CreateDepartment)
-	router.GET("/departments", controllers.GetDepartments)
-	router.GET("/departments/:id", middleware.AuthMiddleware(), controllers.GetDepartment) // Add this line
-	router.PUT("/departments/:id", controllers.UpdateDepartment)                           // Add this line for updates
-	router.DELETE("/departments/:id", middleware.AuthMiddleware(), controllers.DeleteDepartment)
-	UserRoutes(router)
-	LoginRoutes(router)
-}
+func SetupRoutes(router *gin.Engine) {
+	api := router.Group("/api")
+	{
+		// Auth routes (unprotected)
+		api.POST("/login", controllers.Login)
+		api.POST("/register", controllers.Register)
 
-func UserRoutes(router *gin.RouterGroup) {
-	router.GET("/users", controllers.GetUsers)
-	router.GET("/users/:id", controllers.GetUser)
-	router.POST("/users", controllers.CreateUser)
-	router.PUT("/users/:id", controllers.UpdateUser)
-	router.DELETE("/users/:id", controllers.DeleteUser)
-}
+		// Protected routes
+		protected := api.Group("")
+		protected.Use(middleware.AuthMiddleware())
+		{
+			// User routes
+			protected.GET("/users", controllers.GetUsers)
+			protected.GET("/users/:id", controllers.GetUser)
+			protected.POST("/users", controllers.CreateUser)
+			protected.PUT("/users/:id", controllers.UpdateUser)
+			protected.DELETE("/users/:id", controllers.DeleteUser)
 
-func VisitorRoutes(router *gin.RouterGroup) {
-	router.GET("/visitors", middleware.AuthMiddleware(), controllers.GetVisitors)
-	router.GET("/visitors/:id", middleware.AuthMiddleware(), controllers.GetVisitor)
-	router.POST("/visitors", controllers.CreateVisitor)
-	router.PUT("/visitors/:id", controllers.UpdateVisitor)
-	router.DELETE("/visitors/:id", middleware.AuthMiddleware(), controllers.DeleteVisitor)
-}
+			// Department routes
+			protected.GET("/departments", controllers.GetDepartments)
+			protected.POST("/departments", controllers.CreateDepartment)
+			protected.GET("/departments/:id", controllers.GetDepartment)
+			protected.PUT("/departments/:id", controllers.UpdateDepartment)
+			protected.DELETE("/departments/:id", controllers.DeleteDepartment)
 
-func LoginRoutes(router *gin.RouterGroup) {
-	router.POST("/login", controllers.Login)
+			// Visitor routes
+			protected.GET("/visitors", controllers.GetVisitors)
+			protected.POST("/visitors", controllers.CreateVisitor)
+			protected.GET("/visitors/:id", controllers.GetVisitor)
+			protected.PUT("/visitors/:id", controllers.UpdateVisitor)
+			protected.DELETE("/visitors/:id", controllers.DeleteVisitor)
+		}
+	}
 }
