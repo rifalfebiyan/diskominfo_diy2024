@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 21 Okt 2024 pada 04.37
--- Versi server: 10.4.28-MariaDB
--- Versi PHP: 8.2.4
+-- Generation Time: Oct 28, 2024 at 04:50 AM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,39 +24,58 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `departments`
+-- Table structure for table `departments`
 --
 
 CREATE TABLE `departments` (
   `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `address` varchar(255) NOT NULL,
-  `phone` varchar(15) NOT NULL,
-  `status` enum('Active','Inactive') NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `name` longtext DEFAULT NULL,
+  `address` longtext DEFAULT NULL,
+  `phone` longtext DEFAULT NULL,
+  `status` longtext DEFAULT NULL,
+  `created_at` datetime(3) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `departments`
+--
+
+INSERT INTO `departments` (`id`, `name`, `address`, `phone`, `status`, `created_at`) VALUES
+(3, 'Test11', 'Test11', '1', 'Active', '2024-10-21 14:54:35.000'),
+(4, 'Test112', 'Test11', '1', 'Active', '2024-10-22 13:14:17.000');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `nip` varchar(50) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `phone` varchar(15) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `department` varchar(100) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `name` longtext NOT NULL,
+  `nip` longtext NOT NULL,
+  `email` varchar(191) DEFAULT NULL,
+  `phone` longtext NOT NULL,
+  `password` longtext NOT NULL,
+  `department` longtext NOT NULL,
+  `created_at` datetime(3) DEFAULT NULL,
+  `role` longtext DEFAULT NULL,
+  `n_ip` varchar(191) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `nip`, `email`, `phone`, `password`, `department`, `created_at`, `role`, `n_ip`) VALUES
+(4, 'test22222', '1', 'tes1@gmail.com', '12', '222222', 'Test112', '2024-10-28 08:27:32.025', 'user', NULL),
+(5, 'admin', '1', 'admin@gmail.com', '12', 'admin', 'Test112', '2024-10-28 08:53:35.555', 'admin', NULL),
+(6, 'Admin', '', 'admin@admin.com', '08123456789', 'admin123', 'IT', NULL, 'admin', NULL);
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `visitors`
+-- Table structure for table `visitors`
 --
 
 CREATE TABLE `visitors` (
@@ -69,61 +88,61 @@ CREATE TABLE `visitors` (
   `phone` longtext DEFAULT NULL,
   `department` longtext DEFAULT NULL,
   `visit_date` datetime(3) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` datetime(3) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `visitors`
+-- Dumping data for table `visitors`
 --
 
 INSERT INTO `visitors` (`id`, `name`, `gender`, `purpose`, `address`, `institution`, `phone`, `department`, `visit_date`, `created_at`) VALUES
-(2, 'Haidir Abdiah12', 'Perempuan', 'd', 'a', 'UAD', '0179299596', 'Bidang APTIKA', '2024-11-22 07:00:00.000', '2024-10-17 08:40:59');
+(7, 'test2', 'Laki-laki', '1', 'Test11', '1', '1', 'Test11', '0001-01-16 07:00:00.000', '2024-10-23 02:38:30.000'),
+(8, 'test11111', 'Laki-laki', '1', 'Test11', '1', '1', 'Test11', '2024-10-23 07:00:00.000', '2024-10-24 06:59:41.854');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indeks untuk tabel `departments`
+-- Indexes for table `departments`
 --
 ALTER TABLE `departments`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `nip` (`nip`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `uni_users_email` (`email`);
 
 --
--- Indeks untuk tabel `visitors`
+-- Indexes for table `visitors`
 --
 ALTER TABLE `visitors`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT untuk tabel yang dibuang
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT untuk tabel `departments`
+-- AUTO_INCREMENT for table `departments`
 --
 ALTER TABLE `departments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT untuk tabel `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- AUTO_INCREMENT untuk tabel `visitors`
+-- AUTO_INCREMENT for table `visitors`
 --
 ALTER TABLE `visitors`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
