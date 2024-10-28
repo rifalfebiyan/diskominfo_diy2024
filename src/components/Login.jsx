@@ -16,44 +16,43 @@ function Login() {
     setIsLoading(true);
 
     try {
-        console.log('Attempting login with:', { email, password }); // Debug log
+      const response = await axios.post('http://localhost:8080/api/login', {
+        email,
+        password
+      });
 
-        const response = await axios.post('http://localhost:8080/api/login', {
-            email,
-            password
-        });
+      console.log('Login response:', response.data);
 
-        console.log('Login response:', response.data); // Debug log
-
-        const { token, user } = response.data;
-
+      if (response.data.token) {
         // Simpan token dan data user
-        localStorage.setItem('token', token);
-        localStorage.setItem('userId', user.id);
-        localStorage.setItem('userRole', user.role);
-        localStorage.setItem('userName', user.name);
-        localStorage.setItem('userDepartment', user.department);
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userId', response.data.user.id);
+        localStorage.setItem('userRole', response.data.user.role);
+        localStorage.setItem('userName', response.data.user.name);
+        localStorage.setItem('userDepartment', response.data.user.department);
 
-        // Redirect berdasarkan role
-        if (user.role === 'admin') {
-            navigate('/admin');
+        // Redirect berdasarkan role setelah data tersimpan
+        if (response.data.user.role === 'admin') {
+          // Gunakan replace: true untuk menghindari history login
+          navigate('/admin', { replace: true });
         } else {
-            navigate('/');
+          navigate('/', { replace: true });
         }
+      }
     } catch (error) {
-        console.error('Login error:', error); // Debug log
-        
-        if (error.response) {
-            setError(error.response.data.error || 'Login gagal');
-        } else if (error.request) {
-            setError('Tidak dapat terhubung ke server');
-        } else {
-            setError('Terjadi kesalahan');
-        }
+      console.error('Login error:', error);
+      
+      if (error.response) {
+        setError(error.response.data.error || 'Login gagal');
+      } else if (error.request) {
+        setError('Tidak dapat terhubung ke server');
+      } else {
+        setError('Terjadi kesalahan');
+      }
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
-};
+  };
 
   return (
     <div className="container-fluid vh-100 d-flex align-items-center justify-content-center p-0 m-0">
