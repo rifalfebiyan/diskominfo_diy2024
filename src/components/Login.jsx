@@ -121,10 +121,20 @@ function Login({ onLogin }) {
                 type="submit" 
                 className="btn btn-primary w-100"
                 disabled={isLoading}
+                style={{
+                  backgroundColor: '#A83427',
+                  borderColor: '#A83427'
+                }}
+
               >
                 {isLoading ? 'Loading...' : 'Login'}
               </button>
             </form>
+            <div className="text-center mt-3">
+              <p className="text-muted">
+                © 2024 Diskominfo DIY. All rights reserved.
+              </p>
+            </div>
           </div>
         </div>
       </div>
