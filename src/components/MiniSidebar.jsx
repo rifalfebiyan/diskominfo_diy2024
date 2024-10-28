@@ -179,4 +179,4 @@ function MiniSidebar({ onLogout }) {
   );
 }
 
-export default MiniSidebar;
+export default MiniSidebar; 

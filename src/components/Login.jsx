@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function Login({ onLogin }) { // Tambahkan onLogin sebagai prop
+function Login({ onLogin }) {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState(''); // Untuk email atau NIP
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -15,30 +15,31 @@ function Login({ onLogin }) { // Tambahkan onLogin sebagai prop
     setError(null);
     setIsLoading(true);
 
+    // Validasi untuk memastikan identifier dan password tidak kosong
+    if (!identifier || !password) {
+        setError("Email atau NIP dan password harus diisi.");
+        setIsLoading(false);
+        return;
+    }
+
     try {
-      const response = await axios.post('http://localhost:8080/api/login', {
-        email,
-        password
-      });
+        const response = await axios.post('http://localhost:8080/api/login', {
+            identifier, // Bisa email atau NIP
+            password
+        });
 
-      console.log('Login response:', response.data);
-
-      if (response.data.token) {
-        // Simpan token dan data user
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('userId', response.data.user.id);
-        localStorage.setItem('userRole', response.data.user.role);
-        localStorage.setItem('userName', response.data.user.name);
-        localStorage.setItem('userDepartment', response.data.user.department);
-        
-        // Panggil onLogin dengan status dan role
-        onLogin(true, response.data.user.role);
-
-        // Redirect akan ditangani oleh App.js melalui onLogin callback
-      }
+        if (response.data.token) {
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('userId', response.data.user.id);
+            localStorage.setItem('userRole', response.data.user.role);
+            localStorage.setItem('userName', response.data.user.name);
+            localStorage.setItem('userDepartment', response.data.user.department);
+            
+            onLogin(true, response.data.user.role);
+            // Redirect ke halaman yang sesuai
+            navigate(response.data.user.role === 'admin' ? '/admin' : '/', { replace: true });
+        }
     } catch (error) {
-      console.error('Login error:', error);
-      
       if (error.response) {
         setError(error.response.data.error || 'Login gagal');
       } else if (error.request) {
@@ -81,7 +82,6 @@ function Login({ onLogin }) { // Tambahkan onLogin sebagai prop
               minHeight: '400px',
             }}
           >
-            {/* Logo */}
             <div className="text-center mb-4">
               <img 
                 src="/diskominfo_logo.png" 
@@ -90,7 +90,6 @@ function Login({ onLogin }) { // Tambahkan onLogin sebagai prop
               />
             </div>
 
-            {/* Form */}
             <form onSubmit={handleSubmit}>
               {error && (
                 <div className="alert alert-danger" role="alert">
@@ -99,14 +98,12 @@ function Login({ onLogin }) { // Tambahkan onLogin sebagai prop
               )}
 
               <div className="mb-3">
-                <label className="form-label">Email</label>
+                <label className="form-label">Email atau NIP</label>
                 <input
-                  type="email"
+                  type="text"
                   className="form-control"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isLoading}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                 />
               </div>
 
@@ -117,8 +114,6 @@ function Login({ onLogin }) { // Tambahkan onLogin sebagai prop
                   className="form-control"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
                 />
               </div>
 
@@ -126,20 +121,10 @@ function Login({ onLogin }) { // Tambahkan onLogin sebagai prop
                 type="submit" 
                 className="btn btn-primary w-100"
                 disabled={isLoading}
-                style={{
-                  backgroundColor: '#A83427',
-                  borderColor: '#A83427'
-                }}
               >
                 {isLoading ? 'Loading...' : 'Login'}
               </button>
             </form>
-
-            <div className="text-center mt-3">
-              <p className="text-muted">
-                © 2024 Diskominfo DIY. All rights reserved.
-              </p>
-            </div>
           </div>
         </div>
       </div>
