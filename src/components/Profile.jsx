@@ -12,95 +12,89 @@ const Profile = () => {
     department: '',
     profilePicture: ''
   });
-  const [newProfilePicture, setNewProfilePicture] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userId = localStorage.getItem('userId');
-        const token = localStorage.getItem('token');
-
-        if (!userId || !token) {
-          throw new Error('User tidak terautentikasi');
-        }
-
-        const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        setUser({
-          name: response.data.name,
-          nip: response.data.nip,
-          email: response.data.email,
-          phone: response.data.phone,
-          department: response.data.department,
-          profilePicture: response.data.profile_picture || ''
-        });
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    };
-
     fetchUserData();
   }, []);
 
-  const handleProfilePictureChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+  const fetchUserData = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+
+      if (!userId || !token) {
+        throw new Error('User tidak terautentikasi');
+      }
+
+      const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      setUser(response.data);
+      if (response.data.profile_picture) {
+        setPreviewUrl(`http://localhost:8080${response.data.profile_picture}`);
+      }
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setNewProfilePicture(reader.result);
+        setPreviewUrl(reader.result);
         setShowModal(true);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSaveProfilePicture = async () => {
-    try {
+  // src/components/Profile.jsx
+const handleUpload = async () => {
+  try {
       const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
+      
+      const formData = new FormData();
+      formData.append('profile_picture', selectedFile);
 
-      // Kirim foto profil baru ke server
-      await axios.put(`http://localhost:8080/api/users/${userId}`, {
-        profile_picture: newProfilePicture
-      }, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await axios.post(
+          `http://localhost:8080/api/users/${userId}/profile-picture`,
+          formData,
+          {
+              headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'multipart/form-data'
+              }
+          }
+      );
 
-      setUser(prev => ({
-        ...prev,
-        profilePicture: newProfilePicture
-      }));
-      setShowModal(false);
-    } catch (error) {
-      console.error('Error updating profile picture:', error);
-      alert('Gagal mengupdate foto profil');
-    }
-  };
-
-  const handleClickProfilePicture = () => {
-    fileInputRef.current.click();
-  };
-
-  if (loading) {
-    return <div className="container mt-5 text-center">Loading...</div>;
+      if (response.data.profile_picture) {
+          setPreviewUrl(`http://localhost:8080${response.data.profile_picture}`);
+          setShowModal(false);
+          fetchUserData(); // Refresh user data
+      }
+  } catch (error) {
+      console.error('Error uploading profile picture:', error);
+      alert('Gagal mengupload foto profil: ' + (error.response?.data?.error || error.message));
   }
+};
 
-  if (error) {
-    return <div className="container mt-5 text-center text-danger">{error}</div>;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="container my-5">
@@ -108,39 +102,46 @@ const Profile = () => {
         {/* Profile Picture Section */}
         <div className="col-md-3 text-center">
           <div
-            className="bg-secondary rounded"
+            className="profile-picture-container"
+            onClick={() => fileInputRef.current.click()}
             style={{
               width: '100%',
               height: '300px',
-              backgroundColor: '#D3B0A6',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              cursor: 'pointer'
+              backgroundColor: '#f8f9fa',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              overflow: 'hidden',
+              position: 'relative'
             }}
-            onClick={handleClickProfilePicture}
           >
-            {user.profilePicture ? (
+            {previewUrl ? (
               <img
-                src={user.profilePicture}
+                src={previewUrl}
                 alt="Profile"
-                className="rounded"
                 style={{
                   width: '100%',
                   height: '100%',
-                  objectFit: 'cover',
-                  borderRadius: '10px'
+                  objectFit: 'cover'
                 }}
               />
             ) : (
-              <p className="text-light">Klik untuk ganti foto profil</p>
+              <div
+                style={{
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <span>Klik untuk upload foto</span>
+              </div>
             )}
           </div>
           <input
             type="file"
             ref={fileInputRef}
             style={{ display: 'none' }}
-            onChange={handleProfilePictureChange}
+            onChange={handleFileSelect}
             accept="image/*"
           />
         </div>
@@ -155,22 +156,18 @@ const Profile = () => {
               <strong>NIP</strong>
               <p>{user.nip || '-'}</p>
             </div>
-
             <div className="mb-2">
               <strong>NAMA</strong>
               <p>{user.name}</p>
             </div>
-
-            <div className="mb-2">
+             <div className="mb-2">
               <strong>NOMOR TELEPON</strong>
               <p>{user.phone}</p>
             </div>
-
             <div className="mb-2">
               <strong>Email</strong>
               <p>{user.email}</p>
             </div>
-
             <div className="mb-2">
               <strong>Bidang</strong>
               <p>{user.department}</p>
@@ -179,18 +176,18 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Modal untuk konfirmasi penggantian foto */}
+      {/* Modal untuk konfirmasi upload */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Konfirmasi Ganti Foto Profil</Modal.Title>
+          <Modal.Title>Konfirmasi Upload Foto Profil</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Apakah Anda yakin ingin mengganti foto profil?</p>
-          {newProfilePicture && (
+          <p>Apakah Anda yakin ingin mengupload foto profil?</p>
+          {previewUrl && (
             <div>
               <p className="text-center">Pratinjau Foto Baru:</p>
               <img
-                src={newProfilePicture}
+                src={previewUrl}
                 alt="New Profile"
                 style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '10px' }}
               />
@@ -201,8 +198,8 @@ const Profile = () => {
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Batal
           </Button>
-          <Button variant="primary" onClick={handleSaveProfilePicture}>
-            Simpan
+          <Button variant="primary" onClick={handleUpload}>
+            Upload
           </Button>
         </Modal.Footer>
       </Modal>

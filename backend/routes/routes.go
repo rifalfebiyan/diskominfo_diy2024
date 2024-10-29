@@ -10,6 +10,7 @@ import (
 
 func SetupRoutes(router *gin.Engine) {
 	api := router.Group("/api")
+	router.Static("/uploads", "./uploads")
 	{
 		// Auth routes (unprotected)
 		api.POST("/login", controllers.Login)
@@ -25,6 +26,7 @@ func SetupRoutes(router *gin.Engine) {
 			protected.POST("/users", controllers.CreateUser)
 			protected.PUT("/users/:id", controllers.UpdateUser)
 			protected.DELETE("/users/:id", controllers.DeleteUser)
+			protected.POST("/users/:id/profile-picture", controllers.UpdateProfilePicture)
 
 			// Department routes
 			protected.GET("/departments", controllers.GetDepartments)
