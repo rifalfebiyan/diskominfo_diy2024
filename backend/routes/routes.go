@@ -1,4 +1,3 @@
-// routes/routes.go
 package routes
 
 import (
@@ -41,6 +40,9 @@ func SetupRoutes(router *gin.Engine) {
 			protected.GET("/visitors/:id", controllers.GetVisitor)
 			protected.PUT("/visitors/:id", controllers.UpdateVisitor)
 			protected.DELETE("/visitors/:id", controllers.DeleteVisitor)
+
+			// Stats route
+			protected.GET("/stats", controllers.GetStats) // Rute untuk mendapatkan statistik
 		}
 	}
 }
