@@ -96,7 +96,7 @@ const Admin = () => {
 
   return (
     <div className="container mt-4">
-      <h5>Admin Dashboard</h5>
+      <h4>Admin Dashboard</h4>
       <div className="row mb-4">
         <div className="col-md-3">
           <div
@@ -191,9 +191,13 @@ const Admin = () => {
 
       {/* Tampilkan tabel bidang */}
       {showDepartmentsTable && (
-        <div className="card shadow-sm mb-4">
+        // <div className="card shadow-sm mb-4">
+           <div className="card mb-4">
+        <div className="card-header">
+          <h5 className="card-title">Daftar Bidang</h5>
+        </div>
           <div className="card-body">
-            <h2 className="text-center">Data Bidang</h2>
+            {/* <h2 className="text-center">Data Bidang</h2> */}
             <div className="table-responsive">
               <table className="table table-bordered table-hover">
                 <thead className="table-light">
@@ -236,8 +240,12 @@ const Admin = () => {
           </div>
         </div>
       )}
-
-      <div className="card shadow-sm">
+{/* 
+      <div className="card shadow-sm"> */}
+      <div className="card">
+        <div className="card-header">
+          <h5 className="card-title">Daftar Pengguna</h5>
+        </div>
         <div className="card-body">
           <div className="table-responsive">
             <table className="table table-bordered table-hover">
