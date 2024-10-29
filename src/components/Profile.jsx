@@ -148,8 +148,8 @@ const handleUpload = async () => {
 
         {/* Profile Information Section */}
         <div className="col-md-7">
-          <h4 className="fw-bold" style={{ backgroundColor: '#A63B2A', color: '#FFF', padding: '10px', borderRadius: '10px 10px 0 0' }}>
-            PROFILE AKUN
+          <h4 className="fw" style={{ backgroundColor: '#A63B2A', color: '#FFF', padding: '10px', borderRadius: '10px 10px 0 0' }}>
+            Detail Akun
           </h4>
           <div className="p-4 shadow-sm" style={{ backgroundColor: '#FFFFFF', borderRadius: '0 0 10px 10px' }}>
             <div className="mb-2">

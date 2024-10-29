@@ -284,7 +284,7 @@ const Admin = () => {
                       </button>
                       <button
                         className=" btn btn-info btn-sm"
-                        onClick={() => navigate(`/detail-user/${user.id}`)}
+                        onClick={() => navigate(`/profile/${user.id}`)}
                       >
                         Detail
                       </button>
