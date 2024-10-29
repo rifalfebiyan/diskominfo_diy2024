@@ -1,19 +1,24 @@
-import { FaUserPlus, FaClipboardList } from 'react-icons/fa'; // Perbaiki di sini
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { FaUserPlus, FaClipboardList } from 'react-icons/fa';
 
 const Admin = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [showDepartmentsTable, setShowDepartmentsTable] = useState(false);
-  const [showUsersTable, setShowUsersTable] = useState(false); 
+  const [showUsersTable, setShowUsersTable] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalDepartments: 0,
+  });
 
   useEffect(() => {
     fetchDepartments();
     fetchUsers();
+    fetchStats();
   }, []);
 
   const fetchDepartments = async () => {
@@ -42,7 +47,20 @@ const Admin = () => {
     }
   };
 
-  const handleDeleteUser  = async (id) => {
+  const fetchStats = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/stats', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setStats(response.data);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
+  const handleDeleteUser = async (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
       try {
         const response = await axios.delete(`http://localhost:8080/api/users/${id}`, {
@@ -53,7 +71,8 @@ const Admin = () => {
         
         if (response.status === 200) {
           setUsers(users.filter(user => user.id !== id));
-          alert('User  deleted successfully');
+          fetchStats(); // Refresh stats after deletion
+          alert('User deleted successfully');
         } else {
           throw new Error('Failed to delete user');
         }
@@ -75,6 +94,7 @@ const Admin = () => {
         
         if (response.status === 200) {
           setDepartments(departments.filter(department => department.id !== id));
+          fetchStats(); // Refresh stats after deletion
           alert('Department deleted successfully');
         } else {
           throw new Error('Failed to delete department');
@@ -87,7 +107,7 @@ const Admin = () => {
   };
 
   const handleShowDepartments = () => {
-    setShowDepartmentsTable(! showDepartmentsTable);
+    setShowDepartmentsTable(!showDepartmentsTable);
   };
 
   const handleShowUsers = () => {
