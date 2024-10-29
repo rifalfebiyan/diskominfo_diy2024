@@ -1,28 +1,56 @@
+// src/components/Profile.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
 
 const Profile = () => {
-  const { userId } = useParams();
   const [user, setUser] = useState({
-    name: 'RIFAL',
-    nip: '4680543456',
-    email: 'rifal123@gmail.com',
-    phone: '09217639184712941',
-    department: 'APTIKA',
+    name: '',
+    nip: '',
+    email: '',
+    phone: '',
+    department: '',
     profilePicture: ''
   });
   const [newProfilePicture, setNewProfilePicture] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    const storedUsers = JSON.parse(localStorage.getItem('visitors')) || [];
-    const currentUser = storedUsers[userId];
-    if (currentUser) {
-      setUser(currentUser);
-    }
-  }, [userId]);
+    const fetchUserData = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        const token = localStorage.getItem('token');
+
+        if (!userId || !token) {
+          throw new Error('User tidak terautentikasi');
+        }
+
+        const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        setUser({
+          name: response.data.name,
+          nip: response.data.nip,
+          email: response.data.email,
+          phone: response.data.phone,
+          department: response.data.department,
+          profilePicture: response.data.profile_picture || ''
+        });
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
@@ -36,18 +64,43 @@ const Profile = () => {
     }
   };
 
-  const handleSaveProfilePicture = () => {
-    const updatedUser = { ...user, profilePicture: newProfilePicture };
-    setUser(updatedUser);
-    const storedUsers = JSON.parse(localStorage.getItem('visitors')) || [];
-    storedUsers[userId] = updatedUser;
-    localStorage.setItem('visitors', JSON.stringify(storedUsers));
-    setShowModal(false);
+  const handleSaveProfilePicture = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+
+      // Kirim foto profil baru ke server
+      await axios.put(`http://localhost:8080/api/users/${userId}`, {
+        profile_picture: newProfilePicture
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setUser(prev => ({
+        ...prev,
+        profilePicture: newProfilePicture
+      }));
+      setShowModal(false);
+    } catch (error) {
+      console.error('Error updating profile picture:', error);
+      alert('Gagal mengupdate foto profil');
+    }
   };
 
   const handleClickProfilePicture = () => {
     fileInputRef.current.click();
   };
+
+  if (loading) {
+    return <div className="container mt-5 text-center">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="container mt-5 text-center text-danger">{error}</div>;
+  }
 
   return (
     <div className="container my-5">
@@ -73,10 +126,10 @@ const Profile = () => {
                 alt="Profile"
                 className="rounded"
                 style={{
-                  width: '100%', // Tetap lebar 100%
-                  height: '100%', // Tetap tinggi 100%
-                  objectFit: 'cover', // Memastikan gambar tidak merusak layout
-                  borderRadius: '10px' // Tambahkan radius untuk tampilan lebih halus
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  borderRadius: '10px'
                 }}
               />
             ) : (
@@ -88,6 +141,7 @@ const Profile = () => {
             ref={fileInputRef}
             style={{ display: 'none' }}
             onChange={handleProfilePictureChange}
+            accept="image/*"
           />
         </div>
 
@@ -99,7 +153,7 @@ const Profile = () => {
           <div className="p-4 shadow-sm" style={{ backgroundColor: '#FFFFFF', borderRadius: '0 0 10px 10px' }}>
             <div className="mb-2">
               <strong>NIP</strong>
-              <p>{user.nip}</p>
+              <p>{user.nip || '-'}</p>
             </div>
 
             <div className="mb-2">
