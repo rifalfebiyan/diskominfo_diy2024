@@ -1,4 +1,3 @@
-// src/components/MiniSidebar.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
@@ -8,13 +7,22 @@ function MiniSidebar({ onLogout }) {
   const [hoveredItem, setHoveredItem] = useState(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [role, setRole] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768); // Anggap mobile jika lebar kurang dari 768px
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     const storedRole = localStorage.getItem('userRole');
-    console.log('Current role:', storedRole);
     setRole(storedRole);
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768); // Perbarui status mobile saat ukuran jendela berubah
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const handleMouseEnter = (item) => {
@@ -43,7 +51,7 @@ function MiniSidebar({ onLogout }) {
     top: '20vh',
     bottom: '10vh',
     zIndex: 100,
-    display: 'flex',
+    display: isMobile ? 'none' : 'flex', // Sembunyikan sidebar di mobile
     alignItems: 'center',
     flexDirection: 'column',
     paddingTop: '20px',
@@ -94,7 +102,9 @@ function MiniSidebar({ onLogout }) {
             onMouseLeave={handleMouseLeave}
           >
             <Link to="/" style={linkStyle(hoveredItem === 'home')}>
-              <span style={iconStyle(hoveredItem === 'home', location.pathname === '/')}>&#xf015;</span>
+              <span style={iconStyle(hoveredItem === 'home', location.pathname === '/')}>
+                &#xf015;
+              </span>
               {hoveredItem === 'home' && <span>Home</span>}
             </Link>
           </li>
@@ -106,7 +116,9 @@ function MiniSidebar({ onLogout }) {
               onMouseLeave={handleMouseLeave}
             >
               <Link to="/admin" style={linkStyle(hoveredItem === 'admin')}>
-                <span style={iconStyle(hoveredItem === 'admin', location.pathname === '/admin')}>&#xf013;</span>
+                <span style={iconStyle(hoveredItem === 'admin', location.pathname === '/admin')}>
+                  &#xf013;
+                </span>
                 {hoveredItem === 'admin' && <span>Dashboard Admin</span>}
               </Link>
             </li>
@@ -118,7 +130,9 @@ function MiniSidebar({ onLogout }) {
             onMouseLeave={handleMouseLeave}
           >
             <Link to="/guest" style={linkStyle(hoveredItem === 'guest')}>
-              <span style={iconStyle(hoveredItem === 'guest', location.pathname === '/guest')}>&#xf02d;</span>
+              <span style={iconStyle(hoveredItem === 'guest', location.pathname === '/guest')}>
+                &#xf02d;
+              </span>
               {hoveredItem === 'guest' && <span>Tamu</span>}
             </Link>
           </li>
@@ -129,7 +143,9 @@ function MiniSidebar({ onLogout }) {
             onMouseLeave={handleMouseLeave}
           >
             <Link to="/add" style={linkStyle(hoveredItem === 'add')}>
-              <span style={iconStyle(hoveredItem === 'add', location.pathname === '/add')}>&#xf044;</span>
+              <span style={iconStyle(hoveredItem === 'add', location.pathname === '/add')}>
+                &#xf044;
+              </span>
               {hoveredItem === 'add' && <span>Form Tamu</span>}
             </Link>
           </li>
@@ -140,7 +156,9 @@ function MiniSidebar({ onLogout }) {
             onMouseLeave={handleMouseLeave}
           >
             <Link to="/profile" style={linkStyle(hoveredItem === 'profile')}>
-              <span style={iconStyle(hoveredItem === 'profile', location.pathname === '/profile')}>&#xf2bd;</span>
+              <span style={iconStyle(hoveredItem === 'profile', location.pathname === '/profile')}>
+                &#xf2bd;
+              </span>
               {hoveredItem === 'profile' && <span>Profile</span>}
             </Link>
           </li>
@@ -151,9 +169,11 @@ function MiniSidebar({ onLogout }) {
               onClick={handleShow}
               onMouseEnter={() => handleMouseEnter('logout')}
               onMouseLeave={handleMouseLeave}
-              style={{...linkStyle(hoveredItem === 'logout'), cursor: 'pointer'}}
+              style={{ ...linkStyle(hoveredItem === 'logout'), cursor: 'pointer' }}
             >
-              <span style={iconStyle(hoveredItem === 'logout', false)}>&#xf2f5;</span>
+              <span style={iconStyle(hoveredItem === 'logout', false)}>
+                &#xf2f5;
+              </span>
               {hoveredItem === 'logout' && <span>Logout</span>}
             </div>
           </li>
@@ -179,4 +199,4 @@ function MiniSidebar({ onLogout }) {
   );
 }
 
-export default MiniSidebar; 
+export default MiniSidebar;

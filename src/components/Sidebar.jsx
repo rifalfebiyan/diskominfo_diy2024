@@ -1,25 +1,20 @@
-// components/Sidebar.js
 import React from 'react';
-import { Link } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { Navbar, Form, FormControl, Button } from 'react-bootstrap';
 
-function Sidebar() {
+function Header() {
   return (
-    <div className="bg-light border-end" style={{ width: '250px', height: '100vh', position: 'fixed', top: '56px', left: '0', overflowY: 'auto' }}>
-      <h5 className="p-3">Menu</h5>
-      <ul className="nav flex-column">
-        <li className="nav-item">
-          <Link to="/" className="nav-link">Dashboard</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/add" className="nav-link">Tambah Data</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/statistics" className="nav-link">Statistik</Link>
-        </li>
-      </ul>
-    </div>
+    <Navbar bg="light" expand="lg" className="d-flex justify-content-between px-4">
+      <Form inline>
+        <Button variant="outline-secondary" className="mr-2">☰</Button>
+        <FormControl type="text" placeholder="Search" className="mr-sm-2" />
+      </Form>
+      <div className="d-flex align-items-center">
+        <Button variant="primary" className="mr-3">+ New Task</Button>
+        <span className="mr-2">🔔</span>
+        <span>Bonnie Green</span>
+      </div>
+    </Navbar>
   );
 }
 
-export default Sidebar;
+export default Header;

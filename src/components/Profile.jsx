@@ -100,7 +100,8 @@ const handleUpload = async () => {
     <div className="container my-5">
       <div className="row justify-content-center">
         {/* Profile Picture Section */}
-        <div className="col-md-3 text-center">
+        <div className="col-md-3 col-sm-8 text-center mb-3">
+          {/* col-md-5 col-sm-8 text-center mb-3 */}
           <div
             className="profile-picture-container"
             onClick={() => fileInputRef.current.click()}
@@ -108,6 +109,7 @@ const handleUpload = async () => {
               width: '100%',
               height: '300px',
               backgroundColor: '#f8f9fa',
+              // aspectRatio: '1'
               borderRadius: '10px',
               cursor: 'pointer',
               overflow: 'hidden',

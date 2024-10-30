@@ -1,4 +1,3 @@
-// D:\Semester 7\Magang\diskominfo_diy2024-main-edit\src\App.js
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
@@ -32,12 +31,10 @@ function App() {
       if (token) {
         setIsLoggedIn(true);
         setUserRole(role);
-        // Redirect ke halaman yang sesuai jika user sudah login
         if (window.location.pathname === '/login') {
           navigate(role === 'admin' ? '/admin' : '/', { replace: true });
         }
       } else {
-        // Redirect ke login jika tidak ada token
         if (window.location.pathname !== '/login') {
           navigate('/login', { replace: true });
         }
@@ -81,17 +78,15 @@ function App() {
   }
 
   return (
-    <div className="d-flex">
-      {isLoggedIn && <MiniSidebar onLogout={handleLogout} />} {/* Pastikan onLogout diteruskan di sini */}
-      <div className="d-flex flex-column min-vh-100 flex-grow-1">
+    <div className="d-flex flex-column flex-lg-row">
+      {isLoggedIn && <MiniSidebar onLogout={handleLogout} />} {/* Pass onLogout correctly */}
+      <div className="d-flex flex-column flex-grow-1 min-vh-100">
         {isLoggedIn && <Header onLogout={handleLogout} />}
-
         {isLoggedIn && (
           <marquee behavior="scroll" direction="left">
             Selamat Datang di Buku Tamu Dinas Komunikasi dan Informatika Daerah Istimewa Yogyakarta
           </marquee>
         )}
-
         <div className="container-fluid flex-grow-1 p-0">
           <Routes>
             <Route
@@ -106,72 +101,19 @@ function App() {
             />
             
             {/* Protected Routes */}
-            <Route
-              path="/"
-              element={isLoggedIn ? <StatistikData /> : <Navigate to="/login" replace />}
-            />
-            <Route
-              path="/guest"
-              element={isLoggedIn ? <VisitorData /> : <Navigate to="/login" replace />}
-            />
-            <Route
-              path="/add"
-              element={isLoggedIn ? <VisitorForm /> : <Navigate to="/login" replace />}
-            />
-            <Route
-              path="/profile"
-              element={isLoggedIn ? <Profile onNavigate={handleNavigation} /> : <Navigate to="/login" replace />}
-            />
-            <Route
-              path="/edit/:index"
-              element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" replace />}
-            />
-            <Route
-              path="/admin"
-              element={
-                <AdminRoute>
-                  <Admin />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/add-user"
-              element={
-                <AdminRoute>
-                  <AddUser />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/add-department"
-              element={
-                <AdminRoute>
-                  <AddDepartment />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/edit-department/:id"
-              element={
-                <AdminRoute>
-                  <EditDepartment />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/edit-user/:id"
-              element={
-                <AdminRoute>
-                  <EditUser />
-                </AdminRoute>
-              }
-            />
+            <Route path="/" element={isLoggedIn ? <StatistikData /> : <Navigate to="/login" replace />} />
+            <Route path="/guest" element={isLoggedIn ? <VisitorData /> : <Navigate to="/login" replace />} />
+            <Route path="/add" element={isLoggedIn ? <VisitorForm /> : <Navigate to="/login" replace />} />
+            <Route path="/profile" element={isLoggedIn ? <Profile onNavigate={handleNavigation} /> : <Navigate to="/login" replace />} />
+            <Route path="/edit/:index" element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" replace />} />
+            <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+            <Route path="/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
+            <Route path="/add-department" element={<AdminRoute><AddDepartment /></AdminRoute>} />
+            <Route path="/edit-department/:id" element={<AdminRoute><EditDepartment /></AdminRoute>} />
+            <Route path="/edit-user/:id" element={<AdminRoute><EditUser /></AdminRoute>} />
             
             {/* Catch all route */}
-            <Route
-              path="*"
-              element={<Navigate to={isLoggedIn ? '/' : '/login'} replace />}
-            />
+            <Route path="*" element={<Navigate to={isLoggedIn ? '/' : '/login'} replace />} />
           </Routes>
         </div>
         {isLoggedIn && <Footer />}
