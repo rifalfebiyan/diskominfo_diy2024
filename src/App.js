@@ -15,6 +15,9 @@ import Profile from './components/Profile';
 import AddDepartment from './components/AddDepartment';
 import EditDepartment from './components/EditDepartment';
 import EditUser from './components/EditUser';
+import Agency from './components/Agency';
+import AddAgency from './components/AddAgency';
+import AgencyData from './components/AgencyData';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -111,6 +114,9 @@ function App() {
             <Route path="/add-department" element={<AdminRoute><AddDepartment /></AdminRoute>} />
             <Route path="/edit-department/:id" element={<AdminRoute><EditDepartment /></AdminRoute>} />
             <Route path="/edit-user/:id" element={<AdminRoute><EditUser /></AdminRoute>} />
+            <Route path="/agency" element={<AdminRoute><Agency/></AdminRoute>} />
+            <Route path="/add-agency" element={<AdminRoute><AddAgency/></AdminRoute>} />
+            <Route path="/agency-data" element={<AdminRoute><AgencyData/></AdminRoute>} />
             
             {/* Catch all route */}
             <Route path="*" element={<Navigate to={isLoggedIn ? '/' : '/login'} replace />} />
