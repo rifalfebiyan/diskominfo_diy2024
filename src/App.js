@@ -15,7 +15,6 @@ import Profile from './components/Profile';
 import AddDepartment from './components/AddDepartment';
 import EditDepartment from './components/EditDepartment';
 import EditUser from './components/EditUser';
-import Agency from './components/Agency';
 import AddAgency from './components/AddAgency';
 import AgencyData from './components/AgencyData';
 import EditAgency from './components/EditAgency';
@@ -115,10 +114,8 @@ function App() {
             <Route path="/add-department" element={<AdminRoute><AddDepartment /></AdminRoute>} />
             <Route path="/edit-department/:id" element={<AdminRoute><EditDepartment /></AdminRoute>} />
             <Route path="/edit-user/:id" element={<AdminRoute><EditUser /></AdminRoute>} />
-            <Route path="/agency" element={<AdminRoute><Agency/></AdminRoute>} />
             <Route path="/add-agency" element={<AdminRoute><AddAgency/></AdminRoute>} />
             <Route path="/agency-data" element={<AdminRoute><AgencyData/></AdminRoute>} />
-            <Route path="/agency" element={<AdminRoute><Agency /></AdminRoute>} />
             <Route path="/add-agency" element={<AdminRoute><AddAgency /></AdminRoute>} />
             <Route path="/agency-data/:id" element={<AdminRoute><AgencyData /></AdminRoute>} />
             <Route path="/edit-agency/:id" element={<AdminRoute><EditAgency /></AdminRoute>} />
