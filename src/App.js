@@ -18,6 +18,7 @@ import EditUser from './components/EditUser';
 import Agency from './components/Agency';
 import AddAgency from './components/AddAgency';
 import AgencyData from './components/AgencyData';
+import EditAgency from './components/EditAgency';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -120,7 +121,8 @@ function App() {
             <Route path="/agency" element={<AdminRoute><Agency /></AdminRoute>} />
             <Route path="/add-agency" element={<AdminRoute><AddAgency /></AdminRoute>} />
             <Route path="/agency-data/:id" element={<AdminRoute><AgencyData /></AdminRoute>} />
-            
+            <Route path="/edit-agency/:id" element={<AdminRoute><EditAgency /></AdminRoute>} />
+
             {/* Catch all route */}
             <Route path="*" element={<Navigate to={isLoggedIn ? '/' : '/login'} replace />} />
           </Routes>
