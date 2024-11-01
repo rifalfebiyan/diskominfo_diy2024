@@ -11,6 +11,7 @@ import (
 
 var DB *gorm.DB
 
+// Di file backend/database/db.go
 func Connect() {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		os.Getenv("DB_USER"),
@@ -19,7 +20,7 @@ func Connect() {
 		os.Getenv("DB_PORT"),
 		os.Getenv("DB_NAME"))
 
-	fmt.Printf("Connecting to database with DSN: %s\n", dsn)
+	fmt.Printf("Connecting to database with DSN: %s\n", dsn) // Tambahkan log ini
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
