@@ -43,6 +43,7 @@ func main() {
 	database.DB.AutoMigrate(&models.User{})
 	database.DB.AutoMigrate(&models.Department{})
 	database.DB.AutoMigrate(&models.Visitor{})
+	database.DB.AutoMigrate(&models.Agency{})
 	createInitialAdmin()
 
 	// Initialize Gin router

@@ -1,169 +1,70 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaUserPlus, FaClipboardList } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { FaUserPlus } from 'react-icons/fa';
 
-const Admin = () => {
+const Agency = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
-  const [departments, setDepartments] = useState([]);
-  const [showDepartmentsTable, setShowDepartmentsTable] = useState(false);
-  const [showUsersTable, setShowUsersTable] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  const [agencies, setAgencies] = useState([]);
   const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalDepartments: 0,
+    totalAgencies: 0
   });
 
   useEffect(() => {
-    fetchDepartments();
-    fetchUsers();
-    fetchStats();
+    fetchAgencies();
   }, []);
 
-  const fetchDepartments = async () => {
+  const fetchAgencies = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/departments', {
+      const response = await axios.get('http://localhost:8080/api/agencies', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      setDepartments(response.data);
+      setAgencies(response.data);
+      setStats({ totalAgencies: response.data.length });
     } catch (error) {
-      console.error('Error fetching departments:', error);
+      console.error('Error fetching agencies:', error);
     }
   };
 
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/users', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      setUsers(response.data);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
-  };
-
-  const fetchStats = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/stats', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      setStats(response.data);
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-    }
-  };
-
-  const handleDeleteUser = async (id) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
+  const handleDelete = async (id) => {
+    if (window.confirm('Apakah Anda yakin ingin menghapus instansi ini?')) {
       try {
-        const response = await axios.delete(`http://localhost:8080/api/users/${id}`, {
+        await axios.delete(`http://localhost:8080/api/agencies/${id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        
-        if (response.status === 200) {
-          setUsers(users.filter(user => user.id !== id));
-          fetchStats(); // Refresh stats after deletion
-          alert('User deleted successfully');
-        } else {
-          throw new Error('Failed to delete user');
-        }
+        fetchAgencies(); // Refresh data
+        alert('Instansi berhasil dihapus');
       } catch (error) {
-        console.error('Error deleting user:', error);
-        alert('Failed to delete user: ' + error.message);
+        console.error('Error deleting agency:', error);
+        alert('Gagal menghapus instansi');
       }
     }
-  };
-
-  const handleDeleteDepartment = async (id) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus bidang ini?')) {
-      try {
-        const response = await axios.delete(`http://localhost:8080/api/departments/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        
-        if (response.status === 200) {
-          setDepartments(departments.filter(department => department.id !== id));
-          fetchStats(); // Refresh stats after deletion
-          alert('Department deleted successfully');
-        } else {
-          throw new Error('Failed to delete department');
-        }
-      } catch (error) {
-        console.error('Error deleting department:', error);
-        alert('Failed to delete department: ' + error.message);
-      }
-    }
-  };
-
-  const handleShowDepartments = () => {
-    setShowDepartmentsTable(!showDepartmentsTable);
-  };
-
-  const handleShowUsers = () => {
-    setShowUsersTable(!showUsersTable);
   };
 
   return (
     <div className="container mt-4">
-       <h4>Admin Dashboard / Instansi </h4>
+      <h4>Admin Dashboard / Instansi</h4>
       <div className="row mb-4">
-        <div className="col-md-3">
-          <div
-            className="card text-center shadow-sm mb-3"
-            style={{
-              backgroundColor: '#F8EDED',
-              cursor: 'pointer',
-              // transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-              // transition: 'transform 0.2s ease-in-out',
-            }}
-            onClick={() => navigate('/agency')}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            <div className="card-body">
-              <h3>Jumlah Instansi</h3>
-              <h1>0</h1>
-            </div>
-          </div>
-        </div>
-
         <div className="col-md-3">
           <div className="card text-center shadow-sm mb-3" style={{ backgroundColor: '#F8EDED' }}>
             <div className="card-body">
-              <h3>Jumlah User</h3>
-              <h1>{users.length}</h1>
+              <h3>Jumlah Instansi</h3>
+              <h1>{stats.totalAgencies}</h1>
             </div>
           </div>
         </div>
 
-        {/* BUTTON TAMBAH USER< INSTANSI, BIDANG */}
         <div className="col-md-30 d-flex justify-content-end">
-        <button className="btn btn-danger mb-4" onClick={() => navigate('/add-agency')}>
+          <button className="btn btn-danger mb-4" onClick={() => navigate('/add-agency')}>
             <FaUserPlus /> Tambah Instansi
-                </button>
-                </div>
-                </div>
+          </button>
+        </div>
+      </div>
 
-
-      {/* Tampilkan tabel pengguna */}
-    
-
-      {/* Tampilkan tabel bidang */}
-  
-{/* 
-      <div className="card shadow-sm"> */}
       <div className="card">
         <div className="card-header">
           <h5 className="card-title">Instansi</h5>
@@ -178,35 +79,35 @@ const Admin = () => {
                   <th>Email</th>
                   <th>No Telp</th>
                   <th>Alamat</th>
-                 <th>Tanggal di buat</th>
+                  <th>Tanggal dibuat</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
               <tbody>
-                {users.map((user, index) => (
-                  <tr key={user.id}>
+                {agencies.map((agency, index) => (
+                  <tr key={agency.id}>
                     <td>{index + 1}</td>
-                    <td>{user.name}</td>
-                    <td><a href={`mailto:${user.email}`} style={{ color: '#9F2C2C' }}>{user.email}</a></td>
-                    <td>{user.phone}</td>
-                    <td>{user.address}</td> 
-                    <td>{user.createdAt}</td>
+                    <td>{agency.name}</td>
+                    <td><a href={`mailto:${agency.email}`} style={{ color: '#9F2C2C' }}>{agency.email}</a></td>
+                    <td>{agency.phone}</td>
+                    <td>{agency.address}</td>
+                    <td>{new Date(agency.created_at).toLocaleDateString()}</td>
                     <td>
                       <button
                         className="btn btn-warning btn-sm me-2"
-                        onClick={() => navigate(`/edit-user/${user.id}`)}
+                        onClick={() => navigate(`/edit-agency/${agency.id}`)}
                       >
                         Edit
                       </button>
                       <button
                         className="btn btn-danger btn-sm me-2"
-                        onClick={() => handleDeleteUser    (user.id)}
+                        onClick={() => handleDelete(agency.id)}
                       >
                         Hapus
                       </button>
                       <button
-                        className=" btn btn-info btn-sm"
-                        onClick={() => navigate(`/profile/${user.id}`)}
+                        className="btn btn-info btn-sm"
+                        onClick={() => navigate(`/agency-data/${agency.id}`)}
                       >
                         Detail
                       </button>
@@ -218,18 +119,8 @@ const Admin = () => {
           </div>
         </div>
       </div>
-
-      <nav aria-label="Page navigation">
-        <ul className="pagination justify-content-center mt-4">
-          <li className="page-item"><a className="page-link" href="#">Previous </a></li>
-          <li className="page-item active"><a className="page-link" href="#">1</a></li>
-          <li className="page-item"><a className="page-link" href="#">2</a></li>
-          <li className="page-item"><a className="page-link" href="#">3</a></li>
-          <li className="page-item"><a className="page-link" href="#">Next</a></li >
-        </ul>
-      </nav>
     </div>
   );
 };
 
-export default Admin;
+export default Agency;
