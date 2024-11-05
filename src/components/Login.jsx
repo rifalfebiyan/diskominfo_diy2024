@@ -17,28 +17,35 @@ function Login({ onLogin }) {
 
     // Validasi untuk memastikan identifier dan password tidak kosong
     if (!identifier || !password) {
-        setError("Email atau NIP dan password harus diisi.");
-        setIsLoading(false);
-        return;
+      setError("Email atau NIP dan password harus diisi.");
+      setIsLoading(false);
+      return;
     }
 
     try {
-        const response = await axios.post('http://localhost:8080/api/login', {
-            identifier, // Bisa email atau NIP
-            password
-        });
+      const response = await axios.post('http://localhost:8080/api/login', {
+        identifier, // Bisa email atau NIP
+        password
+      });
 
-        if (response.data.token) {
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('userId', response.data.user.id);
-            localStorage.setItem('userRole', response.data.user.role);
-            localStorage.setItem('userName', response.data.user.name);
-            localStorage.setItem('userDepartment', response.data.user.department);
-            
-            onLogin(true, response.data.user.role);
-            // Redirect ke halaman yang sesuai
-            navigate(response.data.user.role === 'admin' ? '/admin' : '/', { replace: true });
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userId', response.data.user.id);
+        localStorage.setItem('userRole', response.data.user.role);
+        localStorage.setItem('userName', response.data.user.name);
+        localStorage.setItem('userDepartment', response.data.user.department);
+        
+        onLogin(true, response.data.user.role);
+        // Redirect ke halaman yang sesuai
+        if (response.data.user.role === 'admin') {
+          navigate('/admin', { replace: true });
+        } else if (response.data.user.role === 'spectator') {
+          console.log('Navigating to spectator dashboard...');
+          navigate('/spectator', { replace: true });
+        } else {
+          navigate('/', { replace: true });
         }
+      }
     } catch (error) {
       if (error.response) {
         setError(error.response.data.error || 'Login gagal');
@@ -104,6 +111,7 @@ function Login({ onLogin }) {
                   className="form-control"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
+                  disabled={isLoading}
                 />
               </div>
 
@@ -114,6 +122,7 @@ function Login({ onLogin }) {
                   className="form-control"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
                 />
               </div>
 
@@ -125,9 +134,13 @@ function Login({ onLogin }) {
                   backgroundColor: '#A83427',
                   borderColor: '#A83427'
                 }}
-
               >
-                {isLoading ? 'Loading...' : 'Login'}
+                {isLoading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Loading...
+                  </>
+                ) : 'Login'}
               </button>
             </form>
             <div className="text-center mt-3">

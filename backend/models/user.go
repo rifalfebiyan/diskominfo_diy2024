@@ -1,4 +1,3 @@
-// models/user.go
 package models
 
 type User struct {
@@ -10,5 +9,5 @@ type User struct {
 	Phone          string `json:"phone"`
 	Role           string `json:"role"`
 	Department     string `json:"department"`
-	ProfilePicture string `json:"profile_picture"` // Tambahkan field ini
+	ProfilePicture string `json:"profile_picture"`
 }

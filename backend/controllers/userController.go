@@ -39,18 +39,28 @@ func CreateUser(c *gin.Context) {
 	}
 
 	// Validate role
-	if user.Role != "admin" && user.Role != "user" {
+	validRoles := map[string]bool{
+		"admin":     true,
+		"user":      true,
+		"spectator": true,
+	}
+
+	if !validRoles[user.Role] {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role"})
 		return
 	}
 
+	// Create user in database
 	result := database.DB.Create(&user)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, user)
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "User created successfully",
+		"user":    user,
+	})
 }
 
 // UpdateUser updates an existing user
@@ -68,13 +78,11 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	// Validate role
-	if updateData.Role != "admin" && updateData.Role != "user" {
+	if updateData.Role != "admin" && updateData.Role != "user" && updateData.Role != "spectator" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role"})
 		return
 	}
 
-	// Update user data
 	user.Name = updateData.Name
 	user.Email = updateData.Email
 	user.Phone = updateData.Phone

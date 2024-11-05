@@ -1,10 +1,8 @@
-// controllers/authController.go
 package controllers
 
 import (
 	"backend/database"
 	"backend/models"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -14,7 +12,7 @@ import (
 
 func Login(c *gin.Context) {
 	var input struct {
-		Identifier string `json:"identifier"` // Bisa email atau NIP
+		Identifier string `json:"identifier"`
 		Password   string `json:"password"`
 	}
 
@@ -23,65 +21,40 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Tambahkan log untuk melihat nilai identifier
-	fmt.Println("Identifier:", input.Identifier)
-
 	var user models.User
-	// Coba cari berdasarkan email
-	result := database.DB.Where("email = ?", input.Identifier).First(&user)
+	result := database.DB.Where("email = ? OR nip = ?", input.Identifier, input.Identifier).First(&user)
 	if result.Error != nil {
-		// Jika tidak ditemukan dengan email, coba cari berdasarkan NIP
-		result = database.DB.Where("nip = ?", input.Identifier).First(&user)
-		if result.Error != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
-			return
-		}
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		return
 	}
 
-	// Verifikasi password
 	if user.Password != input.Password {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
 
-	// Generate token
-	token, err := generateToken(user)
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["user_id"] = user.ID
+	claims["role"] = user.Role
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+
+	tokenString, err := token.SignedString([]byte("your_secret_key"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating token"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"token": token,
+		"token": tokenString,
 		"user": gin.H{
 			"id":         user.ID,
 			"name":       user.Name,
 			"email":      user.Email,
-			"nip":        user.NIP,
-			"role":       user.Role,
+			"role":       user.Role, // Pastikan ini mengirimkan 'spectator' tanpa spasi
 			"department": user.Department,
 		},
 	})
-}
-
-// Fungsi untuk generate token
-func generateToken(user models.User) (string, error) {
-	// Create a new token object
-	token := jwt.New(jwt.SigningMethodHS256)
-
-	// Set claims
-	claims := token.Claims.(jwt.MapClaims)
-	claims["user_id"] = user.ID
-	claims["role"] = user.Role
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix() // Token expires in 24 hours
-
-	// Generate encoded token
-	tokenString, err := token.SignedString([]byte("your_secret_key")) // Ganti dengan secret key yang aman
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
 }
 
 func Register(c *gin.Context) {
@@ -92,9 +65,9 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// Set default role jika tidak ada
-	if user.Role == "" {
-		user.Role = "user"
+	if user.Role != "admin" && user.Role != "user" && user.Role != "spectator" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role"})
+		return
 	}
 
 	result := database.DB.Create(&user)

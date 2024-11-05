@@ -18,6 +18,7 @@ import EditUser from './components/EditUser';
 import AddAgency from './components/AddAgency';
 import AgencyData from './components/AgencyData';
 import EditAgency from './components/EditAgency';
+import SpectatorDashboard from './components/SpectatorDashboard';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -55,6 +56,11 @@ function App() {
   const AdminRoute = ({ children }) => {
     const isAdmin = localStorage.getItem('userRole') === 'admin';
     return isAdmin ? children : <Navigate to="/login" replace />;
+  };
+
+  const SpectatorRoute = ({ children }) => {
+    const isSpectator = localStorage.getItem('userRole') === 'spectator';
+    return isSpectator ? children : <Navigate to="/login" replace />;
   };
 
   const handleLogin = (status, role) => {
@@ -101,6 +107,19 @@ function App() {
                   <Navigate to={userRole === 'admin' ? '/admin' : '/'} replace />
                 )
               }
+            />
+
+            <Route 
+              path="/spectator" 
+              element={
+                (() => {
+                  console.log('isLoggedIn:', isLoggedIn);
+                  console.log('userRole:', userRole);
+                  return isLoggedIn && userRole === 'spectator' ? 
+                    <SpectatorDashboard /> : 
+                    <Navigate to="/login" replace />;
+                })()
+              } 
             />
             
             {/* Protected Routes */}

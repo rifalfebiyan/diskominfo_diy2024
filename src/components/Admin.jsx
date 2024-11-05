@@ -240,9 +240,9 @@ const Admin = () => {
                   <tr>
                     <th>No</th>
                     <th>Nama Bidang</th>
-                    <th>Email</th>
                     <th>No Telp</th>
                     <th>Alamat</th>
+                    <th>Instansi</th>
                     <th>Tanggal dibuat</th>
                     <th>Aksi</th>
                   </tr>
@@ -252,9 +252,9 @@ const Admin = () => {
                     <tr key={department.id}>
                       <td>{index + 1}</td>
                       <td>{department.name}</td>
-                      <td><a href={`mailto:${department.email}`} style={{ color: '#9F2C2C' }}>{department.email}</a></td>
                       <td>{department.phone}</td>
                       <td>{department.address}</td>
+                      <td>{department.agency ? department.agency.name : 'N/A'}</td>
                       <td>{new Date(department.created_at).toLocaleDateString()}</td>
                       <td>
                         <button
@@ -356,11 +356,11 @@ const Admin = () => {
                     <th>Nama</th>
                     <th>Email</th>
                     <th>No Telp</th>
-                    <th>Alamat</th>
+                    <th>Role</th> {/* Mengubah 'Alamat' menjadi 'Role' */}
                     <th>Tanggal dibuat</th>
                     <th>Aksi</th>
                   </tr>
- </thead>
+                </thead>
                 <tbody>
                   {users.map((user, index) => (
                     <tr key={user.id}>
@@ -368,7 +368,7 @@ const Admin = () => {
                       <td>{user.name}</td>
                       <td><a href={`mailto:${user.email}`} style={{ color: '#9F2C2C' }}>{user.email}</a></td>
                       <td>{user.phone}</td>
-                      <td>{user.address}</td>
+                      <td>{user.role}</td> {/* Mengubah user.address menjadi user.role */}
                       <td>{new Date(user.created_at).toLocaleDateString()}</td>
                       <td>
                         <button

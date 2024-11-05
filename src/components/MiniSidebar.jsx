@@ -7,7 +7,7 @@ function MiniSidebar({ onLogout }) {
   const [hoveredItem, setHoveredItem] = useState(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [role, setRole] = useState(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768); // Anggap mobile jika lebar kurang dari 768px
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -16,7 +16,7 @@ function MiniSidebar({ onLogout }) {
     setRole(storedRole);
 
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768); // Perbarui status mobile saat ukuran jendela berubah
+      setIsMobile(window.innerWidth < 768);
     };
 
     window.addEventListener('resize', handleResize);
@@ -51,7 +51,7 @@ function MiniSidebar({ onLogout }) {
     top: '20vh',
     bottom: '10vh',
     zIndex: 100,
-    display: isMobile ? 'none' : 'flex', // Sembunyikan sidebar di mobile
+    display: isMobile ? 'none' : 'flex',
     alignItems: 'center',
     flexDirection: 'column',
     paddingTop: '20px',
@@ -124,33 +124,51 @@ function MiniSidebar({ onLogout }) {
             </li>
           )}
 
-          {/* Guest Link - Visible to all */}
-          <li
-            onMouseEnter={() => handleMouseEnter('guest')}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Link to="/guest" style={linkStyle(hoveredItem === 'guest')}>
-              <span style={iconStyle(hoveredItem === 'guest', location.pathname === '/guest')}>
-                &#xf02d;
-              </span>
-              {hoveredItem === 'guest' && <span>Tamu</span>}
-            </Link>
-          </li>
+          {/* Spectator Dashboard - Only visible to spectator */}
+          {role === 'spectator' && (
+            <li
+              onMouseEnter={() => handleMouseEnter('spectator')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <Link to="/spectator" style={linkStyle(hoveredItem === 'spectator')}>
+                <span style={iconStyle(hoveredItem === 'spectator', location.pathname === '/spectator')}>
+                  &#xf06e;
+                </span>
+                {hoveredItem === 'spectator' && <span>Spectator Dashboard</span>}
+              </Link>
+            </li>
+          )}
 
-          {/* Add Form Link - Visible to all */}
-          <li
-            onMouseEnter={() => handleMouseEnter('add')}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Link to="/add" style={linkStyle(hoveredItem === 'add')}>
-              <span style={iconStyle(hoveredItem === 'add', location.pathname === '/add')}>
-                &#xf044;
-              </span>
-              {hoveredItem === 'add' && <span>Form Tamu</span>}
-            </Link>
-          </li>
+          {/* Guest and Add Form Links - Not visible to spectator */}
+          {role !== 'spectator' && (
+            <>
+              <li
+                onMouseEnter={() => handleMouseEnter('guest')}
+                onMouseLeave={handleMouseLeave}
+              >
+                <Link to="/guest" style={linkStyle(hoveredItem === 'guest')}>
+                  <span style={iconStyle(hoveredItem === 'guest', location.pathname === '/guest')}>
+                    &#xf02d;
+                  </span>
+                  {hoveredItem === 'guest' && <span>Tamu</span>}
+                </Link>
+              </li>
 
-          {/* Profile Link - Visible to all users (including admin) */}
+              <li
+                onMouseEnter={() => handleMouseEnter('add')}
+                onMouseLeave={handleMouseLeave}
+              >
+                <Link to="/add" style={linkStyle(hoveredItem === 'add')}>
+                  <span style={iconStyle(hoveredItem === 'add', location.pathname === '/add')}>
+                    &#xf044;
+                  </span>
+                  {hoveredItem === 'add' && <span>Form Tamu</span>}
+                </Link>
+              </li>
+            </>
+          )}
+
+          {/* Profile Link - Visible to all */}
           <li
             onMouseEnter={() => handleMouseEnter('profile')}
             onMouseLeave={handleMouseLeave}
@@ -164,11 +182,12 @@ function MiniSidebar({ onLogout }) {
           </li>
 
           {/* Logout Link - Visible to all */}
-          <li>
+          <li
+            onMouseEnter={() => handleMouseEnter('logout')}
+            onMouseLeave={handleMouseLeave}
+          >
             <div
               onClick={handleShow}
-              onMouseEnter={() => handleMouseEnter('logout')}
-              onMouseLeave={handleMouseLeave}
               style={{ ...linkStyle(hoveredItem === 'logout'), cursor: 'pointer' }}
             >
               <span style={iconStyle(hoveredItem === 'logout', false)}>
@@ -185,12 +204,13 @@ function MiniSidebar({ onLogout }) {
         <Modal.Header closeButton>
           <Modal.Title>Konfirmasi Logout</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Apakah anda yakin ingin keluar?</Modal.Body>
+        <Modal.Body>Apakah anda yakin ingin keluar? ```jsx
+        </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
-            Batalkan
+            Batal
           </Button>
-          <Button variant="danger" onClick={handleLogout}>
+          <Button variant="primary" onClick={handleLogout}>
             Logout
           </Button>
         </Modal.Footer>

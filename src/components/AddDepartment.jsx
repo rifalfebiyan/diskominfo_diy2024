@@ -1,115 +1,119 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Pastikan axios sudah diinstal
+import axios from 'axios';
 
 const AddDepartment = () => {
-  const [departmentName, setDepartmentName] = useState('');
-  const [address, setAddress] = useState('');
-  const [phone, setPhone] = useState('');
-  const [status, setStatus] = useState('');
+  const [department, setDepartment] = useState({
+    name: '',
+    phone: '',
+    address: '',
+    agencyId: ''
+  });
+  const [agencies, setAgencies] = useState([]);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
+  useEffect(() => {
+    fetchAgencies();
+  }, []);
+
+  const fetchAgencies = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/api/departments', {
-        name: departmentName,
-        address,
-        phone,
-        status
-      }, {
+      const response = await axios.get('http://localhost:8080/api/agencies', {
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-  
-      if (response.status === 201) {
-        alert('Department added successfully');
-        navigate('/');
-      }
-    } 
-    catch (error) {
-      if (error.response) {
-        // Permintaan dibuat dan server merespons dengan status yang tidak dalam rentang 2xx
-        console.error('Error adding department:', error.response.data);
-        alert('Failed to add department: ' + (error.response.data.error || error.response.data.message));
-      } else if (error.request) {
-        // Permintaan dibuat tetapi tidak ada respons yang diterima
-        console.error('No response received:', error.request);
-        alert('Failed to add department: No response from server');
-      } else {
-        // Terjadi kesalahan saat mengatur permintaan
-        console.error('Error:', error.message);
-        alert('Failed to add department: ' + error.message);
-      }
+      setAgencies(response.data);
+    } catch (error) {
+      console.error('Error fetching agencies:', error);
+    }
+  };
+
+  const handleChange = (e) => {
+    setDepartment({ ...department, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:8080/api/departments', department, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      alert('Department added successfully');
+      navigate('/admin');
+    } catch (error) {
+      console.error('Error adding department:', error);
+      alert('Failed to add department');
     }
   };
 
   return (
     <div className="container my-4">
-      <div className="p-3 border rounded shadow" style={{ maxWidth: '700px', margin: '0 auto' }}> {/* Set a max width and center */}
+      <div className="p-3 border rounded shadow" style={{ maxWidth: '700px', margin: '0 auto' }}>
         <form onSubmit={handleSubmit}>
           <p className="fw-bold text-center">TAMBAH BIDANG</p>
 
-          {/* Nama Bidang */}
           <div className="mb-2">
-            <label htmlFor="departmentName" className="form-label">Nama Bidang*</label>
+            <label htmlFor="name" className="form-label">Nama Bidang*</label>
             <input
               type="text"
-              className="form-control border border-dark" // Border around input
-              id="departmentName"
-              value={departmentName}
-              onChange={(e) => setDepartmentName(e.target.value)}
+              className="form-control border border-dark"
+              id="name"
+              name="name"
+              value={department.name}
+              onChange={handleChange}
               required
             />
           </div>
 
-          {/* Alamat */}
-          <div className="mb-2">
-            <label htmlFor="address" className="form-label">Alamat*</label>
-            <input
-              type="text"
-              className="form-control border border-dark" // Border around input
-              id="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              required
-            />
-          </div>
-
-          {/* No Telepon */}
           <div className="mb-2">
             <label htmlFor="phone" className="form-label">No Telepon*</label>
             <input
               type="tel"
-              className="form-control border border-dark" // Border around input
+              className="form-control border border-dark"
               id="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              name="phone"
+              value={department.phone}
+              onChange={handleChange}
               required
             />
           </div>
 
-          {/* Status */}
           <div className="mb-2">
-            <label htmlFor="status" className="form-label">Status*</label>
+            <label htmlFor="address" className="form-label">Alamat*</label>
+            <input
+              type="text"
+              className="form-control border border-dark"
+              id="address"
+              name="address"
+              value={department.address}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="mb-2">
+            <label htmlFor="agencyId" className="form-label">Instansi*</label>
             <select
-              className="form-select border border-dark" // Border around select
-              id="status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
+              className="form-select border border-dark"
+              id="agencyId"
+              name="agencyId"
+              value={department.agencyId}
+              onChange={handleChange}
               required
             >
-              <option value="">Pilih Status</option>
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
+              <option value="">Pilih Instansi</option>
+              {agencies.map(agency => (
+                <option key={agency.id} value={agency.id}>{agency.name}</option>
+              ))}
             </select>
           </div>
 
-          {/* Submit Button */}
-          <button type="submit" className="btn btn-danger w-100">Simpan</button>
+           <button type="submit" className="btn btn-primary w-100">
+            TAMBAH BIDANG
+          </button>
         </form>
       </div>
     </div>

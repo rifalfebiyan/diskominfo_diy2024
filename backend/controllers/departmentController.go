@@ -11,7 +11,11 @@ import (
 
 func GetDepartments(c *gin.Context) {
 	var departments []models.Department
-	database.DB.Find(&departments)
+	if err := database.DB.Preload("Agency").Find(&departments).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusOK, departments)
 }
 
@@ -34,7 +38,18 @@ func CreateDepartment(c *gin.Context) {
 		return
 	}
 
-	database.DB.Create(&department)
+	// Pastikan AgencyID valid
+	var agency models.Agency
+	if err := database.DB.First(&agency, department.AgencyID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Agency ID"})
+		return
+	}
+
+	if err := database.DB.Create(&department).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusCreated, department)
 }
 
@@ -51,7 +66,18 @@ func UpdateDepartment(c *gin.Context) {
 		return
 	}
 
-	database.DB.Save(&department)
+	// Pastikan AgencyID valid
+	var agency models.Agency
+	if err := database.DB.First(&agency, department.AgencyID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Agency ID"})
+		return
+	}
+
+	if err := database.DB.Save(&department).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusOK, department)
 }
 

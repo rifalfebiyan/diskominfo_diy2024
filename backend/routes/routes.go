@@ -41,6 +41,16 @@ func SetupRoutes(router *gin.Engine) {
 		protected.PUT("/agencies/:id", controllers.UpdateAgency)
 		protected.DELETE("/agencies/:id", controllers.DeleteAgency)
 
+		// Visitor routes
+		protected.GET("/visitors", controllers.GetVisitors)
+		protected.POST("/visitors", controllers.CreateVisitor)
+		protected.GET("/visitors/:id", controllers.GetVisitor)
+		protected.PUT("/visitors/:id", controllers.UpdateVisitor)
+		protected.DELETE("/visitors/:id", controllers.DeleteVisitor)
+
+		// Stats route
+		protected.GET("/stats", controllers.GetStats)
+
 		// Stats route (jika ada)
 		// protected.GET("/stats", controllers.GetStats)
 	}

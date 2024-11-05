@@ -2,47 +2,46 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const AddUser  = () => {
-  const [user, setUser ] = useState({
+const AddUser = () => {
+  const navigate = useNavigate();
+  const [departments, setDepartments] = useState([]);
+  const [user, setUser] = useState({
     name: '',
     nip: '',
     email: '',
-    phone: '',
     password: '',
+    phone: '',
     department: '',
     role: ''
   });
-  const [departments, setDepartments] = useState([]); // State to hold department list
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchDepartments = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/api/departments', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        setDepartments(response.data);
-      } catch (error) {
-        console.error('Error fetching departments:', error);
-      }
-    };
-
     fetchDepartments();
   }, []);
 
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/departments', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setDepartments(response.data);
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUser ((prevUser ) => ({
-      ...prevUser ,
+    setUser(prev => ({
+      ...prev,
       [name]: value
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     try {
       const response = await axios.post('http://localhost:8080/api/users', user, {
         headers: {
@@ -50,13 +49,14 @@ const AddUser  = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
+
       if (response.status === 201) {
-        alert('User  added successfully');
-        navigate('/admin'); // Navigate back to admin dashboard
+        alert('User berhasil ditambahkan');
+        navigate('/admin');
       }
     } catch (error) {
       console.error('Error adding user:', error);
-      alert('Failed to add user: ' + error.message);
+      alert('Failed to add user: ' + (error.response?.data?.error || error.message));
     }
   };
 
@@ -105,19 +105,6 @@ const AddUser  = () => {
             />
           </div>
 
-          {/* No Telp Input */}
-          <div className="mb-2">
-            <label className="form-label">No Telp*</label>
-            <input
-              type="tel"
-              className="form-control border border-dark"
-              name="phone"
-              value={user.phone}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-
           {/* Password Input */}
           <div className="mb-2">
             <label className="form-label">Password*</label>
@@ -126,6 +113,19 @@ const AddUser  = () => {
               className="form-control border border-dark"
               name="password"
               value={user.password}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+
+          {/* No Telp Input */}
+          <div className="mb-2">
+            <label className="form-label">No Telp*</label>
+            <input
+              type="tel"
+              className="form-control border border-dark"
+              name="phone"
+              value={user.phone}
               onChange={handleInputChange}
               required
             />
@@ -142,8 +142,10 @@ const AddUser  = () => {
               required
             >
               <option value="">Pilih Bidang</option>
-              {departments.map((dept, index) => (
-                <option key={index} value={dept.name}>{dept.name}</option>
+              {departments.map((dept) => (
+                <option key={dept.id} value={dept.name}>
+                  {dept.name}
+                </option>
               ))}
             </select>
           </div>
@@ -161,10 +163,13 @@ const AddUser  = () => {
               <option value="">Pilih Role</option>
               <option value="admin">Admin</option>
               <option value="user">User</option>
+              <option value="spectator">Spectator</option>
             </select>
           </div>
 
-          <button type="submit" className="btn btn-danger w-100">Simpan</button>
+          <button type="submit" className="btn btn-danger w-100">
+            Simpan
+          </button>
         </form>
       </div>
     </div>
