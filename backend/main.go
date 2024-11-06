@@ -18,13 +18,14 @@ func createInitialAdmin() {
 	result := database.DB.Where("email = ?", "admin@admin.com").First(&user)
 	if result.Error != nil {
 		// User tidak ditemukan, buat admin baru
+		var agencyID uint = 1 // Deklarasikan sebagai uint
 		adminUser := models.User{
-			Name:       "Admin",
-			Email:      "admin@admin.com",
-			Password:   "admin123",
-			Phone:      "08123456789", // Tambahkan nomor telepon
-			Role:       "admin",
-			Department: "IT",
+			Name:     "Admin",
+			Email:    "admin@admin.com",
+			Password: "admin123",
+			Phone:    "08123456789",
+			Role:     "admin",
+			AgencyID: &agencyID, // Gunakan pointer ke agencyID
 		}
 		database.DB.Create(&adminUser)
 		fmt.Println("Admin user created")

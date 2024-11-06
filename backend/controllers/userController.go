@@ -63,12 +63,12 @@ func CreateUser(c *gin.Context) {
 	})
 }
 
-// UpdateUser updates an existing user
+// UpdateUser  updates an existing user
 func UpdateUser(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
 	if err := database.DB.First(&user, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "User  not found"})
 		return
 	}
 
@@ -78,7 +78,23 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	if updateData.Role != "admin" && updateData.Role != "user" && updateData.Role != "spectator" {
+	// Validasi role
+	validRoles := map[string]bool{
+		"admin":     true,
+		"user":      true,
+		"spectator": true,
+	}
+
+	// Validasi agency_id
+	if user.AgencyID != nil {
+		var agency models.Agency
+		if err := database.DB.First(&agency, *user.AgencyID).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid agency_id"})
+			return
+		}
+	}
+
+	if !validRoles[updateData.Role] {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role"})
 		return
 	}
@@ -86,7 +102,7 @@ func UpdateUser(c *gin.Context) {
 	user.Name = updateData.Name
 	user.Email = updateData.Email
 	user.Phone = updateData.Phone
-	user.Department = updateData.Department
+	user.AgencyID = updateData.AgencyID // Update AgencyID
 	user.Role = updateData.Role
 	if updateData.Password != "" {
 		user.Password = updateData.Password

@@ -4,31 +4,31 @@ import axios from 'axios';
 
 const AddUser = () => {
   const navigate = useNavigate();
-  const [departments, setDepartments] = useState([]);
+  const [agencies, setAgencies] = useState([]);
   const [user, setUser] = useState({
     name: '',
     nip: '',
     email: '',
     password: '',
     phone: '',
-    department: '',
+    agency_id: '',
     role: ''
   });
 
   useEffect(() => {
-    fetchDepartments();
+    fetchAgencies();
   }, []);
 
-  const fetchDepartments = async () => {
+  const fetchAgencies = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/departments', {
+      const response = await axios.get('http://localhost:8080/api/agencies', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      setDepartments(response.data);
+      setAgencies(response.data);
     } catch (error) {
-      console.error('Error fetching departments:', error);
+      console.error('Error fetching agencies:', error);
     }
   };
 
@@ -36,13 +36,18 @@ const AddUser = () => {
     const { name, value } = e.target;
     setUser(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'agency_id' ? parseInt(value, 10) : value
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (!user.agency_id) {
+        alert('Silakan pilih Instansi');
+        return;
+      }
+
       const response = await axios.post('http://localhost:8080/api/users', user, {
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +71,6 @@ const AddUser = () => {
         <form onSubmit={handleSubmit}>
           <p className="fw-bold text-center">TAMBAH USER</p>
 
-          {/* Nama Input */}
           <div className="mb-2">
             <label className="form-label">Nama*</label>
             <input
@@ -79,7 +83,6 @@ const AddUser = () => {
             />
           </div>
 
-          {/* NIP Input */}
           <div className="mb-2">
             <label className="form-label">NIP*</label>
             <input
@@ -92,7 +95,6 @@ const AddUser = () => {
             />
           </div>
 
-          {/* Email Input */}
           <div className="mb-2">
             <label className="form-label">Email*</label>
             <input
@@ -105,7 +107,6 @@ const AddUser = () => {
             />
           </div>
 
-          {/* Password Input */}
           <div className="mb-2">
             <label className="form-label">Password*</label>
             <input
@@ -118,7 +119,6 @@ const AddUser = () => {
             />
           </div>
 
-          {/* No Telp Input */}
           <div className="mb-2">
             <label className="form-label">No Telp*</label>
             <input
@@ -131,26 +131,24 @@ const AddUser = () => {
             />
           </div>
 
-          {/* Bidang Dropdown */}
           <div className="mb-2">
-            <label className="form-label">Bidang*</label>
+            <label className="form-label">Instansi*</label>
             <select
-              name="department"
+              name="agency_id"
               className="form-select border border-dark"
-              value={user.department}
+              value={user.agency_id}
               onChange={handleInputChange}
               required
             >
-              <option value="">Pilih Bidang</option>
-              {departments.map((dept) => (
-                <option key={dept.id} value={dept.name}>
-                  {dept.name}
+              <option value="">Pilih Instansi</option>
+              {agencies.map((agency) => (
+                <option key={agency.id} value={agency.id}>
+                  {agency.name}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Role Dropdown */}
           <div className="mb-2">
             <label className="form-label">Role*</label>
             <select

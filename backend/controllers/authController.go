@@ -48,11 +48,11 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"token": tokenString,
 		"user": gin.H{
-			"id":         user.ID,
-			"name":       user.Name,
-			"email":      user.Email,
-			"role":       user.Role, // Pastikan ini mengirimkan 'spectator' tanpa spasi
-			"department": user.Department,
+			"id":     user.ID,
+			"name":   user.Name,
+			"email":  user.Email,
+			"role":   user.Role,
+			"agency": user.Agency, // Accessing the Agency relationship instead
 		},
 	})
 }

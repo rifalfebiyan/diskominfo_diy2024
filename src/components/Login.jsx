@@ -40,12 +40,13 @@ function Login({ onLogin }) {
         if (response.data.user.role === 'admin') {
           navigate('/admin', { replace: true });
         } else if (response.data.user.role === 'spectator') {
-          console.log('Navigating to spectator dashboard...');
           navigate('/spectator', { replace: true });
+        } else if (response.data.user.role === 'user') {
+          navigate('/user', { replace: true }); // Redirect user ke halaman departments
         } else {
           navigate('/', { replace: true });
         }
-      }
+      } 
     } catch (error) {
       if (error.response) {
         setError(error.response.data.error || 'Login gagal');

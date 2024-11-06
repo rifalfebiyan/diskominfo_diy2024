@@ -1,3 +1,4 @@
+// src/components/MiniSidebar.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
@@ -124,6 +125,21 @@ function MiniSidebar({ onLogout }) {
             </li>
           )}
 
+          {/* User Dashboard - Only visible to user */}
+          {role === 'user' && (
+            <li
+              onMouseEnter={() => handleMouseEnter('user')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <Link to="/user" style={linkStyle(hoveredItem === 'user')}>
+                <span style={iconStyle(hoveredItem === 'user', location.pathname === '/user')}>
+                  &#xf007;
+                </span>
+                {hoveredItem === 'user' && <span>Dashboard User</span>}
+              </Link>
+            </li>
+          )}
+
           {/* Spectator Dashboard - Only visible to spectator */}
           {role === 'spectator' && (
             <li
@@ -190,8 +206,8 @@ function MiniSidebar({ onLogout }) {
               onClick={handleShow}
               style={{ ...linkStyle(hoveredItem === 'logout'), cursor: 'pointer' }}
             >
-              <span style={iconStyle(hoveredItem === 'logout', false)}>
-                &#xf2f5;
+              <span style={iconStyle(hoveredItem === 'logout')}>
+                &#xf08b;
               </span>
               {hoveredItem === 'logout' && <span>Logout</span>}
             </div>
@@ -199,13 +215,11 @@ function MiniSidebar({ onLogout }) {
         </ul>
       </div>
 
-      {/* Logout Confirmation Modal */}
-      <Modal show={showLogoutModal} onHide={handleClose} centered>
+      <Modal show={showLogoutModal} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Konfirmasi Logout</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Apakah anda yakin ingin keluar? ```jsx
-        </Modal.Body>
+        <Modal.Body>Apakah Anda yakin ingin logout?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Batal
