@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const AddDepartment = () => {
-  const [department, setDepartment] = useState({
+  const [department, setDepartement] = useState({
     name: '',
     phone: '',
     address: '',
-    agencyId: ''
+    agency_id: ''
   });
   const [agencies, setAgencies] = useState([]);
   const navigate = useNavigate();
@@ -29,23 +29,40 @@ const AddDepartment = () => {
     }
   };
 
-  const handleChange = (e) => {
-    setDepartment({ ...department, [e.target.name]: e.target.value });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setDepartement(prev => ({
+      ...prev,
+      [name]: name === 'agency_id' ? parseInt(value, 10) : value
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8080/api/departments', department, {
+      if (!department.agency_id) {
+        alert('Silakan pilih Instansi');
+        return;
+      }
+  
+      console.log('Sending department data:', department); // Log data yang akan dikirim
+  
+      const response = await axios.post('http://localhost:8080/api/departments', department, {
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      alert('Department added successfully');
-      navigate('/admin');
+  
+      console.log('Response:', response); // Log response dari server
+  
+      if (response.status === 201) {
+        alert('Bidang berhasil ditambahkan');
+        navigate('/admin');
+      }
     } catch (error) {
-      console.error('Error adding department:', error);
-      alert('Failed to add department');
+      console.error('Error details:', error.response); // Log detail error
+      alert('Failed to add department: ' + (error.response?.data?.error || error.message));
     }
   };
 
@@ -63,7 +80,7 @@ const AddDepartment = () => {
               id="name"
               name="name"
               value={department.name}
-              onChange={handleChange}
+              onChange={handleInputChange}
               required
             />
           </div>
@@ -76,7 +93,7 @@ const AddDepartment = () => {
               id="phone"
               name="phone"
               value={department.phone}
-              onChange={handleChange}
+              onChange={handleInputChange}
               required
             />
           </div>
@@ -89,19 +106,19 @@ const AddDepartment = () => {
               id="address"
               name="address"
               value={department.address}
-              onChange={handleChange}
+              onChange={handleInputChange}
               required
             />
           </div>
 
           <div className="mb-2">
-            <label htmlFor="agencyId" className="form-label">Instansi*</label>
+            <label htmlFor="agency_id" className="form-label">Instansi*</label>
             <select
               className="form-select border border-dark"
-              id="agencyId"
-              name="agencyId"
-              value={department.agencyId}
-              onChange={handleChange}
+              id="agency_id"
+              name="agency_id"
+              value={department.agency_id}
+              onChange={handleInputChange}
               required
             >
               <option value="">Pilih Instansi</option>
