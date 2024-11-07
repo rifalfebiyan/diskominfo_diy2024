@@ -15,11 +15,11 @@ const UserAddDepartment = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchUserAgency();
+    fetchUserData();
   }, []);
 
-  // Fetch user's agency data
-  const fetchUserAgency = async () => {
+  // Fetch user's data including agency
+  const fetchUserData = async () => {
     try {
       const userId = localStorage.getItem('userId');
       const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
@@ -28,18 +28,26 @@ const UserAddDepartment = () => {
         }
       });
 
-      // Set agency_id dari data user
       if (response.data.agency_id) {
-        setUserAgency(response.data.agency);
+        // Fetch agency details
+        const agencyResponse = await axios.get(`http://localhost:8080/api/agencies/${response.data.agency_id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        setUserAgency(agencyResponse.data);
         setDepartment(prev => ({
           ...prev,
           agency_id: response.data.agency_id
         }));
+      } else {
+        setError('User tidak memiliki instansi yang terdaftar');
       }
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching user agency:', error);
-      setError('Failed to fetch user agency data');
+      console.error('Error fetching user data:', error);
+      setError('Gagal mengambil data user dan instansi');
       setLoading(false);
     }
   };
@@ -54,9 +62,13 @@ const UserAddDepartment = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      console.log('Sending department data:', department);
+    
+    if (!department.agency_id) {
+      alert('Anda harus terdaftar pada sebuah instansi untuk menambahkan bidang');
+      return;
+    }
 
+    try {
       const response = await axios.post('http://localhost:8080/api/departments', department, {
         headers: {
           'Content-Type': 'application/json',
@@ -64,24 +76,40 @@ const UserAddDepartment = () => {
         }
       });
 
-      console.log('Response:', response);
-
       if (response.status === 201) {
         alert('Bidang berhasil ditambahkan');
         navigate('/user');
       }
     } catch (error) {
       console.error('Error details:', error.response);
-      alert('Failed to add department: ' + (error.response?.data?.error || error.message));
+      alert('Gagal menambahkan bidang: ' + (error.response?.data?.error || error.message));
     }
   };
 
   if (loading) {
-    return <div className="container mt-3">Loading...</div>;
+    return (
+      <div className="container mt-3">
+        <div className="alert alert-info">Loading...</div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="container mt-3 alert alert-danger">{error}</div>;
+    return (
+      <div className="container mt-3">
+        <div className="alert alert-danger">{error}</div>
+      </div>
+    );
+  }
+
+  if (!userAgency) {
+    return (
+      <div className="container mt-3">
+        <div className="alert alert-warning">
+          Anda harus terdaftar pada sebuah instansi untuk menambahkan bidang.
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -100,6 +128,7 @@ const UserAddDepartment = () => {
               value={department.name}
               onChange={handleInputChange}
               required
+              placeholder="Masukkan nama bidang"
             />
           </div>
 
@@ -113,6 +142,7 @@ const UserAddDepartment = () => {
               value={department.phone}
               onChange={handleInputChange}
               required
+              placeholder="Masukkan nomor telepon"
             />
           </div>
 
@@ -126,20 +156,25 @@ const UserAddDepartment = () => {
               value={department.address}
               onChange={handleInputChange}
               required
+              placeholder="Masukkan alamat"
             />
           </div>
 
-          <div className="mb-2">
-            <label htmlFor="agency_id" className="form-label">Instansi</label>
-            <input
-              type="text"
-              className="form-control border border-dark"
-              value={userAgency ? userAgency.name : 'Loading...'}
-              disabled
-            />
+          <div className="mb-3">
+            <label htmlFor="agency" className="form-label">Instansi</label>
+            <div className="form-control border border-dark bg-light">
+              {userAgency.name}
+            </div>
+            <small className="text-muted">
+              Bidang akan ditambahkan ke instansi {userAgency.name}
+            </small>
           </div>
 
-          <button type="submit" className="btn btn-primary w-100">
+          <button 
+            type="submit" 
+            className="btn btn-primary w-100"
+            disabled={!userAgency}
+          >
             TAMBAH BIDANG
           </button>
         </form>
