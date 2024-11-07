@@ -23,11 +23,27 @@ func GetUsers(c *gin.Context) {
 func GetUser(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
-	if err := database.DB.First(&user, id).Error; err != nil {
+
+	result := database.DB.
+		Preload("Agency"). // Preload agency relation
+		First(&user, id)
+
+	if result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
-	c.JSON(http.StatusOK, user)
+
+	// Transform response if needed
+	response := map[string]interface{}{
+		"id":     user.ID,
+		"name":   user.Name,
+		"email":  user.Email,
+		"phone":  user.Phone,
+		"agency": user.Agency, // This should include the full agency object
+		// ... other fields
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 // CreateUser creates a new user

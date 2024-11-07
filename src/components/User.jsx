@@ -12,12 +12,7 @@ const User = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    checkAuthorization();
-    fetchDepartments();
-    fetchVisitors();
-  }, []);
-
+  // Pindahkan checkAuthorization keluar dari useEffect
   const checkAuthorization = () => {
     const token = localStorage.getItem('token');
     const userRole = localStorage.getItem('userRole');
@@ -26,17 +21,37 @@ const User = () => {
     }
   };
 
+  useEffect(() => {
+    // Panggil checkAuthorization
+    checkAuthorization();
+  }, [navigate]); // Tambahkan navigate ke dependency array
+
+  // Pisahkan fetch data ke useEffect terpisah
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await fetchDepartments();
+        await fetchVisitors();
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError('Failed to fetch data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []); // Empty dependency array karena hanya perlu dijalankan sekali saat mount
+
   const fetchDepartments = async () => {
     try {
       const response = await axios.get('http://localhost:8080/api/departments', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
       });
       setDepartments(response.data);
-      setLoading(false);
     } catch (error) {
       console.error('Error fetching departments:', error);
-      setError('Failed to fetch departments');
-      setLoading(false);
+      throw new Error('Failed to fetch departments');
     }
   };
 
@@ -48,7 +63,7 @@ const User = () => {
       setVisitors(response.data);
     } catch (error) {
       console.error('Error fetching visitors:', error);
-      setError('Failed to fetch visitors');
+      throw new Error('Failed to fetch visitors');
     }
   };
 
@@ -71,7 +86,7 @@ const User = () => {
         {error}
       </div>
     );
-  }
+  } 
 
   return (
     <div className="container mt-4">
@@ -90,7 +105,7 @@ const User = () => {
           </div>
           <button
             className="btn btn-danger w-100 mb-3"
-            onClick={() => navigate('/add-department')}
+            onClick={() => navigate('/user/add-department')}
           >
             <FaUserPlus /> Tambah Bidang
           </button>

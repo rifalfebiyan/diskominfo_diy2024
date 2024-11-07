@@ -13,6 +13,7 @@ import Admin from './components/Admin';
 import AddUser from './components/AddUser';
 import Profile from './components/Profile';
 import AddDepartment from './components/AddDepartment';
+import UserAddDepartment from './components/UserAddDepartment';
 import EditDepartment from './components/EditDepartment';
 import EditUser from './components/EditUser';
 import User from './components/User';
@@ -148,6 +149,16 @@ function App() {
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
             <Route path="/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
             <Route path="/add-department" element={<AddDepartment />} />
+            <Route 
+              path="/user/add-department" 
+              element={
+                isLoggedIn && userRole === 'user' ? (
+                  <UserAddDepartment />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } 
+            />
             <Route path="/edit-department/:id" element={<AdminRoute><EditDepartment /></AdminRoute>} />
             <Route path="/edit-user/:id" element={<AdminRoute><EditUser /></AdminRoute>} />
             <Route path="/add-agency" element={<AdminRoute><AddAgency/></AdminRoute>} />
