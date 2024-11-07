@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 07, 2024 at 07:38 AM
+-- Generation Time: Nov 07, 2024 at 09:34 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -72,7 +72,8 @@ CREATE TABLE `departments` (
 --
 
 INSERT INTO `departments` (`id`, `name`, `address`, `phone`, `status`, `email`, `agency_id`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'Tamu 22q', 'Jogja', '1228282', NULL, '', 4, '2024-11-07 08:40:25.947', '2024-11-07 08:40:25.947', NULL);
+(1, 'Tamu 22q', 'Jogja', '1228282', NULL, '', 4, '2024-11-07 08:40:25.947', '2024-11-07 08:40:25.947', NULL),
+(2, 'Tamu 222', 'Jogja', '1228282', NULL, '', 3, '2024-11-07 14:33:09.920', '2024-11-07 14:33:09.920', NULL);
 
 -- --------------------------------------------------------
 
@@ -111,29 +112,24 @@ INSERT INTO `users` (`id`, `name`, `nip`, `email`, `phone`, `password`, `created
 
 CREATE TABLE `visitors` (
   `id` int(11) NOT NULL,
-  `name` longtext DEFAULT NULL,
-  `gender` longtext DEFAULT NULL,
-  `purpose` longtext DEFAULT NULL,
-  `address` longtext DEFAULT NULL,
-  `institution` longtext DEFAULT NULL,
-  `phone` longtext DEFAULT NULL,
-  `department` longtext DEFAULT NULL,
-  `visit_date` datetime(3) DEFAULT NULL,
-  `created_at` datetime(3) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `name` varchar(100) NOT NULL COMMENT 'Nama pengunjung',
+  `gender` enum('Laki-laki','Perempuan') NOT NULL COMMENT 'Jenis kelamin',
+  `purpose` text NOT NULL COMMENT 'Tujuan kunjungan',
+  `address` text NOT NULL COMMENT 'Alamat pengunjung',
+  `institution` varchar(100) NOT NULL COMMENT 'Asal instansi',
+  `phone` varchar(20) NOT NULL COMMENT 'Nomor telepon',
+  `department` varchar(100) NOT NULL COMMENT 'Bidang yang dituju',
+  `visit_date` datetime NOT NULL COMMENT 'Tanggal dan waktu kunjungan',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Waktu data dibuat',
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'Waktu terakhir diupdate'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `visitors`
 --
 
-INSERT INTO `visitors` (`id`, `name`, `gender`, `purpose`, `address`, `institution`, `phone`, `department`, `visit_date`, `created_at`) VALUES
-(7, 'test2', 'Laki-laki', '1', 'Test11', '1', '1', 'Test11', '0001-01-16 07:00:00.000', '2024-10-23 02:38:30.000'),
-(8, 'test11111', 'Laki-laki', '1', 'Test11', '1', '1', 'Test11', '2024-10-23 07:00:00.000', '2024-10-24 06:59:41.854'),
-(9, 'Tamu 1', 'Laki-laki', 'Test', 'Jogja', 'Test', '1228282', 'APTIKA', '2024-10-29 07:00:00.000', '2024-10-29 16:36:24.040'),
-(10, 'Tamu 1', 'Perempuan', 'Test', 'Jogja', 'Test', '1228282', 'APTIKA', '2024-10-18 07:00:00.000', '2024-10-30 11:28:43.212'),
-(11, 'Tamu 1', 'Laki-laki', 'Test', 'Jogja', 'Test', '1228282', 'APTIKA', '2024-10-24 07:00:00.000', '2024-10-30 13:28:05.492'),
-(12, 'Tamu 1', 'Laki-laki', 'Test', 'Jogja', 'Test', '1228282', 'APTIKA', '2024-09-25 07:00:00.000', '2024-10-30 13:28:37.421'),
-(13, 'Tamu 1', 'Laki-laki', 'Test', 'Jogja', 'Test', '1228282', 'APTIKA', '2024-10-30 07:00:00.000', '2024-10-30 13:48:02.536');
+INSERT INTO `visitors` (`id`, `name`, `gender`, `purpose`, `address`, `institution`, `phone`, `department`, `visit_date`, `created_at`, `updated_at`) VALUES
+(1, 'Admin', 'Laki-laki', 'Test', 'Test', 'Kominfo', '08123456789', 'Tamu 222', '2024-11-07 07:00:00', '2024-11-07 08:34:03', '2024-11-07 08:34:03');
 
 --
 -- Indexes for dumped tables
@@ -166,7 +162,10 @@ ALTER TABLE `users`
 -- Indexes for table `visitors`
 --
 ALTER TABLE `visitors`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_visit_date` (`visit_date`),
+  ADD KEY `idx_department` (`department`),
+  ADD KEY `idx_institution` (`institution`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -182,7 +181,7 @@ ALTER TABLE `agencies`
 -- AUTO_INCREMENT for table `departments`
 --
 ALTER TABLE `departments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -194,7 +193,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `visitors`
 --
 ALTER TABLE `visitors`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables

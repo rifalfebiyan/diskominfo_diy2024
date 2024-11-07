@@ -5,6 +5,10 @@ import axios from 'axios';
 function VisitorForm() {
   const navigate = useNavigate();
   const [departments, setDepartments] = useState([]);
+  const [agencies, setAgencies] = useState([]);
+  const [selectedAgency, setSelectedAgency] = useState('');
+  const [filteredDepartments, setFilteredDepartments] = useState([]);
+  
   const [formData, setFormData] = useState({
     name: '',
     gender: '',
@@ -18,8 +22,10 @@ function VisitorForm() {
 
   useEffect(() => {
     fetchDepartments();
+    fetchAgencies();
   }, []);
 
+  // Fetch departments
   const fetchDepartments = async () => {
     try {
       const response = await axios.get('http://localhost:8080/api/departments', {
@@ -33,11 +39,45 @@ function VisitorForm() {
     }
   };
 
+  // Fetch agencies
+  const fetchAgencies = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/agencies', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setAgencies(response.data);
+    } catch (error) {
+      console.error('Error fetching agencies:', error);
+    }
+  };
+
+  // Handle agency selection
+  const handleAgencyChange = (e) => {
+    const selectedAgencyId = e.target.value;
+    setSelectedAgency(selectedAgencyId);
+    setFormData(prev => ({
+      ...prev,
+      institution: e.target.options[e.target.selectedIndex].text
+    }));
+
+    // Filter departments based on selected agency
+    const filtered = departments.filter(
+      dept => dept.agency_id === parseInt(selectedAgencyId)
+    );
+    setFilteredDepartments(filtered);
+    // Reset department selection
+    setFormData(prev => ({
+      ...prev,
+      department: ''
+    }));
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === 'visitDate') {
       try {
-        // Ensure the date is in the correct format (YYYY-MM-DD)
         const date = new Date(value + 'T00:00:00Z');
         if (!isNaN(date.getTime())) {
           setFormData({
@@ -59,7 +99,6 @@ function VisitorForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate required fields
     const requiredFields = ['name', 'gender', 'purpose', 'address', 'institution', 'phone', 'department', 'visitDate'];
     const missingFields = requiredFields.filter(field => !formData[field]);
     
@@ -67,14 +106,13 @@ function VisitorForm() {
       alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
       return;
     }
-
+  
     try {
-      // Create a copy of formData with the properly formatted date
       const submitData = {
         ...formData,
         visitDate: new Date(formData.visitDate + 'T00:00:00Z').toISOString()
       };
-
+  
       const token = localStorage.getItem('token');
       console.log('Sending data:', submitData);
       
@@ -84,7 +122,7 @@ function VisitorForm() {
           'Authorization': `Bearer ${token}`
         }
       });
-
+  
       console.log('Response:', response.data);
       alert('Data berhasil disimpan!');
       navigate('/guest');
@@ -128,7 +166,7 @@ function VisitorForm() {
           </div>
 
           <div className="mb-2">
-            <label className="form-label">Keperl ukan*</label>
+            <label className="form-label">Keperluan*</label>
             <input
               type="text"
               className="form-control border border-dark"
@@ -152,15 +190,21 @@ function VisitorForm() {
           </div>
 
           <div className="mb-2">
-            <label className="form-label">Institusi*</label>
-            <input
-              type="text"
-              className="form-control border border-dark"
+            <label className="form-label">Instansi*</label>
+            <select
               name="institution"
-              value={formData.institution}
-              onChange={handleChange}
+              className="form-select border border-dark"
+              value={selectedAgency}
+              onChange={handleAgencyChange}
               required
-            />
+            >
+              <option value="">Pilih Instansi</option>
+              {agencies.map((agency) => (
+                <option key={agency.id} value={agency.id}>
+                  {agency.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="mb-2">
@@ -183,9 +227,10 @@ function VisitorForm() {
               value={formData.department}
               onChange={handleChange}
               required
+              disabled={!selectedAgency}
             >
               <option value="">Pilih Bidang</option>
-              {departments.map((department) => (
+              {filteredDepartments.map((department) => (
                 <option key={department.id} value={department.name}>
                   {department.name}
                 </option>
@@ -197,7 +242,7 @@ function VisitorForm() {
             <label className="form-label">Tanggal Kunjungan*</label>
             <input
               type="date"
-              className="form-control border border-dark"
+               className="form-control border border-dark"
               name="visitDate"
               value={formData.visitDate}
               onChange={handleChange}
@@ -208,7 +253,6 @@ function VisitorForm() {
           <button type="submit" className="btn btn-danger w-100">
           Simpan
         </button>
-
         </form>
       </div>
     </div>
