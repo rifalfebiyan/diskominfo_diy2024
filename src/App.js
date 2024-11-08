@@ -17,6 +17,7 @@ import DepartmentData from './components/DepartmentData';
 import UserAddDepartment from './components/UserAddDepartment';
 import EditDepartment from './components/EditDepartment';
 import EditUser from './components/EditUser';
+import UserData from './components/UserData'; 
 import User from './components/User';
 import AddAgency from './components/AddAgency';
 import AgencyData from './components/AgencyData';
@@ -149,7 +150,7 @@ function App() {
             <Route path="/edit/:index" element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" replace />} />
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
             <Route path="/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
-            <Route path="/add-department" element={<AddDepartment />} />
+            <Route path="/user-detail/:id" element={<AdminRoute><UserData /></AdminRoute>} />            <Route path="/add-department" element={<AddDepartment />} />
             <Route 
               path="/user/add-department" 
               element={

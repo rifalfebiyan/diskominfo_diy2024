@@ -63,7 +63,7 @@ const AgencyData = () => {
       
       {/* Agency Details Card */}
       <div className="card mb-4">
-        <div className="card-header bg-primary text-white">
+        <div className="card-header bg-danger text-white">
           <h5 className="card-title mb-0">{agency.name}</h5>
         </div>
         <div className="card-body">
@@ -82,7 +82,7 @@ const AgencyData = () => {
 
       {/* Departments Table */}
       <div className="card mb-4">
-        <div className="card-header">
+        <div className="card-header bg-danger text-white">
           <h5 className="card-title mb-0">Daftar Bidang</h5>
         </div>
         <div className="card-body">
@@ -121,7 +121,7 @@ const AgencyData = () => {
 
       {/* Action Buttons */}
       <div className="d-flex gap-2">
-        <button className="btn btn-primary" onClick={handleEdit}>Edit</button>
+        <button className="btn btn-danger" onClick={handleEdit}>Edit</button>
         <button className="btn btn-secondary" onClick={handleBack}>Kembali</button>
       </div>
     </div>

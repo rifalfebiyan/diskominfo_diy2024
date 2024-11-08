@@ -126,8 +126,8 @@ const EditDepartment = () => {
             </select>
           </div>
 
-           <button type="submit" className="btn btn-primary w-100">
-            UPDATE BIDANG
+          <button type="submit" className="btn btn-danger w-100">
+            Simpan Perubahan
           </button>
         </form>
       </div>

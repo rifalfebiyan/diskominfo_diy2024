@@ -9,10 +9,10 @@ const EditUser = () => {
     email: '',
     phone: '',
     password: '',
-    department: '',
-    role: ''
+    role: '',
+    agency_id: null
   });
-  const [departments, setDepartments] = useState([]);
+  const [agencies, setAgencies] = useState([]);
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -30,28 +30,28 @@ const EditUser = () => {
       }
     };
 
-    const fetchDepartments = async () => {
+    const fetchAgencies = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/departments', {
+        const response = await axios.get('http://localhost:8080/api/agencies', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        setDepartments(response.data);
+        setAgencies(response.data);
       } catch (error) {
-        console.error('Error fetching departments:', error);
+        console.error('Error fetching agencies:', error);
       }
     };
 
     fetchUser();
-    fetchDepartments();
+    fetchAgencies();
   }, [id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUser(prevUser => ({
       ...prevUser,
-      [name]: value
+      [name]: name === 'agency_id' ? parseInt(value, 10) : value
     }));
   };
 
@@ -65,13 +65,14 @@ const EditUser = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
+      
       if (response.status === 200) {
         alert('User updated successfully');
         navigate('/admin');
       }
     } catch (error) {
       console.error('Error updating user:', error);
-      alert('Failed to update user: ' + error.message);
+      alert('Failed to update user: ' + (error.response?.data?.error || error.message));
     }
   };
 
@@ -104,7 +105,6 @@ const EditUser = () => {
               value={user.nip}
               onChange={handleInputChange}
               required
-              readOnly
             />
           </div>
 
@@ -146,25 +146,6 @@ const EditUser = () => {
             />
           </div>
 
-          {/* Department Dropdown */}
-          <div className="mb-2">
-            <label className="form-label">Bidang*</label>
-            <select
-              className="form-select border border-dark"
-              name="department"
-              value={user.department}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="">Pilih Bidang</option>
-              {departments.map((dept) => (
-                <option key={dept.id} value={dept.name}>
-                  {dept.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
           {/* Role Dropdown */}
           <div className="mb-2">
             <label className="form-label">Role*</label>
@@ -178,6 +159,26 @@ const EditUser = () => {
               <option value="">Pilih Role</option>
               <option value="admin">Admin</option>
               <option value="user">User</option>
+              <option value="spectator">Spectator</option>
+            </select>
+          </div>
+
+          {/* Agency Dropdown */}
+          <div className="mb-2">
+            <label className="form-label">Instansi*</label>
+            <select
+              className="form-select border border-dark"
+              name="agency_id"
+              value={user.agency_id || ''}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Pilih Instansi</option>
+              {agencies.map((agency) => (
+                <option key={agency.id} value={agency.id}>
+                  {agency.name}
+                </option>
+              ))}
             </select>
           </div>
 

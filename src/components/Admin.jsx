@@ -327,25 +327,25 @@ const Admin = () => {
                     : '-'}
                 </td>
                 <td>
-                  <button
-                    className="btn btn-warning btn-sm me-2"
-                    onClick={() => navigate(`/edit-department/${department.id}`)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => handleDeleteDepartment(department.id)}
-                  >
-                    Hapus
-                  </button>
-                  <button
-                    className="btn btn-info btn-sm mt-1"
-                    onClick={() => navigate(`/department-detail/${department.id}`)}
-                  >
-                    Detail
-                  </button>
-                </td>
+                    <button
+                      className="btn btn-warning btn-sm me-2"
+                      onClick={() => navigate(`/edit-department/${department.id}`)}
+                    >
+                       Edit
+                    </button>
+                    <button
+                        className="btn btn-danger btn-sm me-2"
+                        onClick={() => handleDeleteDepartment(department.id)}
+                    >
+                      Hapus
+                    </button>
+                    <button
+                      className="btn btn-info btn-sm"
+                      onClick={() => navigate(`/department-detail/${department.id}`)}
+                    >
+                      Detail
+                    </button>
+                  </td>
               </tr>
             ))}
           </tbody>
@@ -356,7 +356,7 @@ const Admin = () => {
 )}
 
       {/* Tabel Pengguna dengan kondisi showUsersTable */}
-{showUsersTable && (
+      {showUsersTable && (
   <div className="card mb-4">
     <div className="card-header">
       <h5 className="card-title">Daftar Pengguna</h5>
@@ -371,7 +371,6 @@ const Admin = () => {
               <th>NIP</th>
               <th>Email</th>
               <th>No Telepon</th>
-              <th>Instansi</th>
               <th>Role</th>
               <th>Tanggal Dibuat</th>
               <th>Aksi</th>
@@ -392,11 +391,6 @@ const Admin = () => {
                   </a>
                 </td>
                 <td>{user.phone || '-'}</td>
-                <td>
-                  {user.agency 
-                    ? user.agency.name 
-                    : (user.agency_name || 'Tidak ada instansi')}
-                </td>
                 <td>{user.role || '-'}</td>
                 <td>
                   {user.created_at 
@@ -404,27 +398,25 @@ const Admin = () => {
                     : '-'}
                 </td>
                 <td>
-                  <div className="d-flex flex-column">
-                    <button
-                      className="btn btn-warning btn-sm mb-1"
-                      onClick={() => navigate(`/edit-user/${user.id}`)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-danger btn-sm mb-1"
-                      onClick={() => handleDeleteUser(user.id)}
-                    >
-                      Hapus
-                    </button>
-                    <button
-                      className="btn btn-info btn-sm"
-                      onClick={() => navigate(`/user-detail/${user.id}`)}
-                    >
-                      Detail
-                    </button>
-                  </div>
-                </td>
+    <button
+        className="btn btn-warning btn-sm me-2"
+        onClick={() => navigate(`/edit-user/${user.id}`)}
+    >
+        Edit
+    </button>
+    <button
+        className="btn btn-danger btn-sm me-2"
+        onClick={() => handleDeleteUser(user.id)}
+    >
+        Hapus
+    </button>
+    <button
+        className="btn btn-info btn-sm"
+        onClick={() => navigate(`/user-detail/${user.id}`)}
+    >
+        Detail
+    </button>
+</td>
               </tr>
             ))}
           </tbody>
