@@ -166,17 +166,15 @@ function VisitorData() {
           >
             <option value="">Pilih Bidang</option>
             {departments.map((dept) => (
-              dept.status === 'Active' && (
-                <option key={dept.id} value={dept.name}>
-                  {dept.name}
-                </option>
-              )
+              <option key={dept.id} value={dept.name}>
+                {dept.name}
+              </option>
             ))}
           </select>
         </div>
         <div className="col-6 col-md-3 mb-2 mb-md-0 d-flex">
           <button className="btn btn-primary me-2" onClick={handleSort}>
-            Sortir Nama {sortOrder === 'asc' ? '↑' : '↓'}
+            Sortir Nama A-Z {sortOrder === 'asc' ? '↑' : '↓'}
           </button>
           <button className="btn btn-success" onClick={() => navigate('/add')}>Tambah Tamu</button>
         </div>

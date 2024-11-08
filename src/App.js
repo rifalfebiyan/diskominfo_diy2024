@@ -13,6 +13,7 @@ import Admin from './components/Admin';
 import AddUser from './components/AddUser';
 import Profile from './components/Profile';
 import AddDepartment from './components/AddDepartment';
+import DepartmentData from './components/DepartmentData';
 import UserAddDepartment from './components/UserAddDepartment';
 import EditDepartment from './components/EditDepartment';
 import EditUser from './components/EditUser';
@@ -159,6 +160,7 @@ function App() {
                 )
               } 
             />
+            <Route path="/department-data/:id" element={<AdminRoute><DepartmentData /></AdminRoute>} />
             <Route path="/edit-department/:id" element={<AdminRoute><EditDepartment /></AdminRoute>} />
             <Route path="/edit-user/:id" element={<AdminRoute><EditUser /></AdminRoute>} />
             <Route path="/add-agency" element={<AdminRoute><AddAgency/></AdminRoute>} />
