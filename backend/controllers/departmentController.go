@@ -3,7 +3,7 @@ package controllers
 import (
 	"backend/database"
 	"backend/models"
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,30 +15,34 @@ func GetDepartments(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
+	fmt.Println(departments) // Log data untuk debugging
 	c.JSON(http.StatusOK, departments)
 }
 
 func GetDepartment(c *gin.Context) {
 	id := c.Param("id")
-
 	var department models.Department
-	if err := database.DB.First(&department, id).Error; err != nil {
+	if err := database.DB.Preload("Agency").First(&department, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Department not found"})
 		return
 	}
-
 	c.JSON(http.StatusOK, department)
 }
 
 func CreateDepartment(c *gin.Context) {
 	var department models.Department
 	if err := c.ShouldBindJSON(&department); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 
-	// Pastikan AgencyID valid
+	// Validasi semua field yang diperlukan
+	if department.Name == "" || department.Address == "" || department.Phone == "" || department.Status == "" || department.Email == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Semua field harus diisi"})
+		return
+	}
+
+	// Validasi AgencyID
 	var agency models.Agency
 	if err := database.DB.First(&agency, department.AgencyID).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Agency ID"})
@@ -46,7 +50,7 @@ func CreateDepartment(c *gin.Context) {
 	}
 
 	if err := database.DB.Create(&department).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create department"})
 		return
 	}
 
@@ -66,7 +70,7 @@ func UpdateDepartment(c *gin.Context) {
 		return
 	}
 
-	// Pastikan AgencyID valid
+	// Validasi AgencyID
 	var agency models.Agency
 	if err := database.DB.First(&agency, department.AgencyID).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Agency ID"})
@@ -77,19 +81,19 @@ func UpdateDepartment(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, department)
 }
 
 func DeleteDepartment(c *gin.Context) {
 	id := c.Param("id")
-	log.Printf("Attempting to delete department with ID: %s", id)
-
 	var department models.Department
 	if err := database.DB.First(&department, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Department not found"})
 		return
 	}
+
+	// Sebelum menghapus, periksa apakah ada data terkait yang perlu ditangani
+	// Misalnya, jika ada relasi dengan tabel lain, Anda bisa menanganinya di sini
 
 	if err := database.DB.Delete(&department).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete department"})
@@ -97,5 +101,4 @@ func DeleteDepartment(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Department deleted successfully"})
-	log.Printf("Department with ID %s deleted successfully", id)
 }

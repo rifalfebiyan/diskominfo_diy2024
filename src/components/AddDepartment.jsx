@@ -3,14 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const AddDepartment = () => {
-  const [department, setDepartement] = useState({
+  const navigate = useNavigate();
+  const [department, setDepartment] = useState({
     name: '',
     phone: '',
     address: '',
+    status: '', // status akan diisi dengan "Active" atau "Non-Active"
+    email: '',
     agency_id: ''
   });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setDepartment({ ...department, [name]: value });
+  };
+
   const [agencies, setAgencies] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchAgencies();
@@ -31,7 +39,7 @@ const AddDepartment = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setDepartement(prev => ({
+    setDepartment(prev => ({
       ...prev,
       [name]: name === 'agency_id' ? parseInt(value, 10) : value
     }));
@@ -40,29 +48,16 @@ const AddDepartment = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (!department.agency_id) {
-        alert('Silakan pilih Instansi');
-        return;
-      }
-  
-      console.log('Sending department data:', department); // Log data yang akan dikirim
-  
-      const response = await axios.post('http://localhost:8080/api/departments', department, {
+      await axios.post('http://localhost:8080/api/departments', department, {
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-  
-      console.log('Response:', response); // Log response dari server
-  
-      if (response.status === 201) {
-        alert('Bidang berhasil ditambahkan');
-        navigate('/admin');
-      }
+      alert('Departemen berhasil ditambahkan');
+      navigate('/admin');
     } catch (error) {
-      console.error('Error details:', error.response); // Log detail error
-      alert('Failed to add department: ' + (error.response?.data?.error || error.message));
+      console.error('Error adding department:', error);
+      alert('Gagal menambahkan departemen: ' + error.message);
     }
   };
 
@@ -112,7 +107,36 @@ const AddDepartment = () => {
           </div>
 
           <div className="mb-2">
-            <label htmlFor="agency_id" className="form-label">Instansi*</label>
+            <label htmlFor="status" className="form-label">Status*</label>
+            <select
+              className="form-select border border-dark"
+              id="status"
+              name="status"
+              value={department.status}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Pilih Status</option>
+              <option value="Active">Active</option>
+              <option value="Non-Active">Non-Active</option>
+            </select>
+          </div>
+
+          <div className="mb-2">
+            <label htmlFor="email" className="form-label">Email*</label>
+            <input
+              type="email"
+              className="form-control border border-dark"
+              id="email"
+              name="email"
+              value={department.email}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+
+          <div className="mb- 2">
+            <label htmlFor="agency_id" className="form-label">Pilih Agency*</label>
             <select
               className="form-select border border-dark"
               id="agency_id"
@@ -121,16 +145,14 @@ const AddDepartment = () => {
               onChange={handleInputChange}
               required
             >
-              <option value="">Pilih Instansi</option>
+              <option value="">Pilih Agency</option>
               {agencies.map(agency => (
                 <option key={agency.id} value={agency.id}>{agency.name}</option>
               ))}
             </select>
           </div>
-
-           <button type="submit" className="btn btn-primary w-100">
-            TAMBAH BIDANG
-          </button>
+          <br></br>
+          <button type="submit" className="btn btn-primary">Simpan</button>
         </form>
       </div>
     </div>

@@ -28,12 +28,11 @@ func SetupRoutes(router *gin.Engine) {
 		protected.POST("/users/:id/profile-picture", controllers.UpdateProfilePicture)
 
 		// Department routes
-		protected.GET("/departments", controllers.GetDepartments)
 		protected.POST("/departments", controllers.CreateDepartment)
+		protected.GET("/departments", controllers.GetDepartments)
 		protected.GET("/departments/:id", controllers.GetDepartment)
 		protected.PUT("/departments/:id", controllers.UpdateDepartment)
 		protected.DELETE("/departments/:id", controllers.DeleteDepartment)
-
 		// Agency routes
 		protected.GET("/agencies", controllers.GetAgencies)
 		protected.GET("/agencies/:id", controllers.GetAgency)

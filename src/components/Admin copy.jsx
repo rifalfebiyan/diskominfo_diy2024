@@ -32,9 +32,7 @@ const Admin = () => {
   const fetchDepartments = async () => {
     try {
       const response = await axios.get('http://localhost:8080/api/departments', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       setDepartments(response.data);
     } catch (error) {
@@ -104,30 +102,30 @@ const Admin = () => {
     }
   };
 
-  const handleEditDepartment = (id) => {
-    navigate(`/edit-department/${id}`);
-  };
-  
-  const handleAddDepartment = () => {
-    navigate('/add-department');
-  };
-
   const handleDeleteDepartment = async (id) => {
-    console.log("Deleting department with ID:", id); // Tambahkan log ini
-    if (window.confirm('Apakah Anda yakin ingin menghapus bidang ini?')) {
+    console.log("Deleting department with ID:", id);
+    if (!id) {
+        alert("Invalid department ID");
+        return;
+    }
+
+    if (window.confirm('Are you sure you want to delete this department?')) {
         try {
             const response = await axios.delete(`http://localhost:8080/api/departments/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             });
+            
             if (response.status === 200) {
                 setDepartments(departments.filter(department => department.id !== id));
-                alert('Departemen berhasil dihapus');
+                alert('Department deleted successfully');
+            } else {
+                throw new Error('Failed to delete department');
             }
         } catch (error) {
             console.error('Error deleting department:', error);
-            alert('Gagal menghapus departemen: ' + error.response?.data?.error || error.message);
+            alert('Failed to delete department: ' + (error.response?.data?.error || error.message));
         }
     }
 };
@@ -154,6 +152,14 @@ const handleDeleteAgency = async (id) => {
           alert('Gagal menghapus instansi: ' + (error.response?.data?.error || error.message));
       }
   }
+};
+
+const handleEditDepartment = (id) => {
+  navigate(`/edit-department/${id}`);
+};
+
+const handleAddDepartment = () => {
+  navigate('/add-department');
 };
   
   const handleShowDepartments = () => {
@@ -301,55 +307,53 @@ const handleDeleteAgency = async (id) => {
         </div>
       )}
 
-{/* Tabel Departemen dengan kondisi showDepartmentsTable */}
-{showDepartmentsTable && (
-  <div className="card mb-4">
-    <div className="card-header">
-      <h5 className="card-title">Department List</h5>
-    </div>
-    <div className="card-body">
-      <table className="table table-bordered table-hover">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Nama</th>
-            <th>No Telepon</th>
-            <th>Alamat</th>
-            <th>Status</th> {/* Pastikan kolom Status ada */}
-            <th>Email</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {departments.map((department, index) => (
-            <tr key={department.id}>
-              <td>{index + 1}</td>
-              <td>{department.name}</td>
-              <td>{department.phone}</td>
-              <td>{department.address}</td>
-              <td>{department.status}</td> {/* Tampilkan status */}
-              <td>{department.email}</td>
-              <td>
-                <button
-                  className="btn btn-warning btn-sm me-2"
-                  onClick={() => handleEditDepartment(department.id)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => handleDeleteDepartment(department.id)}
-                >
-                  Hapus
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
+      {/* Tabel Departemen dengan kondisi showDepartmentsTable */}
+      {showDepartmentsTable && (
+        <div className="card mb-4">
+          <div className="card-header">
+            <h5 className="card-title">Department List</h5>
+          </div>
+          <div className="card-body">
+            <table className="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Address</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {departments.map((department, index) => (
+                  <tr key={department.id}>
+                    <td>{index + 1}</td>
+                    <td>{department.name}</td>
+                    <td>{department.phone}</td>
+                    <td>{department.address}</td>
+                    <td>{department.status}</td>
+                    <td>{department.email}</td>
+                    <td>
+                      <button
+                        className="btn btn-warning btn-sm me-2"
+                        onClick={() => handleEditDepartment(department.id)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDeleteDepartment(department.id)}
+                      >
+                        Hapus
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Tabel Pengguna dengan kondisi showUsersTable */}
       {showUsersTable && (

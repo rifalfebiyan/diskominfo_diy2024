@@ -62,21 +62,23 @@ function Header({ onLogout }) {
           </button>
 
           <div className={`collapse navbar-collapse`} id="navbarNav">
-            <ul className="navbar-nav ms-auto">
-              <li className="nav-item dropdown">
-                <Dropdown>
-                  <Dropdown.Toggle variant="link" id="dropdown-basic" className="nav-link d-flex align-items-center" style={{ color: 'white' }}>
-                    <i className="bi bi-person-circle" style={{ fontSize: '20px', color: 'white' }}></i>
-                    <span className="ms-2">Admin</span>
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu align="end">
-                    <Dropdown.Item href="/profile">Profile</Dropdown.Item>
-                    <Dropdown.Item onClick={handleShow}>Logout</Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </li>
-            </ul>
-          </div>
+  <ul className="navbar-nav ms-auto">
+    <li className="nav-item dropdown">
+      <Dropdown>
+        <Dropdown.Toggle variant="link" id="dropdown-basic" className="nav-link d-flex align-items-center" style={{ color: 'white' }}>
+          <i className="bi bi-person-circle" style={{ fontSize: '20px', color: 'white' }}></i>
+          <span className="ms-2">
+            {localStorage.getItem('userRole') || 'User'}
+          </span>
+        </Dropdown.Toggle>
+        <Dropdown.Menu align="end">
+          <Dropdown.Item href="/profile">Profile</Dropdown.Item>
+          <Dropdown.Item onClick={handleShow}>Logout</Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>
+    </li>
+  </ul>
+</div>
         </div>
       </nav>
 
