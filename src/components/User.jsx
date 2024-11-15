@@ -1,201 +1,323 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUserPlus } from 'react-icons/fa';
 import axios from 'axios';
+import { FaUserPlus, FaClipboardList } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 const User = () => {
   const navigate = useNavigate();
+  const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
-  const [visitors, setVisitors] = useState([]);
-  const [showDepartmentsTable, setShowDepartmentsTable] = useState(false);
-  const [showVisitorsTable, setShowVisitorsTable] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Pindahkan checkAuthorization keluar dari useEffect
-  const checkAuthorization = () => {
-    const token = localStorage.getItem('token');
-    const userRole = localStorage.getItem('userRole');
-    if (!token || userRole !== 'user') {
-      navigate('/login');
-    }
-  };
+  const [agencies, setAgencies] = useState([]);
+  
+  // Ubah state default menjadi true untuk menampilkan tabel saat pertama kali dimuat
+  const [showDepartmentsTable, setShowDepartmentsTable] = useState(true);
+  const [showUsersTable, setShowUsersTable] = useState(true);
+  const [showAgenciesTable, setShowAgenciesTable] = useState(true);
+  
+  const [isHovered, setIsHovered] = useState(false);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalDepartments: 0,
+    totalAgencies: 0,
+  });
 
   useEffect(() => {
-    // Panggil checkAuthorization
-    checkAuthorization();
-  }, [navigate]); // Tambahkan navigate ke dependency array
-
-  // Pisahkan fetch data ke useEffect terpisah
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await fetchDepartments();
-        await fetchVisitors();
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Failed to fetch data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []); // Empty dependency array karena hanya perlu dijalankan sekali saat mount
+    fetchDepartments();
+    fetchUsers();
+    fetchAgencies();
+    fetchStats();
+  }, []);
 
   const fetchDepartments = async () => {
     try {
       const response = await axios.get('http://localhost:8080/api/departments', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
       });
-      setDepartments(response.data);
+      setDepartments(response.data); // Menyimpan data ke state
     } catch (error) {
       console.error('Error fetching departments:', error);
-      throw new Error('Failed to fetch departments');
     }
   };
 
-  const fetchVisitors = async () => {
+  const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/visitors', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      const response = await axios.get('http://localhost:8080/api/users', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
       });
-      setVisitors(response.data);
+      setUsers(response.data);
     } catch (error) {
-      console.error('Error fetching visitors:', error);
-      throw new Error('Failed to fetch visitors');
+      console.error('Error fetching users:', error);
     }
   };
 
-  const handleShowDepartments = () => setShowDepartmentsTable(!showDepartmentsTable);
-  const handleShowVisitors = () => setShowVisitorsTable(!showVisitorsTable);
+  const fetchAgencies = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/agencies', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setAgencies(response.data);
+    } catch (error) {
+      console.error('Error fetching agencies:', error);
+    }
+  };
 
-  if (loading) {
-    return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
+  const fetchStats = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/stats', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setStats(response.data);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
 
-  if (error) {
-    return (
-      <div className="alert alert-danger m-3" role="alert">
-        {error}
-      </div>
-    );
-  } 
+  const handleDeleteUser = async (id) => {
+    if (window.confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
+      try {
+        const response = await axios.delete(`http://localhost:8080/api/users/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (response.status === 200) {
+          setUsers(users.filter(user => user.id !== id));
+          fetchStats();
+          alert('User deleted successfully');
+        } else {
+          throw new Error('Failed to delete user');
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        alert('Failed to delete user: ' + error.message);
+      }
+    }
+  };
+
+  const handleEditDepartment = (id) => {
+    navigate(`/edit-department/${id}`);
+  };
+  
+  const handleAddDepartment = () => {
+    navigate('/add-department');
+  };
+
+  const handleDeleteDepartment = async (id) => {
+    if (window.confirm('Apakah Anda yakin ingin menghapus bidang ini?')) {
+      try {
+        const response = await axios.delete(`http://localhost:8080/api/departments/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        if (response.status === 200) {
+          setDepartments(departments.filter(department => department.id !== id));
+          alert('Departemen berhasil dihapus');
+        }
+      } catch (error) {
+        console.error('Error deleting department:', error);
+        alert('Gagal menghapus departemen: ' + error.message);
+      }
+    }
+  };
+  
+const handleShowDepartments = () => {
+  setShowDepartmentsTable(!showDepartmentsTable);
+};
+
+  const handleShowUsers = () => {
+    setShowUsersTable(!showUsersTable);
+  };
+
+  const handleShowAgencies = () => {
+    setShowAgenciesTable(!showAgenciesTable);
+  };
 
   return (
     <div className="container mt-4">
       <h4>User Dashboard</h4>
-      <div className="row mb-4 justify-content-center"> {/* Tambahkan justify-content-center */}
-        <div className="col-md-4">
-          <div
-            className="card text-center shadow-sm mb-3"
-            style={{ backgroundColor: '#F8EDED', cursor: 'pointer' }}
-            onClick={handleShowDepartments}
-          >
-            <div className="card-body">
-              <h3>Jumlah Bidang</h3>
-              <h1>{departments.length}</h1>
-            </div>
-          </div>
-          <button
-            className="btn btn-danger w-100 mb-3"
-            onClick={() => navigate('/user/add-department')}
-          >
-            <FaUserPlus /> Tambah Bidang
-          </button>
-        </div>
-
-        <div className="col-md-4">
-          <div
-            className="card text-center shadow-sm mb-3"
-            style={{ backgroundColor: '#F8EDED', cursor: 'pointer' }}
-            onClick={handleShowVisitors}
-          >
-            <div className="card-body">
-              <h3>Jumlah Tamu</h3>
-              <h1>{visitors.length}</h1>
-            </div>
-          </div>
-          <button
-            className="btn btn-danger w-100 mb-3"
-            onClick={() => navigate('/add')}
-          >
-            <FaUserPlus /> Tambah Tamu
-          </button>
+      <div className="row mb-4 justify-content-center">
+    <div className="col-md-3">
+      <div
+        className="card text-center shadow-sm mb-3"
+        style={{
+          backgroundColor: '#F8EDED',
+          cursor: 'pointer',
+        }}
+        onClick={handleShowDepartments}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className="card-body">
+          <h3>Jumlah Bidang</h3>
+          <h1>{departments.length}</h1>
         </div>
       </div>
-
-      {showDepartmentsTable && (
-        <div className="card mb-4">
-          <div className="card-header">
-            <h5 className="card-title">Daftar Bidang</h5>
-          </div>
-          <div className="card-body">
-            <div className="table-responsive">
-              <table className="table table-bordered table-hover">
-                <thead className="table-light">
-                  <tr>
-                    <th>No</th>
-                    <th>Nama Bidang</th>
-                    <th>No Telp</th>
-                    <th>Alamat</th>
-                    <th>Tanggal dibuat</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {departments.map((department, index) => (
-                    <tr key={department.id}>
-                      <td>{index + 1}</td>
-                      <td>{department.name}</td>
-                      <td>{department.phone}</td>
-                      <td>{department.address}</td>
-                      <td>{new Date(department.createdAt).toLocaleDateString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+    </div>
+    
+    <div className="col-md-3">
+      <div 
+        className="card text-center shadow-sm mb-3" 
+        style={{
+          backgroundColor: '#F8EDED',
+          cursor: 'pointer',
+        }}
+        onClick={handleShowUsers}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className="card-body">
+          <h3>Jumlah User</h3>
+          <h1>{users.length}</h1>
         </div>
-      )}
+      </div>
+    </div>
+  </div>
 
-      {showVisitorsTable && (
-        <div className="card mb-4">
-          <div className="card-header">
-            <h5 className="card-title">Daftar Tamu</h5>
-          </div>
-          <div className="card-body">
-            <div className="table-responsive">
-              <table className="table table-bordered table-hover">
-                <thead className="table-light">
-                  <tr>
-                    <th>No</th>
-                    <th>Nama Tamu</th>
-                    <th>Tujuan</th>
-                    <th>Tanggal Kunjungan</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visitors.map((visitor, index) => (
-                    <tr key={visitor.id}>
-                      <td>{index + 1}</td>
-                      <td>{visitor.name}</td>
-                      <td>{visitor.purpose}</td>
-                      <td>{new Date(visitor.visitDate).toLocaleDateString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
+  {/* Baris untuk tombol tambah user dan tambah bidang */}
+  <div className="row mb-4 justify-content-center">
+    <div className="col-md-4">
+      <button className="btn btn-danger w-100 mb-3" onClick={() => navigate('/add-user')}>
+        <FaUserPlus /> Tambah User
+      </button>
+    </div>
+    <div className="col-md-4">
+      <button className="btn btn-danger w-100 mb-3" onClick={() => navigate('/add-department')}>
+        <FaUserPlus /> Tambah Bidang
+      </button>
+    </div>
+  </div>
+
+{/* Tabel Departemen dengan kondisi showDepartmentsTable */}
+{showDepartmentsTable && (
+  <div className="card mb-4">
+    <div className="card-header">
+      <h5 className="card-title">Daftar Departemen</h5>
+    </div>
+    <div className="card-body">
+      <table className="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>No Telepon</th>
+            <th>Alamat</th>
+            <th>Status</th>
+            <th>Email</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {departments.map((department, index) => (
+            <tr key={department.id}>
+              <td>{index + 1}</td>
+              <td>{department.name}</td>
+              <td>{department.phone}</td>
+              <td>{department.address}</td>
+              <td>{department.status}</td>
+              <td>{department.email}</td>
+              <td>
+                <button
+                  className="btn btn-warning btn-sm me-2"
+                  onClick={() => handleEditDepartment(department.id)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => handleDeleteDepartment(department.id)}
+                >
+                  Hapus
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+
+      {/* Tabel Pengguna dengan kondisi showUsersTable */}
+      {showUsersTable && (
+  <div className="card mb-4">
+    <div className="card-header">
+      <h5 className="card-title">Daftar Pengguna</h5>
+    </div>
+    <div className="card-body">
+      <div className="table-responsive">
+        <table className="table table-bordered table-hover">
+          <thead className="table-light">
+            <tr>
+              <th>No</th>
+              <th>Nama</th>
+              <th>NIP</th>
+              <th>Email</th>
+              <th>No Telepon</th>
+              <th>Role</th>
+              <th>Tanggal Dibuat</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user, index) => (
+              <tr key={user.id}>
+                <td>{index + 1}</td>
+                <td>{user.name || '-'}</td>
+                <td>{user.nip || '-'}</td>
+                <td>
+                  <a 
+                    href={`mailto:${user.email}`} 
+                    style={{ color: '#9F2C2C' }}
+                  >
+                    {user.email || '-'}
+                  </a>
+                </td>
+                <td>{user.phone || '-'}</td>
+                <td>{user.role || '-'}</td>
+                <td>
+                  {user.created_at 
+                    ? new Date(user.created_at).toLocaleDateString() 
+                    : '-'}
+                </td>
+                <td>
+    <button
+        className="btn btn-warning btn-sm me-2"
+        onClick={() => navigate(`/edit-user/${user.id}`)}
+    >
+        Edit
+    </button>
+    <button
+        className="btn btn-danger btn-sm me-2"
+        onClick={() => handleDeleteUser(user.id)}
+    >
+        Hapus
+    </button>
+    <button
+        className="btn btn-info btn-sm"
+        onClick={() => navigate(`/user-detail/${user.id}`)}
+    >
+        Detail
+    </button>
+</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };
