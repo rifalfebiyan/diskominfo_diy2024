@@ -3,7 +3,6 @@ package controllers
 import (
 	"backend/database"
 	"backend/models"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +14,6 @@ func GetDepartments(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	fmt.Println(departments) // Log data untuk debugging
 	c.JSON(http.StatusOK, departments)
 }
 

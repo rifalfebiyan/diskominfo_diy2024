@@ -10,7 +10,7 @@ type Agency struct {
 	Email       string       `json:"email"`
 	Phone       string       `json:"phone"`
 	Address     string       `json:"address"`
-	Departments []Department `gorm:"foreignKey:AgencyID" json:"departments"`
+	Departments []Department `gorm:"foreignKey:AgencyID" json:"departments"` // Pastikan ini ada
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
 }

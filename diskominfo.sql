@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 07, 2024 at 09:34 AM
+-- Generation Time: Nov 15, 2024 at 04:17 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -43,10 +43,7 @@ CREATE TABLE `agencies` (
 --
 
 INSERT INTO `agencies` (`id`, `name`, `email`, `phone`, `address`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(3, 'Kominfo', 'kominfo@gmail.com', '08123456789', 'yogya', '2024-11-05 08:36:33.294', '2024-11-05 08:36:33.294', NULL),
-(4, 'Komidigi', 'komidigi@gmail.com', '08123456786', 'komidigi', '2024-11-06 13:41:52.150', '2024-11-06 13:41:52.150', NULL),
-(5, 'Komidigi1', 'komidigi@gmail.com', '08123456786', 'Di Yogyakarta, Kota Yogyakarta', '2024-11-06 14:54:50.326', '2024-11-06 14:54:50.326', NULL),
-(6, 'Test', 'test@gmail.com', '12282821', 'Jogja', '2024-11-07 07:01:48.144', '2024-11-07 07:01:48.144', NULL);
+(11, 'Badan Pusat Statistik (BPS)', 'bps@gmail.com', '0835345622', 'Jakarta', '2024-11-15 08:20:57.853', '2024-11-15 08:20:57.853', NULL);
 
 -- --------------------------------------------------------
 
@@ -72,8 +69,7 @@ CREATE TABLE `departments` (
 --
 
 INSERT INTO `departments` (`id`, `name`, `address`, `phone`, `status`, `email`, `agency_id`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'Tamu 22q', 'Jogja', '1228282', NULL, '', 4, '2024-11-07 08:40:25.947', '2024-11-07 08:40:25.947', NULL),
-(2, 'Tamu 222', 'Jogja', '1228282', NULL, '', 3, '2024-11-07 14:33:09.920', '2024-11-07 14:33:09.920', NULL);
+(1, 'Bidanng BPS 1', 'Jakarta', '0835345622', 'Active', 'bps@gmail.com', 11, '2024-11-15 09:10:01.276', '2024-11-15 09:10:01.276', NULL);
 
 -- --------------------------------------------------------
 
@@ -100,9 +96,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `nip`, `email`, `phone`, `password`, `created_at`, `role`, `n_ip`, `profile_picture`, `agency_id`) VALUES
-(30, 'Spectator', '', 'spectator@gmail.com', '08123456789', 'spec', NULL, 'spectator', '2', '', NULL),
-(32, 'User', '', 'user@gmail.com', '1228282', 'user', NULL, 'user', '11', '/uploads\\profiles\\32_A.jpg', 3),
-(38, 'Admin', '', 'admin@gmail.com', '08123456799', 'admin', '2024-11-07 13:36:13.792', 'admin', '1234', '', 3);
+(1, 'Admin', '2100018365', 'admin@gmail.com', '08123456789', 'admin', '2024-11-11 13:22:30.000', 'admin', NULL, NULL, NULL),
+(51, 'Admin1', '', 'admin1@gmail.com', '083534222', 'admin1', '2024-11-15 09:00:01.857', 'admin', '123432', '', 11);
 
 -- --------------------------------------------------------
 
@@ -112,24 +107,17 @@ INSERT INTO `users` (`id`, `name`, `nip`, `email`, `phone`, `password`, `created
 
 CREATE TABLE `visitors` (
   `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL COMMENT 'Nama pengunjung',
-  `gender` enum('Laki-laki','Perempuan') NOT NULL COMMENT 'Jenis kelamin',
-  `purpose` text NOT NULL COMMENT 'Tujuan kunjungan',
-  `address` text NOT NULL COMMENT 'Alamat pengunjung',
-  `institution` varchar(100) NOT NULL COMMENT 'Asal instansi',
-  `phone` varchar(20) NOT NULL COMMENT 'Nomor telepon',
-  `department` varchar(100) NOT NULL COMMENT 'Bidang yang dituju',
-  `visit_date` datetime NOT NULL COMMENT 'Tanggal dan waktu kunjungan',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Waktu data dibuat',
+  `name` longtext DEFAULT NULL,
+  `gender` longtext DEFAULT NULL,
+  `purpose` longtext DEFAULT NULL,
+  `address` longtext DEFAULT NULL,
+  `institution` longtext DEFAULT NULL,
+  `phone` longtext DEFAULT NULL,
+  `department` longtext DEFAULT NULL,
+  `visit_date` datetime(3) DEFAULT NULL,
+  `created_at` datetime(3) DEFAULT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'Waktu terakhir diupdate'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `visitors`
---
-
-INSERT INTO `visitors` (`id`, `name`, `gender`, `purpose`, `address`, `institution`, `phone`, `department`, `visit_date`, `created_at`, `updated_at`) VALUES
-(1, 'Admin', 'Laki-laki', 'Test', 'Test', 'Kominfo', '08123456789', 'Tamu 222', '2024-11-07 07:00:00', '2024-11-07 08:34:03', '2024-11-07 08:34:03');
 
 --
 -- Indexes for dumped tables
@@ -164,8 +152,8 @@ ALTER TABLE `users`
 ALTER TABLE `visitors`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_visit_date` (`visit_date`),
-  ADD KEY `idx_department` (`department`),
-  ADD KEY `idx_institution` (`institution`);
+  ADD KEY `idx_department` (`department`(768)),
+  ADD KEY `idx_institution` (`institution`(768));
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -175,7 +163,7 @@ ALTER TABLE `visitors`
 -- AUTO_INCREMENT for table `agencies`
 --
 ALTER TABLE `agencies`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `departments`
@@ -187,13 +175,13 @@ ALTER TABLE `departments`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT for table `visitors`
 --
 ALTER TABLE `visitors`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables

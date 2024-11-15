@@ -36,7 +36,7 @@ const Admin = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      setDepartments(response.data);
+      setDepartments(response.data); // Menyimpan data ke state
     } catch (error) {
       console.error('Error fetching departments:', error);
     }
@@ -113,24 +113,23 @@ const Admin = () => {
   };
 
   const handleDeleteDepartment = async (id) => {
-    console.log("Deleting department with ID:", id); // Tambahkan log ini
     if (window.confirm('Apakah Anda yakin ingin menghapus bidang ini?')) {
-        try {
-            const response = await axios.delete(`http://localhost:8080/api/departments/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            if (response.status === 200) {
-                setDepartments(departments.filter(department => department.id !== id));
-                alert('Departemen berhasil dihapus');
-            }
-        } catch (error) {
-            console.error('Error deleting department:', error);
-            alert('Gagal menghapus departemen: ' + error.response?.data?.error || error.message);
+      try {
+        const response = await axios.delete(`http://localhost:8080/api/departments/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        if (response.status === 200) {
+          setDepartments(departments.filter(department => department.id !== id));
+          alert('Departemen berhasil dihapus');
         }
+      } catch (error) {
+        console.error('Error deleting department:', error);
+        alert('Gagal menghapus departemen: ' + error.message);
+      }
     }
-};
+  };
 
 const handleDeleteAgency = async (id) => {
   if (window.confirm('Apakah Anda yakin ingin menghapus instansi ini?')) {
@@ -156,9 +155,9 @@ const handleDeleteAgency = async (id) => {
   }
 };
   
-  const handleShowDepartments = () => {
-    setShowDepartmentsTable(!showDepartmentsTable);
-  };
+const handleShowDepartments = () => {
+  setShowDepartmentsTable(!showDepartmentsTable);
+};
 
   const handleShowUsers = () => {
     setShowUsersTable(!showUsersTable);
@@ -305,7 +304,7 @@ const handleDeleteAgency = async (id) => {
 {showDepartmentsTable && (
   <div className="card mb-4">
     <div className="card-header">
-      <h5 className="card-title">Department List</h5>
+      <h5 className="card-title">Daftar Departemen</h5>
     </div>
     <div className="card-body">
       <table className="table table-bordered table-hover">
@@ -315,7 +314,7 @@ const handleDeleteAgency = async (id) => {
             <th>Nama</th>
             <th>No Telepon</th>
             <th>Alamat</th>
-            <th>Status</th> {/* Pastikan kolom Status ada */}
+            <th>Status</th>
             <th>Email</th>
             <th>Aksi</th>
           </tr>
@@ -327,7 +326,7 @@ const handleDeleteAgency = async (id) => {
               <td>{department.name}</td>
               <td>{department.phone}</td>
               <td>{department.address}</td>
-              <td>{department.status}</td> {/* Tampilkan status */}
+              <td>{department.status}</td>
               <td>{department.email}</td>
               <td>
                 <button
