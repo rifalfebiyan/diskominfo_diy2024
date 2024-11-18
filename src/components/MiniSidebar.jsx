@@ -142,19 +142,33 @@ function MiniSidebar({ onLogout }) {
 
           {/* Spectator Dashboard - Only visible to spectator */}
           {role === 'spectator' && (
-            <li
-              onMouseEnter={() => handleMouseEnter('spectator')}
-              onMouseLeave={handleMouseLeave}
-            >
-              <Link to="/spectator" style={linkStyle(hoveredItem === 'spectator')}>
-                <span style={iconStyle(hoveredItem === 'spectator', location.pathname === '/spectator')}>
-                  &#xf06e;
-                </span>
-                {hoveredItem === 'spectator' && <span>Spectator Dashboard</span>}
-              </Link>
-            </li>
+            <>
+                <li
+                onMouseEnter={() => handleMouseEnter('guest')}
+                onMouseLeave={handleMouseLeave}
+              >
+                <Link to="/guest" style={linkStyle(hoveredItem === 'guest')}>
+                  <span style={iconStyle(hoveredItem === 'guest', location.pathname === '/guest')}>
+                    &#xf02d;
+                  </span>
+                  {hoveredItem === 'guest' && <span>Tamu</span>}
+                </Link>
+              </li>
+              
+              <li
+                onMouseEnter={() => handleMouseEnter('add')}
+                onMouseLeave={handleMouseLeave}
+              >
+                <Link to="/add" style={linkStyle(hoveredItem === 'add')}>
+                  <span style={iconStyle(hoveredItem === 'add', location.pathname === '/add')}>
+                    &#xf044;
+                  </span>
+                  {hoveredItem === 'add' && <span>Form Tamu</span>}
+                </Link>
+              </li>
+            </>
           )}
-
+          
           {/* Guest and Add Form Links - Not visible to spectator */}
           {role !== 'spectator' && (
             <>

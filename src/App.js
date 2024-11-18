@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Login from './components/Login';
+import Register from './components/Register'; // Impor komponen Register
 import VisitorForm from './components/VisitorForm';
 import VisitorData from './components/VisitorData';
 import Footer from './components/Footer';
@@ -10,13 +11,13 @@ import StatistikData from './components/StatistikData';
 import MiniSidebar from './components/MiniSidebar';
 import EditVisitor from './components/EditVisitor';
 import Admin from './components/Admin';
-import AddUser from './components/AddUser';
+import AddUser  from './components/AddUser';
 import Profile from './components/Profile';
 import AddDepartment from './components/AddDepartment';
 import DepartmentData from './components/DepartmentData';
 import UserAddDepartment from './components/UserAddDepartment';
 import EditDepartment from './components/EditDepartment';
-import EditUser from './components/EditUser';
+import EditUser  from './components/EditUser';
 import UserData from './components/UserData'; 
 import User from './components/User';
 import AddAgency from './components/AddAgency';
@@ -28,7 +29,7 @@ import './App.css';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState(null);
+  const [userRole, setUserRole] = useState(null); // Perbaikan di sini
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -38,17 +39,17 @@ function App() {
       const role = localStorage.getItem('userRole');
       if (token) {
         setIsLoggedIn(true);
-        setUserRole(role);
+        setUserRole(role); // Corrected here
         if (window.location.pathname === '/login') {
           navigate(role === 'admin' ? '/admin' : '/', { replace: true });
         }
       } else {
-        if (window.location.pathname !== '/login') {
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
           navigate('/login', { replace: true });
         }
       }
       setLoading(false);
-    };
+    };  
 
     checkAuth();
   }, [navigate]);
@@ -63,9 +64,9 @@ function App() {
   };
 
   const UserRoute = ({ children }) => {
-    const isUser = localStorage.getItem('userRole') === 'user';
-    return isUser ? children : <Navigate to="/login" replace />;
-};
+    const isUser  = localStorage.getItem('userRole') === 'user';
+    return isUser  ? children : <Navigate to="/login" replace />;
+  };
 
   const SpectatorRoute = ({ children }) => {
     const isSpectator = localStorage.getItem('userRole') === 'spectator';
@@ -74,7 +75,7 @@ function App() {
 
   const handleLogin = (status, role) => {
     setIsLoggedIn(status);
-    setUserRole(role);
+    setUserRole(role); // Perbaikan di sini
     if (status && role === 'admin') {
       navigate('/admin', { replace: true });
     } else if (status) {
@@ -85,7 +86,7 @@ function App() {
   const handleLogout = () => {
     setLoading(true);
     setIsLoggedIn(false);
-    setUserRole(null);
+    setUserRole(null); // Perbaikan di sini
     localStorage.clear();
     navigate('/login', { replace: true });
     setLoading(false);
@@ -97,13 +98,12 @@ function App() {
 
   return (
     <div className="d-flex flex-column flex-lg-row">
-      {isLoggedIn && <MiniSidebar onLogout={handleLogout} />} {/* Pass onLogout correctly */}
+      {isLoggedIn && <MiniSidebar onLogout={handleLogout} />}
       <div className="d-flex flex-column flex-grow-1 min-vh-100">
         {isLoggedIn && <Header onLogout={handleLogout} />}
         {isLoggedIn && (
           <marquee behavior="scroll" direction="left">
-            Selamat Datang di Buku Tamu Dinas Komunikasi dan Informatika Daerah Istimewa Yogyakarta
-          </marquee>
+            Selamat Datang di Buku Tamu Dinas Komunikasi dan Informatika Daerah Istimewa Yogyakarta </marquee>
         )}
         <div className="container-fluid flex-grow-1 p-0">
           <Routes>
@@ -119,10 +119,15 @@ function App() {
             />
 
             <Route 
+              path="/register" 
+              element={<Register />} // Rute untuk halaman register
+            />
+
+            <Route 
               path="/user" 
               element={
                 isLoggedIn && userRole === 'user' ? (
-                  <User />
+                  <User   />
                 ) : (
                   <Navigate to="/login" replace />
                 )
@@ -149,13 +154,14 @@ function App() {
             <Route path="/profile" element={isLoggedIn ? <Profile onNavigate={handleNavigation} /> : <Navigate to="/login" replace />} />
             <Route path="/edit/:index" element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" replace />} />
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
-            <Route path="/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
-            <Route path="/user-detail/:id" element={<AdminRoute><UserData /></AdminRoute>} />            <Route path="/add-department" element={<AddDepartment />} />
+            <Route path="/add-user" element={<AdminRoute><AddUser   /></AdminRoute>} />
+            <Route path="/user-detail/:id" element={<AdminRoute><User Data /></AdminRoute>} />
+            <Route path="/add-department" element={<AddDepartment />} />
             <Route 
               path="/user/add-department" 
               element={
                 isLoggedIn && userRole === 'user' ? (
-                  <UserAddDepartment />
+                  <User AddDepartment />
                 ) : (
                   <Navigate to="/login" replace />
                 )
@@ -163,11 +169,9 @@ function App() {
             />
             <Route path="/department-data/:id" element={<AdminRoute><DepartmentData /></AdminRoute>} />
             <Route path="/edit-department/:id" element={<EditDepartment />} />
-            <Route path="/add-department" element={<AddDepartment />} />
-            <Route path="/edit-user/:id" element={<AdminRoute><EditUser /></AdminRoute>} />
+            <Route path="/edit-user/:id" element={<AdminRoute><EditUser   /></AdminRoute>} />
             <Route path="/add-agency" element={<AdminRoute><AddAgency/></AdminRoute>} />
             <Route path="/agency-data" element={<AdminRoute><AgencyData/></AdminRoute>} />
-            <Route path="/add-agency" element={<AdminRoute><AddAgency /></AdminRoute>} />
             <Route path="/agency-data/:id" element={<AdminRoute><AgencyData /></AdminRoute>} />
             <Route path="/edit-agency/:id" element={<AdminRoute><EditAgency /></AdminRoute>} />
 

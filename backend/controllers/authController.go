@@ -58,16 +58,40 @@ func Login(c *gin.Context) {
 }
 
 func Register(c *gin.Context) {
-	var user models.User
+	var input struct {
+		Name     string `json:"name" binding:"required"`
+		Email    string `json:"email" binding:"required,email"`
+		Password string `json:"password" binding:"required,min=6"`
+		Role     string `json:"role" binding:"required,oneof=admin user spectator"`
+		AgencyID uint   `json:"agency_id" binding:"required"` // Menggunakan AgencyID sebagai uint
+	}
 
-	if err := c.ShouldBindJSON(&user); err != nil {
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if user.Role != "admin" && user.Role != "user" && user.Role != "spectator" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role"})
+	// Cek apakah email sudah terdaftar
+	var existingUser models.User
+	if err := database.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "Email already registered"})
 		return
+	}
+
+	// Cek apakah AgencyID valid
+	var agency models.Agency
+	if err := database.DB.First(&agency, input.AgencyID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Agency ID"})
+		return
+	}
+
+	// Buat user baru
+	user := models.User{
+		Name:     input.Name,
+		Email:    input.Email,
+		Password: input.Password, // Pastikan password dienkripsi saat menyimpan
+		Role:     input.Role,
+		AgencyID: &agency.ID, // Menyimpan pointer ke AgencyID
 	}
 
 	result := database.DB.Create(&user)
@@ -76,5 +100,5 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "User created successfully"})
+	c.JSON(http.StatusCreated, gin.H{"message": "User  created successfully"})
 }
