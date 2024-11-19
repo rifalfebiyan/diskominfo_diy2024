@@ -15,5 +15,6 @@ type User struct {
 	Role           string    `json:"role"`
 	ProfilePicture string    `json:"profile_picture"`
 	AgencyID       *uint     `json:"agency_id"`
+	N_IP           string    `json:"n_ip"` // Pastikan field ini ada
 	Agency         Agency    `gorm:"foreignKey:AgencyID" json:"agency"`
 }

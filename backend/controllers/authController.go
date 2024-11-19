@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	log "github.com/sirupsen/logrus" // Mengimpor logrus dengan alias log
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -60,45 +62,52 @@ func Login(c *gin.Context) {
 func Register(c *gin.Context) {
 	var input struct {
 		Name     string `json:"name" binding:"required"`
+		NIP      string `json:"nip"`
 		Email    string `json:"email" binding:"required,email"`
+		Phone    string `json:"phone" binding:"required"`
 		Password string `json:"password" binding:"required,min=6"`
 		Role     string `json:"role" binding:"required,oneof=admin user spectator"`
-		AgencyID uint   `json:"agency_id" binding:"required"` // Menggunakan AgencyID sebagai uint
+		AgencyID uint   `json:"agency_id" binding:"required"`
+		N_IP     string `json:"n_ip"` // Tambahkan ini untuk n_ip
 	}
 
+	// Mengikat JSON ke struct input
 	if err := c.ShouldBindJSON(&input); err != nil {
+		log.Errorf("Error binding JSON: %v", err) // Mencatat kesalahan
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	log.Infof("Received registration request: %+v", input) // Mencatat permintaan pendaftaran
+
 	// Cek apakah email sudah terdaftar
 	var existingUser models.User
 	if err := database.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
+		log.Warnf("Email already registered: %s", input.Email) // Mencatat jika email sudah terdaftar
 		c.JSON(http.StatusConflict, gin.H{"error": "Email already registered"})
-		return
-	}
-
-	// Cek apakah AgencyID valid
-	var agency models.Agency
-	if err := database.DB.First(&agency, input.AgencyID).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Agency ID"})
 		return
 	}
 
 	// Buat user baru
 	user := models.User{
 		Name:     input.Name,
+		NIP:      input.NIP,
 		Email:    input.Email,
+		Phone:    input.Phone,
 		Password: input.Password, // Pastikan password dienkripsi saat menyimpan
 		Role:     input.Role,
-		AgencyID: &agency.ID, // Menyimpan pointer ke AgencyID
+		AgencyID: &input.AgencyID,
+		N_IP:     input.N_IP, // Simpan n_ip ke database
 	}
 
+	// Menyimpan pengguna baru ke dalam database
 	result := database.DB.Create(&user)
 	if result.Error != nil {
+		log.Errorf("Failed to create user: %v", result.Error) // Mencatat kesalahan saat membuat user
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "User  created successfully"})
+	log.Infof("User  registered successfully: %+v", user) // Mencatat keberhasilan pendaftaran
+	c.JSON(http.StatusCreated, gin.H{"message": "User  registered successfully"})
 }

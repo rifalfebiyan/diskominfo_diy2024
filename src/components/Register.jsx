@@ -57,7 +57,7 @@ const RegisterForm = () => {
             } else {
                 setUser (prev => ({
                     ...prev,
-                    agency_id: '' // Reset jika tidak ditemukan
+                    agency_id:1 // Reset jika tidak ditemukan
                 }));
             }
         }
@@ -73,23 +73,38 @@ const RegisterForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+    
+        // Pastikan semua field diisi
+        if (!user.name || !user.nip || !user.email || !user.password || !user.phone) {
+            alert('Semua field harus diisi!');
+            return;
+        }
+    
         try {
             const response = await axios.post('http://localhost:8080/api/register', {
                 ...user,
-                role: 'spectator' // Pastikan role tetap 'spectator' saat pengiriman
+                n_ip: user.nip, // Pastikan n_ip diisi dengan nilai yang sesuai
+                role: 'spectator' // Pastikan role tetap 'spectator'
             }, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
-
+    
             if (response.status === 201) {
                 alert('User  berhasil terdaftar');
-                navigate('/login'); // Redirect ke halaman login setelah berhasil
+                // Reset form setelah pendaftaran berhasil
+                setUser ({
+                    name: '',
+                    nip : '',
+                    email: '',
+                    phone: '',
+                    password: ''
+                });
             }
         } catch (error) {
-            console.error('Error registering user:', error);
-            alert('Gagal mendaftar: ' + (error.response?.data?.error || error.message));
+            console.error('Error during registration:', error);
+            alert('Terjadi kesalahan saat mendaftar. Silakan coba lagi.');
         }
     };
 
@@ -241,19 +256,6 @@ const RegisterForm = () => {
                         Daftar
                     </button>
                 </form>
-                <a
-                    href="#lihat-data"
-                    style={{
-                        display: "block",
-                        marginTop: "10px",
-                        fontSize: "12px",
-                        color: "#B91C1C",
-                        textDecoration: "none",
-                        fontWeight: "bold",
-                    }}
-                >
-                    LIHAT DATA TAMU
-                </a>
             </div>
         </div>
     );
