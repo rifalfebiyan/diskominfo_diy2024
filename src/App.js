@@ -1,109 +1,183 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Login from './components/Login';
+import Register from './components/Register'; // Impor komponen Register
 import VisitorForm from './components/VisitorForm';
 import VisitorData from './components/VisitorData';
 import Footer from './components/Footer';
 import Loader from './components/Loader';
-import Profile from './components/Profile';
 import StatistikData from './components/StatistikData';
 import MiniSidebar from './components/MiniSidebar';
+import EditVisitor from './components/EditVisitor';
+import Admin from './components/Admin';
+import AddUser  from './components/AddUser';
+import Profile from './components/Profile';
+import AddDepartment from './components/AddDepartment';
+import DepartmentData from './components/DepartmentData';
+import UserAddDepartment from './components/UserAddDepartment';
+import EditDepartment from './components/EditDepartment';
+import EditUser  from './components/EditUser';
+import UserData from './components/UserData'; 
+import User from './components/User';
+import AddAgency from './components/AddAgency';
+import AgencyData from './components/AgencyData';
+import EditAgency from './components/EditAgency';
+import SpectatorDashboard from './components/SpectatorDashboard';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import EditVisitor from './components/EditVisitor';
-import Admin from './components/Admin'; // Impor halaman Admin
-import AddUser from './components/AddUser'; // Impor halaman tambah user
-import AddDepartment from './components/AddDepartment'; // Impor halaman tambah bidang
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [userRole, setUserRole] = useState(null); // Perbaikan di sini
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Fungsi untuk menangani login
-  const handleLogin = (status, role) => {
-    setIsLoggedIn(status);
-    if (status) {
-      localStorage.setItem('role', role); // Simpan role di localStorage
-      setLoading(true);
-
-      // Navigasi berdasarkan role
-      if (role === 'admin') {
-        navigate('/admin'); // Jika admin, ke halaman admin
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('userRole');
+      if (token) {
+        setIsLoggedIn(true);
+        setUserRole(role); // Corrected here
+        if (window.location.pathname === '/login') {
+          navigate(role === 'admin' ? '/admin' : '/', { replace: true });
+        }
       } else {
-        navigate('/'); // Jika user biasa, ke halaman statistik
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+          navigate('/login', { replace: true });
+        }
       }
       setLoading(false);
+    };  
+
+    checkAuth();
+  }, [navigate]);
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
+  const AdminRoute = ({ children }) => {
+    const isAdmin = localStorage.getItem('userRole') === 'admin';
+    return isAdmin ? children : <Navigate to="/login" replace />;
+  };
+
+  const UserRoute = ({ children }) => {
+    const isUser  = localStorage.getItem('userRole') === 'user';
+    return isUser  ? children : <Navigate to="/login" replace />;
+  };
+
+  const SpectatorRoute = ({ children }) => {
+    const isSpectator = localStorage.getItem('userRole') === 'spectator';
+    return isSpectator ? children : <Navigate to="/login" replace />;
+  };
+
+  const handleLogin = (status, role) => {
+    setIsLoggedIn(status);
+    setUserRole(role); // Perbaikan di sini
+    if (status && role === 'admin') {
+      navigate('/admin', { replace: true });
+    } else if (status) {
+      navigate('/', { replace: true });
     }
   };
 
-  // Fungsi untuk logout
   const handleLogout = () => {
     setLoading(true);
     setIsLoggedIn(false);
-    localStorage.removeItem('role'); // Hapus role saat logout
-    navigate('/login');
+    setUserRole(null); // Perbaikan di sini
+    localStorage.clear();
+    navigate('/login', { replace: true });
     setLoading(false);
   };
 
-  // Fungsi untuk navigasi manual
-  const handleNavigation = (path) => {
-    setLoading(true);
-    navigate(path);
-    setLoading(false);
-  };
-
-  // Cek apakah role pengguna adalah admin
-  const isAdmin = () => {
-    const role = localStorage.getItem('role');
-    return role === 'admin'; // Hanya izinkan admin
-  };
-
-  // Komponen Route khusus untuk admin
-  const AdminRoute = ({ children }) => {
-    return isAdmin() ? children : <Navigate to="/" />; // Jika bukan admin, redirect ke home
-  };
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
-    <div className="d-flex">
+    <div className="d-flex flex-column flex-lg-row">
       {isLoggedIn && <MiniSidebar onLogout={handleLogout} />}
-      <div className="d-flex flex-column min-vh-100 flex-grow-1">
+      <div className="d-flex flex-column flex-grow-1 min-vh-100">
         {isLoggedIn && <Header onLogout={handleLogout} />}
         {isLoggedIn && (
-          <marquee className="py-2 text-dark">
-            Selamat Datang di Buku Tamu Dinas Komunikasi dan Informasi Daerah Istimewa Yogyakarta
-          </marquee>
+          <marquee behavior="scroll" direction="left">
+            Selamat Datang di Buku Tamu Dinas Komunikasi dan Informatika Daerah Istimewa Yogyakarta </marquee>
         )}
         <div className="container-fluid flex-grow-1 p-0">
-          {!isLoggedIn ? (
-            <Login onLogin={handleLogin} />
-          ) : (
-            <div>
-              <Routes>
-                {/* Rute ke halaman utama */}
-                <Route path="/" element={<StatistikData onNavigate={handleNavigation} />} />
+          <Routes>
+            <Route
+              path="/login"
+              element={
+                !isLoggedIn ? (
+                  <Login onLogin={handleLogin} />
+                ) : (
+                  <Navigate to={userRole === 'admin' ? '/admin' : '/'} replace />
+                )
+              }
+            />
 
-                {/* Rute untuk data visitor */}
-                <Route path="/guest" element={<VisitorData />} />
+            <Route 
+              path="/register" 
+              element={<Register />} // Rute untuk halaman register
+            />
 
-                {/* Rute untuk tambah visitor */}
-                <Route path="/add" element={<VisitorForm onNavigate={handleNavigation} />} />
-                {/* Rute untuk tambah visitor */}
-                <Route path="/profile" element={<Profile onNavigate={handleNavigation}/>} />
+            <Route 
+              path="/user" 
+              element={
+                isLoggedIn && userRole === 'user' ? (
+                  <User   />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } 
+            />
 
-                {/* Rute untuk edit visitor */}
-                <Route path="/edit/:index" element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" />} />
+            <Route 
+              path="/spectator" 
+              element={
+                (() => {
+                  console.log('isLoggedIn:', isLoggedIn);
+                  console.log('userRole:', userRole);
+                  return isLoggedIn && userRole === 'spectator' ? 
+                    <SpectatorDashboard /> : 
+                    <Navigate to="/login" replace />;
+                })()
+              } 
+            />
+            
+            {/* Protected Routes */}
+            <Route path="/" element={isLoggedIn ? <StatistikData /> : <Navigate to="/login" replace />} />
+            <Route path="/guest" element={isLoggedIn ? <VisitorData /> : <Navigate to="/login" replace />} />
+            <Route path="/add" element={isLoggedIn ? <VisitorForm /> : <Navigate to="/login" replace />} />
+            <Route path="/profile" element={isLoggedIn ? <Profile onNavigate={handleNavigation} /> : <Navigate to="/login" replace />} />
+            <Route path="/edit/:index" element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" replace />} />
+            <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+            <Route path="/add-user" element={<AdminRoute><AddUser   /></AdminRoute>} />
+            <Route path="/user-detail/:id" element={<AdminRoute><User Data /></AdminRoute>} />
+            <Route path="/add-department" element={<AddDepartment />} />
+            <Route 
+              path="/user/add-department" 
+              element={
+                isLoggedIn && userRole === 'user' ? (
+                  <User AddDepartment />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } 
+            />
+            <Route path="/department-data/:id" element={<AdminRoute><DepartmentData /></AdminRoute>} />
+            <Route path="/edit-department/:id" element={<EditDepartment />} />
+            <Route path="/edit-user/:id" element={<AdminRoute><EditUser   /></AdminRoute>} />
+            <Route path="/add-agency" element={<AdminRoute><AddAgency/></AdminRoute>} />
+            <Route path="/agency-data" element={<AdminRoute><AgencyData/></AdminRoute>} />
+            <Route path="/agency-data/:id" element={<AdminRoute><AgencyData /></AdminRoute>} />
+            <Route path="/edit-agency/:id" element={<AdminRoute><EditAgency /></AdminRoute>} />
 
-                {/* Halaman admin yang dilindungi */}
-                <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} /> {/* Admin Page */}
-
-                {/* Rute untuk tambah user dan bidang */}
-                <Route path="/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
-                <Route path="/add-department" element={<AdminRoute><AddDepartment /></AdminRoute>} />
-              </Routes>
-            </div>
-          )}
+            {/* Catch all route */}
+            <Route path="*" element={<Navigate to={isLoggedIn ? '/' : '/login'} replace />} />
+          </Routes>
         </div>
         {isLoggedIn && <Footer />}
         {loading && <Loader />}

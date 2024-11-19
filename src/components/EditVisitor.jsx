@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Loader from './Loader'; // Import Loader
+import axios from 'axios';
 
 function EditVisitor() {
   const { index } = useParams();
@@ -12,49 +12,122 @@ function EditVisitor() {
     institution: '',
     phone: '',
     department: '',
+    visitDate: '',
   });
-  const [loading, setLoading] = useState(true); // State for loading
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
-    const storedVisitors = JSON.parse(localStorage.getItem('visitors')) || [];
-    if (storedVisitors[index]) {
-      setVisitor(storedVisitors[index]);
+    fetchDepartments();
+    fetchVisitor();
+  }, []);
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/departments', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setDepartments(response.data);
+    } catch (error) {
+      console.error('Error fetching departments:', error);
     }
-    setLoading(false); // Set loading to false after data is retrieved
-  }, [index]);
+  };
+
+  const fetchVisitor = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Token tidak ditemukan. Silakan login kembali.');
+        setLoading(false);
+        return;
+      }
+      const response = await axios.get(`http://localhost:8080/api/visitors/${index}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      // Format the date properly
+      const visitDate = response.data.visitDate ? 
+        new Date(response.data.visitDate).toISOString().split('T')[0] : '';
+      
+      setVisitor({ ...response.data, visitDate });
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching visitor:', error);
+      setError('Failed to fetch visitor data. Please try again.');
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setVisitor((prevVisitor) => ({
+    setVisitor(prevVisitor => ({
       ...prevVisitor,
-      [name]: value,
+      [name]: value
     }));
   };
 
-  const handleSave = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const storedVisitors = JSON.parse(localStorage.getItem('visitors')) || [];
-    storedVisitors[index] = visitor;
-    localStorage.setItem('visitors', JSON.stringify(storedVisitors));
-    navigate('/'); // Navigate back to the visitor list page after saving
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Prepare the data for submission
+      const submitData = {
+        ...visitor,
+        visitDate: new Date(visitor.visitDate + 'T00:00:00Z').toISOString()
+      };
+
+      console.log('Sending data:', submitData);
+
+      const response = await axios.put(
+        `http://localhost:8080/api/visitors/${index}`,
+        submitData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log('Response:', response.data);
+      alert('Data berhasil diupdate!');
+      navigate('/guest');
+    } catch (error) {
+      console.error('Error updating visitor:', error);
+      setError('Failed to update visitor. Please try again.');
+      alert('Error updating visitor: ' + (error.response?.data?.message || error.message));
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
-    return <Loader />; // Show Loader while loading
+    return <div className="container mt-3">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="container mt-3 alert alert-danger">{error}</div>;
   }
 
   return (
     <div className="container my-4">
-      <div className="p-3 border rounded shadow" style={{ maxWidth: '700px', margin: '0 auto' }}> {/* Set a max width and center */}
-        <form onSubmit={handleSave}>
-          <p className="fw-bold text-center">EDIT DATA TAMU</p>
+      <div className="p-3 border rounded shadow" style={{ maxWidth: '700px', margin: '0 auto' } }>
+        <form onSubmit={handleSubmit}>
+          <p className="fw-bold text-center">EDIT FORM TAMU</p>
 
           <div className="mb-2">
             <label className="form-label">Nama*</label>
             <input
               type="text"
-              className="form-control border border-dark" // Border around input
+              className="form-control border border-dark"
               name="name"
               value={visitor.name}
               onChange={handleInputChange}
@@ -66,7 +139,7 @@ function EditVisitor() {
             <label className="form-label">Jenis Kelamin*</label>
             <select
               name="gender"
-              className="form-select border border-dark" // Border around select
+              className="form-select border border-dark"
               value={visitor.gender}
               onChange={handleInputChange}
               required
@@ -81,7 +154,7 @@ function EditVisitor() {
             <label className="form-label">Keperluan*</label>
             <input
               type="text"
-              className="form-control border border-dark" // Border around input
+              className="form-control border border-dark"
               name="purpose"
               value={visitor.purpose}
               onChange={handleInputChange}
@@ -91,8 +164,9 @@ function EditVisitor() {
 
           <div className="mb-2">
             <label className="form-label">Alamat*</label>
-            <textarea
-              className="form-control border border-dark" // Border around textarea
+            <input
+              type="text"
+              className="form-control border border-dark"
               name="address"
               value={visitor.address}
               onChange={handleInputChange}
@@ -101,10 +175,10 @@ function EditVisitor() {
           </div>
 
           <div className="mb-2">
-            <label className="form-label">Instansi*</label>
+            <label className="form-label">Institusi*</label>
             <input
               type="text"
-              className="form-control border border-dark" // Border around input
+              className="form-control border border-dark"
               name="institution"
               value={visitor.institution}
               onChange={handleInputChange}
@@ -113,10 +187,10 @@ function EditVisitor() {
           </div>
 
           <div className="mb-2">
-            <label className="form-label">No Telp*</label>
+            <label className="form-label">No. Telepon*</label>
             <input
               type="tel"
-              className="form-control border border-dark" // Border around input
+              className="form-control border border-dark"
               name="phone"
               value={visitor.phone}
               onChange={handleInputChange}
@@ -125,22 +199,39 @@ function EditVisitor() {
           </div>
 
           <div className="mb-2">
-            <label className="form-label">Bidang*</label>
+            <label className="form-label">Departemen*</label>
             <select
               name="department"
-              className="form-select border border-dark" // Border around select
+              className="form-select border border-dark"
               value={visitor.department}
               onChange={handleInputChange}
               required
             >
-              <option value="">Pilih Bidang</option>
-              <option value="Bidang IKP">Bidang IKP</option>
-              <option value="Bidang HUMAS">Bidang HUMAS</option>
-              <option value="Bidang APTIKA">Bidang APTIKA</option>
+              <option value="">Pilih Departemen</option>
+              {departments.map((department) => (
+                <option key={department.id} value={department.name}>
+                  {department.name}
+                </option>
+              ))}
             </select>
           </div>
 
-          <button type="submit" className="btn btn-danger w-100">Simpan</button>
+          <div className="mb-2">
+            <label className="form-label">Tanggal Kunjungan*</label>
+            <input
+              type="date"
+              className="form-control border border-dark"
+              name="visitDate"
+              value={visitor.visitDate}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+
+          <button type="submit" className="btn btn-danger w-100">
+          Update
+        </button>
+
         </form>
       </div>
     </div>

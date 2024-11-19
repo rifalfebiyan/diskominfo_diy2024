@@ -3,6 +3,7 @@ import { Bar } from 'react-chartjs-2';
 import 'chart.js/auto';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Card } from 'react-bootstrap';
+import axios from 'axios';
 
 function StatistikData() {
   const [visitors, setVisitors] = useState([]);
@@ -10,49 +11,54 @@ function StatistikData() {
   const currentDate = new Date();
 
   useEffect(() => {
-    const storedVisitors = JSON.parse(localStorage.getItem('visitors')) || [];
-    setVisitors(storedVisitors);
-  }, []);
+    const fetchVisitors = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/visitors', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        setVisitors(response.data);
+      } catch (error) {
+        console.error('Error fetching visitors:', error);
+      }
+    };
 
+    fetchVisitors();
+  }, []);
+  
   // Helper functions to filter data by date
   const filterByDay = (date) => {
-    return (
-      new Date(date).toLocaleDateString() === currentDate.toLocaleDateString()
-    );
+    return date && (new Date(date).toLocaleDateString() === currentDate.toLocaleDateString());
   };
 
   const filterByMonth = (date) => {
-    return (
+    return date && (
       new Date(date).getMonth() === currentDate.getMonth() &&
       new Date(date).getFullYear() === currentDate.getFullYear()
     );
   };
 
   const filterByYear = (date) => {
-    return new Date(date).getFullYear() === currentDate.getFullYear();
+    return date && (new Date(date).getFullYear() === currentDate.getFullYear());
   };
 
   // Calculate totals for today, this month, and this year
-  const totalVisitorsToday = visitors.filter((visitor) => filterByDay(visitor.visitDate)).length;
-  const totalVisitorsMonth = visitors.filter((visitor) => filterByMonth(visitor.visitDate)).length;
-  const totalVisitorsYear = visitors.filter((visitor) => filterByYear(visitor.visitDate)).length;
+  const totalVisitorsToday = visitors.filter((visitor) => filterByDay(visitor.visit_date)).length;
+  const totalVisitorsMonth = visitors.filter((visitor) => filterByMonth(visitor.visit_date)).length;
+  const totalVisitorsYear = visitors.filter((visitor) => filterByYear(visitor.visit_date)).length;
 
   // Prepare monthly statistics for the chart
   const monthlyVisitorCounts = new Array(12).fill(0);
   visitors.forEach((visitor) => {
-    const visitMonth = new Date(visitor.visitDate).getMonth();
-    const visitYear = new Date(visitor.visitDate).getFullYear();
-    if (visitYear === currentDate.getFullYear()) {
-      monthlyVisitorCounts[visitMonth]++;
+    if (visitor.visit_date) {
+      const visitDate = new Date(visitor.visit_date);
+      const visitMonth = visitDate.getMonth();
+      if (visitDate.getFullYear() === currentDate.getFullYear()) {
+        monthlyVisitorCounts[visitMonth]++;
+      }
     }
   });
-
-  // Prepare yearly statistics for the chart
-  const yearlyVisitorCounts = visitors.reduce((acc, visitor) => {
-    const visitYear = new Date(visitor.visitDate).getFullYear();
-    acc[visitYear] = (acc[visitYear] || 0) + 1;
-    return acc;
-  }, {});
 
   const monthlyData = {
     labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
@@ -64,20 +70,6 @@ function StatistikData() {
       },
     ],
   };
-
-  const yearlyData = {
-    labels: Object.keys(yearlyVisitorCounts), // Extracting years dynamically
-    datasets: [
-      {
-        label: 'Jumlah Kunjungan Tahunan',
-        data: Object.values(yearlyVisitorCounts), // Corresponding yearly counts
-        backgroundColor: 'rgba(54, 162, 235, 0.6)',
-      },
-    ],
-  };
-
-  // Toggle between monthly and yearly view
-  const chartData = viewMode === 'monthly' ? monthlyData : yearlyData;
 
   return (
     <div className="container mt-5">
@@ -104,29 +96,10 @@ function StatistikData() {
         </div>
       </div>
 
-      <div className="d-flex justify-content-center mb-4">
-        <div className="btn-group" role="group" aria-label="View mode">
-          <button
-            type="button"
-            className={`btn ${viewMode === 'monthly' ? 'btn-danger' : 'btn-outline-danger'}`}
-            onClick={() => setViewMode('monthly')}
-          >
-            Monthly
-          </button>
-          <button
-            type="button"
-            className={`btn ${viewMode === 'yearly' ? 'btn-danger' : 'btn-outline-danger'}`}
-            onClick={() => setViewMode('yearly')}
-          >
-            Yearly
-          </button>
-        </div>
-      </div>
-
       <Card className="shadow-sm mb-5"> {/* Added margin-bottom */}
         <Card.Body>
           <h5 className="text-center">Grafik Aktivitas Kunjungan</h5>
-          <Bar data={chartData} />
+          <Bar data={monthlyData} />
         </Card.Body>
       </Card>
     </div>
@@ -134,4 +107,3 @@ function StatistikData() {
 }
 
 export default StatistikData;
-                 

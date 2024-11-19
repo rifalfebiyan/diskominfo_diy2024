@@ -1,13 +1,66 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Sidebar */
+.sidebar2 {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 250px;
+  z-index: 999;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transform: translateX(100%);
+  transition: transform 0.4s ease;
+  padding-top: 20px; /* Adds padding to the top for spacing */
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Sidebar visible state */
+.sidebar2.visible {
+  transform: translateX(0);
+}
+
+/* Sidebar Links */
+.sidebar2 ul {
+  padding: 0; /* Removes padding from the ul */
+  margin: 0;
+  width: 100%;
+  list-style-type: none;
+}
+
+.sidebar-link {
+  display: block;
+  width: 100%;
+  padding: 15px 20px; /* Uniform padding for each link */
+  color: #333;
+  text-decoration: none;
+  text-align: left; /* Align text to the left */
+  border-radius: 4px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: 16px;
+}
+
+.sidebar-link:hover {
+  background-color: rgba(167, 56, 39, 0.1);
+  transform: translateX(10px);
+}
+
+/* Close Button styling */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  color: #A83427;
+  font-size: 1.5rem;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #871D15;
+  transform: scale(1.1);
 }

@@ -1,28 +1,75 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
-import { Modal, Button } from 'react-bootstrap';
+import axios from 'axios';
+import { Modal, Button, Container, Row, Col } from 'react-bootstrap';
 
 const Profile = () => {
-  const { userId } = useParams();
   const [user, setUser] = useState({
-    name: 'RIFAL',
-    nip: '4680543456',
-    email: 'rifal123@gmail.com',
-    phone: '09217639184712941',
-    department: 'APTIKA',
-    profilePicture: ''
+    name: '',
+    nip: '',
+    email: '',
+    phone: '',
+    agency_id: null,
+    profilePicture: '',
+    role: ''
   });
+  const [agency, setAgency] = useState(null);
   const [newProfilePicture, setNewProfilePicture] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    const storedUsers = JSON.parse(localStorage.getItem('visitors')) || [];
-    const currentUser = storedUsers[userId];
-    if (currentUser) {
-      setUser(currentUser);
+    fetchUserData();
+  }, []);
+
+  const fetchAgencyData = async (agencyId) => {
+    try {
+      const response = await axios.get(`http://localhost:8080/api/agencies/${agencyId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setAgency(response.data);
+    } catch (error) {
+      console.error('Error fetching agency data:', error);
     }
-  }, [userId]);
+  };
+
+  const fetchUserData = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      console.log("Fetching data for user ID:", userId);
+      const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      console.log("Received user data:", response.data);
+      
+      const { name, nip, email, phone, role, profile_picture, agency_id } = response.data;
+      
+      setUser({
+        name,
+        nip,
+        email,
+        phone,
+        role,
+        profilePicture: profile_picture,
+        agency_id
+      });
+
+      if (agency_id) {
+        fetchAgencyData(agency_id);
+      }
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setError('Failed to load user data');
+      setLoading(false);
+    }
+  };
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
@@ -36,51 +83,92 @@ const Profile = () => {
     }
   };
 
-  const handleSaveProfilePicture = () => {
-    const updatedUser = { ...user, profilePicture: newProfilePicture };
-    setUser(updatedUser);
-    const storedUsers = JSON.parse(localStorage.getItem('visitors')) || [];
-    storedUsers[userId] = updatedUser;
-    localStorage.setItem('visitors', JSON.stringify(storedUsers));
-    setShowModal(false);
+  const handleSaveProfilePicture = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      const formData = new FormData();
+      formData.append('profile_picture', fileInputRef.current.files[0]);
+
+      await axios.post(
+        `http://localhost:8080/api/users/${userId}/profile-picture`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      setUser({ ...user, profilePicture: newProfilePicture });
+      setShowModal(false);
+      alert('Profile picture updated successfully');
+      window.location.reload();
+    } catch (error) {
+      console.error('Error updating profile picture:', error);
+      alert('Failed to update profile picture');
+    }
   };
 
-  const handleClickProfilePicture = () => {
-    fileInputRef.current.click();
-  };
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container className="mt-3">
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      </Container>
+    );
+  }
 
   return (
-    <div className="container my-5">
-      <div className="row justify-content-center">
+    <Container className="my-5">
+      <Row className="justify-content-center">
         {/* Profile Picture Section */}
-        <div className="col-md-3 text-center">
+        <Col md={3} className="text-center mb-4">
           <div
-            className="bg-secondary rounded"
+            className="position-relative"
             style={{
               width: '100%',
-              height: '300px',
-              backgroundColor: '#D3B0A6',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
+              paddingBottom: '100%',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '10px',
+              overflow: 'hidden',
               cursor: 'pointer'
             }}
-            onClick={handleClickProfilePicture}
+            onClick={() => fileInputRef.current.click()}
           >
             {user.profilePicture ? (
               <img
-                src={user.profilePicture}
+                src={`http://localhost:8080${user.profilePicture}`}
                 alt="Profile"
-                className="rounded"
                 style={{
-                  width: '100%', // Tetap lebar 100%
-                  height: '100%', // Tetap tinggi 100%
-                  objectFit: 'cover', // Memastikan gambar tidak merusak layout
-                  borderRadius: '10px' // Tambahkan radius untuk tampilan lebih halus
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
                 }}
               />
             ) : (
-              <p className="text-light">Klik untuk ganti foto profil</p>
+              <div
+                className="d-flex justify-content-center align-items-center"
+                style={{
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%'
+                }}
+              >
+                <span className="text-secondary" style={{ fontSize: '3rem' }}>👤</span>
+              </div>
             )}
           </div>
           <input
@@ -88,71 +176,117 @@ const Profile = () => {
             ref={fileInputRef}
             style={{ display: 'none' }}
             onChange={handleProfilePictureChange}
+            accept="image/*"
           />
-        </div>
+          <small className="text-muted mt-2 d-block">
+            Klik untuk mengubah foto profil
+          </small>
+        </Col>
 
         {/* Profile Information Section */}
-        <div className="col-md-7">
-          <h4 className="fw-bold" style={{ backgroundColor: '#A63B2A', color: '#FFF', padding: '10px', borderRadius: '10px 10px 0 0' }}>
-            PROFILE AKUN
-          </h4>
-          <div className="p-4 shadow-sm" style={{ backgroundColor: '#FFFFFF', borderRadius: '0 0 10px 10px' }}>
-            <div className="mb-2">
-              <strong>NIP</strong>
-              <p>{user.nip}</p>
+        <Col md={7}>
+          <div className="card border-0 shadow-sm">
+            <div className="card-header bg-primary text-white py-3">
+              <h5 className="mb-0 fw-bold">PROFILE AKUN</h5>
             </div>
+            <div className="card-body p-4">
+              <Row className="mb-3">
+                <Col sm={4}>
+                  <strong>NIP</strong>
+                </Col>
+                <Col sm={8}>
+                  {user.nip || '-'}
+                </Col>
+              </Row>
 
-            <div className="mb-2">
-              <strong>NAMA</strong>
-              <p>{user.name}</p>
-            </div>
+              <Row className="mb-3">
+                <Col sm={4}>
+                  <strong>NAMA</strong>
+                </Col>
+                <Col sm={8}>
+                  {user.name || '-'}
+                </Col>
+              </Row>
 
-            <div className="mb-2">
-              <strong>NOMOR TELEPON</strong>
-              <p>{user.phone}</p>
-            </div>
+              <Row className="mb-3">
+                <Col sm={4}>
+                  <strong>NOMOR TELEPON</strong>
+                </Col>
+                <Col sm={8}>
+                  {user.phone || '-'}
+                </Col>
+              </Row>
 
-            <div className="mb-2">
-              <strong>Email</strong>
-              <p>{user.email}</p>
-            </div>
+              <Row className="mb-3">
+                <Col sm={4}>
+                  <strong>EMAIL</strong>
+                </Col>
+                <Col sm={8}>
+                  {user.email || '-'}
+                </Col>
+              </Row>
 
-            <div className="mb-2">
-              <strong>Bidang</strong>
-              <p>{user.department}</p>
+              <Row className="mb-3">
+                <Col sm={4}>
+                  <strong>ROLE</strong>
+                </Col>
+                <Col sm={8}>
+                  {user.role || '-'}
+                </Col>
+              </Row>
+
+              <Row className="mb-3">
+                <Col sm={4}>
+                  <strong>INSTANSI</strong>
+                </Col>
+                <Col sm={8}>
+                  {agency ? agency.name : '-'}
+                </Col>
+              </Row>
+
+              {agency && (
+                <>
+                  <Row className="mb-3">
+                    <Col sm={4}>
+                       <strong>ALAMAT INSTANSI</strong>
+                    </Col>
+                    <Col sm={8}>
+                      {agency.address || '-'}
+                    </Col>
+                  </Row>
+
+                  <Row className="mb-3">
+                    <Col sm={4}>
+                      <strong>TELEPON INSTANSI</strong>
+                    </Col>
+                    <Col sm={8}>
+                      {agency.phone || '-'}
+                    </Col>
+                  </Row>
+                </>
+              )}
             </div>
           </div>
-        </div>
-      </div>
+        </Col>
+      </Row>
 
       {/* Modal untuk konfirmasi penggantian foto */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Konfirmasi Ganti Foto Profil</Modal.Title>
+          <Modal.Title>Konfirmasi Penggantian Foto Profil</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Apakah Anda yakin ingin mengganti foto profil?</p>
-          {newProfilePicture && (
-            <div>
-              <p className="text-center">Pratinjau Foto Baru:</p>
-              <img
-                src={newProfilePicture}
-                alt="New Profile"
-                style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '10px' }}
-              />
-            </div>
-          )}
+          Apakah Anda yakin ingin mengganti foto profil?
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Batal
           </Button>
-          <Button variant="primary" onClick={handleSaveProfilePicture}>
-            Simpan
+          <Button variant="primary" onClick={handleSaveProfilePicture}> Ganti Foto
           </Button>
         </Modal.Footer>
       </Modal>
-    </div>
+    </Container>
   );
 };
 

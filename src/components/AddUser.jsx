@@ -1,62 +1,68 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const AddUser = () => {
+  const navigate = useNavigate();
+  const [agencies, setAgencies] = useState([]);
   const [user, setUser] = useState({
     name: '',
     nip: '',
     email: '',
-    phone: '',
     password: '',
-    department: '',
-    profilePicture: null // State to hold the profile picture
+    phone: '',
+    agency_id: '',
+    role: ''
   });
-  const [departments, setDepartments] = useState([]); // State to hold department list
-  const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch departments from localStorage when the component mounts
-    const storedDepartments = JSON.parse(localStorage.getItem('departments')) || [];
-    setDepartments(storedDepartments);
+    fetchAgencies();
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUser((prevUser) => ({
-      ...prevUser,
-      [name]: value
-    }));
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUser((prevUser) => ({
-          ...prevUser,
-          profilePicture: reader.result // Save the image as a base64 string
-        }));
-      };
-      reader.readAsDataURL(file);
+  const fetchAgencies = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/agencies', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setAgencies(response.data);
+    } catch (error) {
+      console.error('Error fetching agencies:', error);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUser(prev => ({
+      ...prev,
+      [name]: name === 'agency_id' ? parseInt(value, 10) : value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newUser = { ...user };
+    try {
+      if (!user.agency_id) {
+        alert('Silakan pilih Instansi');
+        return;
+      }
 
-    // Get existing users from localStorage
-    const existingUsers = JSON.parse(localStorage.getItem('visitors')) || [];
+      const response = await axios.post('http://localhost:8080/api/users', user, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
 
-    // Add the new user to the existing array
-    existingUsers.push(newUser);
-
-    // Update localStorage
-    localStorage.setItem('visitors', JSON.stringify(existingUsers));
-
-    // Navigate back to admin dashboard
-    navigate('/');
+      if (response.status === 201) {
+        alert('User berhasil ditambahkan');
+        navigate('/admin');
+      }
+    } catch (error) {
+      console.error('Error adding user:', error);
+      alert('Failed to add user: ' + (error.response?.data?.error || error.message));
+    }
   };
 
   return (
@@ -65,7 +71,6 @@ const AddUser = () => {
         <form onSubmit={handleSubmit}>
           <p className="fw-bold text-center">TAMBAH USER</p>
 
-          {/* Nama Input */}
           <div className="mb-2">
             <label className="form-label">Nama*</label>
             <input
@@ -78,7 +83,6 @@ const AddUser = () => {
             />
           </div>
 
-          {/* NIP Input */}
           <div className="mb-2">
             <label className="form-label">NIP*</label>
             <input
@@ -91,7 +95,6 @@ const AddUser = () => {
             />
           </div>
 
-          {/* Email Input */}
           <div className="mb-2">
             <label className="form-label">Email*</label>
             <input
@@ -104,20 +107,6 @@ const AddUser = () => {
             />
           </div>
 
-          {/* No Telp Input */}
-          <div className="mb-2">
-            <label className="form-label">No Telp*</label>
-            <input
-              type="tel"
-              className="form-control border border-dark"
-              name="phone"
-              value={user.phone}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-
-          {/* Password Input */}
           <div className="mb-2">
             <label className="form-label">Password*</label>
             <input
@@ -130,34 +119,55 @@ const AddUser = () => {
             />
           </div>
 
-          {/* Profile Picture Upload */}
           <div className="mb-2">
-            <label className="form-label">Foto Profil</label>
+            <label className="form-label">No Telp*</label>
             <input
-              type="file"
+              type="tel"
               className="form-control border border-dark"
-              onChange={handleImageChange}
+              name="phone"
+              value={user.phone}
+              onChange={handleInputChange}
+              required
             />
           </div>
 
-          {/* Bidang Dropdown */}
           <div className="mb-2">
-            <label className="form-label">Bidang*</label>
+            <label className="form-label">Instansi*</label>
             <select
-              name="department"
+              name="agency_id"
               className="form-select border border-dark"
-              value={user.department}
+              value={user.agency_id}
               onChange={handleInputChange}
               required
             >
-              <option value="">Pilih Bidang</option>
-              {departments.map((dept, index) => (
-                <option key={index} value={dept.name}>{dept.name}</option>
+              <option value="">Pilih Instansi</option>
+              {agencies.map((agency) => (
+                <option key={agency.id} value={agency.id}>
+                  {agency.name}
+                </option>
               ))}
             </select>
           </div>
 
-          <button type="submit" className="btn btn-danger w-100">Simpan</button>
+          <div className="mb-2">
+            <label className="form-label">Role*</label>
+            <select
+              className="form-select border border-dark"
+              name="role"
+              value={user.role}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Pilih Role</option>
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+              <option value="spectator">Spectator</option>
+            </select>
+          </div>
+
+          <button type="submit" className="btn btn-danger w-100">
+            Simpan
+          </button>
         </form>
       </div>
     </div>
