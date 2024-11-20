@@ -11,7 +11,6 @@ const Admin = () => {
   const [agencies, setAgencies] = useState([]);
   
   // Ubah state default menjadi true untuk menampilkan tabel saat pertama kali dimuat
-  const [showDepartmentsTable, setShowDepartmentsTable] = useState(true);
   const [showUsersTable, setShowUsersTable] = useState(true);
   const [showAgenciesTable, setShowAgenciesTable] = useState(true);
   
@@ -154,10 +153,6 @@ const handleDeleteAgency = async (id) => {
       }
   }
 };
-  
-const handleShowDepartments = () => {
-  setShowDepartmentsTable(!showDepartmentsTable);
-};
 
   const handleShowUsers = () => {
     setShowUsersTable(!showUsersTable);
@@ -176,9 +171,8 @@ const handleShowDepartments = () => {
             className="card text-center shadow-sm mb-3"
             style={{
               backgroundColor: '#F8EDED',
-              cursor: 'pointer',
+              cursor: 'default',
             }}
-            onClick={handleShowDepartments}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
@@ -299,56 +293,6 @@ const handleShowDepartments = () => {
           </div>
         </div>
       )}
-
-{/* Tabel Departemen dengan kondisi showDepartmentsTable */}
-{showDepartmentsTable && (
-  <div className="card mb-4">
-    <div className="card-header">
-      <h5 className="card-title">Daftar Departemen</h5>
-    </div>
-    <div className="card-body">
-      <table className="table table-bordered table-hover">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Nama</th>
-            <th>No Telepon</th>
-            <th>Alamat</th>
-            <th>Status</th>
-            <th>Email</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {departments.map((department, index) => (
-            <tr key={department.id}>
-              <td>{index + 1}</td>
-              <td>{department.name}</td>
-              <td>{department.phone}</td>
-              <td>{department.address}</td>
-              <td>{department.status}</td>
-              <td>{department.email}</td>
-              <td>
-                <button
-                  className="btn btn-warning btn-sm me-2"
-                  onClick={() => handleEditDepartment(department.id)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => handleDeleteDepartment(department.id)}
-                >
-                  Hapus
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
 
       {/* Tabel Pengguna dengan kondisi showUsersTable */}
       {showUsersTable && (

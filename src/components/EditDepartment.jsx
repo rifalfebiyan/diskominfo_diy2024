@@ -1,77 +1,72 @@
-import React, { useState, useEffect, useCallback } from 'react'; // Mengimpor React dan hook yang diperlukan
-import { useParams, useNavigate } from 'react-router-dom'; // Mengimpor hook untuk mendapatkan parameter URL dan navigasi
-import axios from 'axios'; // Mengimpor axios untuk melakukan permintaan HTTP
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const EditDepartment = () => {
-  const { id } = useParams(); // Mengambil ID departemen dari URL
+  const { id } = useParams(); // ID dari departemen yang akan diedit
   const navigate = useNavigate(); // Hook untuk navigasi
   const [department, setDepartment] = useState({
     name: '',
     phone: '',
     address: '',
-    status: '', // status akan diisi dengan "Active" atau "Non-Active"
+    status: '',
     email: '',
-    agency_id: '' // Menambahkan agency_id ke dalam state
+    agency_id: ''
   });
-  const [agencies, setAgencies] = useState([]); // State untuk menyimpan daftar agensi
+  const [agencies, setAgencies] = useState([]);
 
-  // Mengambil data agensi dan departemen saat komponen dimuat
   useEffect(() => {
-    fetchAgencies(); // Mengambil daftar agensi
-    fetchDepartment(); // Mengambil data departemen berdasarkan ID
+    fetchAgencies();
+    fetchDepartment();
   }, []);
 
-  // Fetch agencies from the backend
   const fetchAgencies = async () => {
     try {
       const response = await axios.get('http://localhost:8080/api/agencies', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}` // Menyertakan token otorisasi
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      setAgencies(response.data); // Mengatur state agencies dengan data yang diambil
+      setAgencies(response.data);
     } catch (error) {
-      console.error('Error fetching agencies:', error); // Menangani kesalahan
+      console.error('Error fetching agencies:', error);
     }
   };
 
-  // Fetch department data based on ID
   const fetchDepartment = useCallback(async () => {
     try {
       const response = await axios.get(`http://localhost:8080/api/departments/${id}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}` // Menyertakan token otorisasi
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      setDepartment(response.data); // Mengatur state department dengan data yang diambil
+      setDepartment(response.data);
     } catch (error) {
-      console.error('Error fetching department:', error); // Menangani kesalahan
+      console.error('Error fetching department:', error);
     }
   }, [id]);
 
-  // Handle input changes
   const handleInputChange = (e) => {
-    const { name, value } = e.target; // Mengambil nama dan nilai dari input
+    const { name, value } = e.target;
     setDepartment(prev => ({
       ...prev,
-      [name]: name === 'agency_id' ? parseInt(value, 10) : value // Memperbarui state department
+      [name]: name === 'agency_id' ? parseInt(value, 10) : value
     }));
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Mencegah refresh halaman
+    e.preventDefault();
     try {
       await axios.put(`http://localhost:8080/api/departments/${id}`, department, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}` // Menyertakan token otorisasi
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
       alert('Departemen berhasil diperbarui'); // Menampilkan pesan sukses
-      navigate('/admin'); // Mengarahkan kembali ke halaman admin
+      navigate(`/agency-data/${department.agency_id}`); // Mengalihkan kembali ke halaman agency data
     } catch (error) {
-      console.error('Error updating department:', error); // Menangani kesalahan
-      alert('Gagal memperbarui departemen: ' + error.message); // Menampilkan pesan kesalahan
+      console.error('Error updating department:', error);
+      alert('Gagal memperbarui departemen: ' + error.message);
     }
   };
 
@@ -102,7 +97,7 @@ const EditDepartment = () => {
               id="phone"
               name="phone"
               value={department.phone}
-              on Change={handleInputChange}
+              onChange={handleInputChange}
               required
             />
           </div>
@@ -122,8 +117,7 @@ const EditDepartment = () => {
 
           <div className="mb-2">
             <label htmlFor="status" className="form-label">Status*</label>
-            <select
-              className="form-select border border-dark"
+            <select className="form-select border border-dark"
               id="status"
               name="status"
               value={department.status}
@@ -131,8 +125,8 @@ const EditDepartment = () => {
               required
             >
               <option value="">Pilih Status</option>
-              <option value="Active">Active</option>
-              <option value="Non-Active">Non-Active</option>
+              <option value="active">Aktif</option>
+              <option value="inactive">Tidak Aktif</option>
             </select>
           </div>
 
@@ -166,7 +160,7 @@ const EditDepartment = () => {
             </select>
           </div>
 
-          <button type="submit" className="btn btn-primary">Simpan</button>
+          <button type="submit" className="btn btn-primary">Simpan Perubahan</button>
         </form>
       </div>
     </div>
