@@ -56,6 +56,10 @@ const EditDepartment = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!department.name || !department.phone || !department.address || !department.status || !department.email || !department.agency_id) {
+      alert('Semua field harus diisi!');
+      return;
+    }
     try {
       await axios.put(`http://localhost:8080/api/departments/${id}`, department, {
         headers: {
@@ -63,12 +67,13 @@ const EditDepartment = () => {
         }
       });
       alert('Departemen berhasil diperbarui'); // Menampilkan pesan sukses
-      navigate(`/agency-data/${department.agency_id}`); // Mengalihkan kembali ke halaman agency data
+      navigate(`/agency-data/${department.agency_id}`); // Menggunakan backticks
     } catch (error) {
       console.error('Error updating department:', error);
       alert('Gagal memperbarui departemen: ' + error.message);
     }
   };
+  
 
   return (
     <div className="container my-4">

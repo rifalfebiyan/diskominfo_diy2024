@@ -8,14 +8,14 @@ const AddDepartment = () => {
     name: '',
     phone: '',
     address: '',
-    status: '', // status akan diisi dengan "Active" atau "Non-Active"
+    status: 'Active', // Set default status
     email: '',
     agency_id: ''
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setDepartment({ ...department, [name]: value });
+    setDepartment(prev => ({ ...prev, [name]: value }));
   };
 
   const [agencies, setAgencies] = useState([]);
@@ -47,17 +47,23 @@ const AddDepartment = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Validasi form
+    if (!department.name || !department.phone || !department.address || !department.status || !department.email || !department.agency_id) {
+      alert('Semua field harus diisi!');
+      return;
+    }
+
     try {
-      await axios.post('http://localhost:8080/api/departments', department, {
+      const response = await axios.post('http://localhost:8080/api/departments', department, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
       alert('Departemen berhasil ditambahkan');
-      navigate('/admin');
+      navigate(`/agency-data/${department.agency_id}`); // Gunakan backticks
     } catch (error) {
       console.error('Error adding department:', error);
-      alert('Gagal menambahkan departemen: ' + error.message);
+      alert('Gagal menambahkan departemen: ' + (error.response?.data?.error || error.message));
     }
   };
 
@@ -107,7 +113,7 @@ const AddDepartment = () => {
           </div>
 
           <div className="mb-2">
-            <label htmlFor="status" className="form-label">Status*</label>
+            <label htmlFor="status" className="form -label">Status*</label>
             <select
               className="form-select border border-dark"
               id="status"
@@ -116,9 +122,9 @@ const AddDepartment = () => {
               onChange={handleInputChange}
               required
             >
-              <option value="">Pilih Status</option>
-              <option value="Active">Active</option>
-              <option value="Non-Active">Non-Active</option>
+              <option value="Active">Pilih Status</option>
+              <option value="Active">Aktif</option>
+              <option value="Inactive">Tidak Aktif</option>
             </select>
           </div>
 
@@ -135,8 +141,8 @@ const AddDepartment = () => {
             />
           </div>
 
-          <div className="mb- 2">
-            <label htmlFor="agency_id" className="form-label">Pilih Agency*</label>
+          <div className="mb-2">
+            <label htmlFor="agency_id" className="form-label">Pilih Agensi*</label>
             <select
               className="form-select border border-dark"
               id="agency_id"
@@ -145,14 +151,14 @@ const AddDepartment = () => {
               onChange={handleInputChange}
               required
             >
-              <option value="">Pilih Agency</option>
+              <option value="">Pilih Agensi</option>
               {agencies.map(agency => (
                 <option key={agency.id} value={agency.id}>{agency.name}</option>
               ))}
             </select>
           </div>
-          <br></br>
-          <button type="submit" className="btn btn-primary">Simpan</button>
+
+          <button type="submit" className="btn btn-primary">Tambah Departemen</button>
         </form>
       </div>
     </div>

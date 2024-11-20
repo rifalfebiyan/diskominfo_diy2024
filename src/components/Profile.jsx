@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Modal, Button, Container, Row, Col } from 'react-bootstrap';
 
 const Profile = () => {
-  const [user, setUser] = useState({
+  const [user, setUser ] = useState({
     name: '',
     nip: '',
     email: '',
@@ -39,17 +39,15 @@ const Profile = () => {
   const fetchUserData = async () => {
     try {
       const userId = localStorage.getItem('userId');
-      console.log("Fetching data for user ID:", userId);
       const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      console.log("Received user data:", response.data);
       
       const { name, nip, email, phone, role, profile_picture, agency_id } = response.data;
       
-      setUser({
+      setUser ({
         name,
         nip,
         email,
@@ -100,7 +98,7 @@ const Profile = () => {
         }
       );
 
-      setUser({ ...user, profilePicture: newProfilePicture });
+      setUser ({ ...user, profilePicture: newProfilePicture });
       setShowModal(false);
       alert('Profile picture updated successfully');
       window.location.reload();
@@ -148,8 +146,7 @@ const Profile = () => {
             onClick={() => fileInputRef.current.click()}
           >
             {user.profilePicture ? (
-              <img
-                src={`http://localhost:8080${user.profilePicture}`}
+              <img src={`http://localhost:8080${user.profilePicture}`}
                 alt="Profile"
                 style={{
                   position: 'absolute',
@@ -248,7 +245,7 @@ const Profile = () => {
                 <>
                   <Row className="mb-3">
                     <Col sm={4}>
-                       <strong>ALAMAT INSTANSI</strong>
+                      <strong>ALAMAT INSTANSI</strong>
                     </Col>
                     <Col sm={8}>
                       {agency.address || '-'}
