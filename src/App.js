@@ -5,6 +5,7 @@ import Login from './components/Login';
 import Register from './components/Register'; // Impor komponen Register
 import VisitorForm from './components/VisitorForm';
 import VisitorData from './components/VisitorData';
+import VisitorDataSpectator from './components/VisitorDataSpectator'; // Pastikan path ini sesuai
 import Footer from './components/Footer';
 import Loader from './components/Loader';
 import StatistikData from './components/StatistikData';
@@ -150,6 +151,10 @@ function App() {
             {/* Protected Routes */}
             <Route path="/" element={isLoggedIn ? <StatistikData /> : <Navigate to="/login" replace />} />
             <Route path="/guest" element={isLoggedIn ? <VisitorData /> : <Navigate to="/login" replace />} />
+            <Route 
+              path="/visitor-data-spectator" 
+              element={<VisitorDataSpectator />} 
+            />
             <Route path="/add" element={isLoggedIn ? <VisitorForm /> : <Navigate to="/login" replace />} />
             <Route path="/profile" element={isLoggedIn ? <Profile onNavigate={handleNavigation} /> : <Navigate to="/login" replace />} />
             <Route path="/edit/:index" element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" replace />} />

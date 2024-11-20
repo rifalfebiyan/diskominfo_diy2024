@@ -147,10 +147,15 @@ function MiniSidebar({ onLogout }) {
                 onMouseEnter={() => handleMouseEnter('guest')}
                 onMouseLeave={handleMouseLeave}
               >
-                <Link to="/guest" style={linkStyle(hoveredItem === 'guest')}>
-                  <span style={iconStyle(hoveredItem === 'guest', location.pathname === '/guest')}>
-                    &#xf02d;
-                  </span>
+                <Link to="/visitor-data-spectator" style={linkStyle(hoveredItem === 'guest')}>
+                <span
+                  style={iconStyle(
+                    hoveredItem === 'guest',
+                    location.pathname === '/visitor-data-spectator'
+                  )}
+                >
+                  &#xf02d;
+                </span>
                   {hoveredItem === 'guest' && <span>Tamu</span>}
                 </Link>
               </li>
