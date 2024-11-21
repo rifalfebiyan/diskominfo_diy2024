@@ -7,7 +7,6 @@ import axios from 'axios';
 
 function StatistikData() {
   const [visitors, setVisitors] = useState([]);
-  const [viewMode, setViewMode] = useState('monthly');
   const currentDate = new Date();
 
   useEffect(() => {
@@ -18,6 +17,7 @@ function StatistikData() {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
+        console.log('Visitor Data:', response.data); // Debugging
         setVisitors(response.data);
       } catch (error) {
         console.error('Error fetching visitors:', error);
@@ -44,15 +44,15 @@ function StatistikData() {
   };
 
   // Calculate totals for today, this month, and this year
-  const totalVisitorsToday = visitors.filter((visitor) => filterByDay(visitor.visit_date)).length;
-  const totalVisitorsMonth = visitors.filter((visitor) => filterByMonth(visitor.visit_date)).length;
-  const totalVisitorsYear = visitors.filter((visitor) => filterByYear(visitor.visit_date)).length;
+  const totalVisitorsToday = visitors.filter((visitor) => filterByDay(visitor.visitDate)).length;
+  const totalVisitorsMonth = visitors.filter((visitor) => filterByMonth(visitor.visitDate)).length;
+  const totalVisitorsYear = visitors.filter((visitor) => filterByYear(visitor.visitDate)).length;
 
   // Prepare monthly statistics for the chart
   const monthlyVisitorCounts = new Array(12).fill(0);
   visitors.forEach((visitor) => {
-    if (visitor.visit_date) {
-      const visitDate = new Date(visitor.visit_date);
+    if (visitor.visitDate) {
+      const visitDate = new Date(visitor.visitDate);
       const visitMonth = visitDate.getMonth();
       if (visitDate.getFullYear() === currentDate.getFullYear()) {
         monthlyVisitorCounts[visitMonth]++;
@@ -90,16 +90,16 @@ function StatistikData() {
         </div>
         <div className="col-md-4">
           <div className="p-3 bg-light rounded shadow-sm">
-            <h5>Total Kunjungan Tahun {currentDate.getFullYear()}</h5>
+            <h5>Total Kunjungan Tahun {currentDate.getFullYear ()}</h5>
             <h1 className="text-danger">{totalVisitorsYear}</h1>
           </div>
         </div>
       </div>
 
-      <Card className="shadow-sm mb-5"> {/* Added margin-bottom */}
+      <Card className="shadow-sm mb-5">
         <Card.Body>
-          <h5 className="text-center">Grafik Aktivitas Kunjungan</h5>
-          <Bar data={monthlyData} />
+          <Card.Title>Statistik Kunjungan Bulanan</Card.Title>
+          <Bar data={monthlyData} options={{ responsive: true }} />
         </Card.Body>
       </Card>
     </div>
