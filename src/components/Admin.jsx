@@ -311,6 +311,7 @@ const handleDeleteAgency = async (id) => {
               <th>Email</th>
               <th>No Telepon</th>
               <th>Role</th>
+              <th>Instansi ID</th> {/* Kolom untuk Instansi ID */}
               <th>Tanggal Dibuat</th>
               <th>Aksi</th>
             </tr>
@@ -331,31 +332,32 @@ const handleDeleteAgency = async (id) => {
                 </td>
                 <td>{user.phone || '-'}</td>
                 <td>{user.role || '-'}</td>
+                <td>{user.agency_id || '-'}</td> {/* Tampilkan agency_id */}
                 <td>
                   {user.created_at 
                     ? new Date(user.created_at).toLocaleDateString() 
                     : '-'}
                 </td>
                 <td>
-    <button
-        className="btn btn-warning btn-sm me-2"
-        onClick={() => navigate(`/edit-user/${user.id}`)}
-    >
-        Edit
-    </button>
-    <button
-        className="btn btn-danger btn-sm me-2"
-        onClick={() => handleDeleteUser(user.id)}
-    >
-        Hapus
-    </button>
-    <button
-        className="btn btn-info btn-sm"
-        onClick={() => navigate(`/user-detail/${user.id}`)}
-    >
-        Detail
-    </button>
-</td>
+                  <button
+                    className="btn btn-warning btn-sm me-2"
+                    onClick={() => navigate(`/edit-user/${user.id}`)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger btn-sm me-2"
+                    onClick={() => handleDeleteUser (user.id)}
+                  >
+                    Hapus
+                  </button>
+                  <button
+                    className="btn btn-info btn-sm"
+                    onClick={() => navigate(`/user-detail/${user.id}`)}
+                  >
+                    Detail
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

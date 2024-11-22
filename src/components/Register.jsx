@@ -11,7 +11,7 @@ const RegisterForm = () => {
         email: '',
         password: '',
         phone: '',
-        agency_id: 1,
+        agency_id: '', // Ubah ini untuk memulai dengan kosong
         role: 'spectator' // Nilai default untuk role
     });
 
@@ -19,7 +19,7 @@ const RegisterForm = () => {
         fetchAgencies();
         // Mengubah latar belakang halaman menjadi merah
         document.body.style.backgroundColor = 'red';
-        
+
         // Mengembalikan latar belakang ke default saat komponen dibongkar
         return () => {
             document.body.style.backgroundColor = '';
@@ -28,12 +28,10 @@ const RegisterForm = () => {
 
     const fetchAgencies = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/agencies', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            setAgencies(response.data); // Menyimpan data instansi ke state
+            const response = await axios.get('http://localhost:8080/api/agencies'); // Tidak perlu header otentikasi
+            // Filter untuk menghapus agency "Tamu"
+            const filteredAgencies = response.data.filter(agency => agency.name !== 'Tamu');
+            setAgencies(filteredAgencies); // Menyimpan data instansi ke state
         } catch (error) {
             console.error('Error fetching agencies:', error);
         }
@@ -45,41 +43,17 @@ const RegisterForm = () => {
             ...prev,
             [name]: name === 'agency_id' ? parseInt(value, 10) : value
         }));
-    
-        // Jika nama adalah "Tamu", otomatis set agency_id
-        if (name === 'name' && value === 'Tamu') {
-            const tamuAgency = agencies.find(agency => agency.name === 'Tamu');
-            if (tamuAgency) {
-                setUser (prev => ({
-                    ...prev,
-                    agency_id: tamuAgency.id // Set ID instansi Tamu
-                }));
-            } else {
-                setUser (prev => ({
-                    ...prev,
-                    agency_id:1 // Reset jika tidak ditemukan
-                }));
-            }
-        }
-    
-        // Jika agency_id tidak diisi, set ke nilai default
-        if (name === 'agency_id' && value === "") {
-            setUser (prev => ({
-                ...prev,
-                agency_id: 1 // Set ke ID instansi default, misalnya 1
-            }));
-        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         // Pastikan semua field diisi
-        if (!user.name || !user.nip || !user.email || !user.password || !user.phone) {
+        if (!user.name || !user.nip || !user.email || !user.password || !user.phone || !user.agency_id) {
             alert('Semua field harus diisi!');
             return;
         }
-    
+
         try {
             const response = await axios.post('http://localhost:8080/api/register', {
                 ...user,
@@ -90,17 +64,19 @@ const RegisterForm = () => {
                     'Content-Type': 'application/json'
                 }
             });
-    
+
             if (response.status === 201) {
                 alert('User  berhasil terdaftar');
                 // Reset form setelah pendaftaran berhasil
                 setUser ({
                     name: '',
-                    nip : '',
+                    nip: '',
                     email: '',
                     phone: '',
-                    password: ''
+                    password: '',
+                    agency_id: '' // Reset agency_id juga
                 });
+                navigate('/'); // Redirect setelah berhasil
             }
         } catch (error) {
             console.error('Error during registration:', error);
@@ -149,19 +125,19 @@ const RegisterForm = () => {
                 >
                     REGISTRASI BUKU TAMU
                 </h2>
-                
+
                 <form onSubmit={handleSubmit}>
                     <input
                         type="text"
                         placeholder="Nama *"
                         style={{
                             width: "100%",
-                            padding: "8px",
+ padding: "8px",
                             margin: "6px 0",
                             borderRadius: "8px",
                             border: "1px solid #D1D5DB",
                             fontSize: "14px",
-                            fontFamily: " Arial, sans-serif",
+                            fontFamily: "Arial, sans-serif",
                         }}
                         name="name"
                         value={user.name}
@@ -237,6 +213,33 @@ const RegisterForm = () => {
                         required
                     />
                     
+                    <select
+                        name="agency_id"
+                        value={user.agency_id}
+                        onChange={handleInputChange}
+                        style={{
+                            width: "100%",
+                            padding: "8px",
+                            margin: "6px 0",
+                            borderRadius: "8px",
+                            border: "1px solid #D1D5DB",
+                            fontSize: "14px",
+                            fontFamily: "Arial, sans-serif",
+                        }}
+                        required
+                    >
+                        <option value="">Pilih Instansi *</option>
+                        {agencies.length > 0 ? (
+                            agencies.map(agency => (
+                                <option key={agency.id} value={agency.id}>
+                                    {agency.name}
+                                </option>
+                            ))
+                        ) : (
+                            <option value="" disabled>Loading...</option>
+                        )}
+                    </select>
+
                     <button
                         type="submit"
                         style={{

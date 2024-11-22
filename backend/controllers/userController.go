@@ -15,7 +15,10 @@ import (
 // GetUsers retrieves all users
 func GetUsers(c *gin.Context) {
 	var users []models.User
-	database.DB.Find(&users)
+	if err := database.DB.Preload("Agency").Find(&users).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, users)
 }
 
