@@ -248,6 +248,7 @@ const handleDeleteAgency = async (id) => {
                 <thead className="table-light">
                   <tr>
                     <th>No</th>
+                    <th>Id Instansi</th> {/* Kolom Id Instansi */}
                     <th>Nama Instansi</th>
                     <th>Email</th>
                     <th>No Telp</th>
@@ -260,6 +261,7 @@ const handleDeleteAgency = async (id) => {
                   {agencies.map((agency, index) => (
                     <tr key={agency.id}>
                       <td>{index + 1}</td>
+                      <td>{agency.id}</td> {/* Menampilkan Id Instansi */}
                       <td>{agency.name}</td>
                       <td><a href={`mailto:${agency.email}`} style={{ color: '#9F2C2C' }}>{agency.email}</a></td>
                       <td>{agency.phone}</td>
@@ -312,6 +314,7 @@ const handleDeleteAgency = async (id) => {
               <th>No Telepon</th>
               <th>Role</th>
               <th>Instansi ID</th> {/* Kolom untuk Instansi ID */}
+              <th>Instansi</th> {/* Kolom untuk nama instansi */}
               <th>Tanggal Dibuat</th>
               <th>Aksi</th>
             </tr>
@@ -333,6 +336,7 @@ const handleDeleteAgency = async (id) => {
                 <td>{user.phone || '-'}</td>
                 <td>{user.role || '-'}</td>
                 <td>{user.agency_id || '-'}</td> {/* Tampilkan agency_id */}
+                <td>{user.agency ? user.agency.name : '-'}</td> {/* Menampilkan nama instansi */}
                 <td>
                   {user.created_at 
                     ? new Date(user.created_at).toLocaleDateString() 
