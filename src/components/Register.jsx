@@ -11,7 +11,7 @@ const RegisterForm = () => {
         email: '',
         password: '',
         phone: '',
-        agency_id: '', // Ubah ini untuk memulai dengan kosong
+        agency_id: 1, // Set default agency_id to 1 for "Tamu"
         role: 'spectator' // Nilai default untuk role
     });
 
@@ -29,9 +29,7 @@ const RegisterForm = () => {
     const fetchAgencies = async () => {
         try {
             const response = await axios.get('http://localhost:8080/api/agencies'); // Tidak perlu header otentikasi
-            // Filter untuk menghapus agency "Tamu"
-            const filteredAgencies = response.data.filter(agency => agency.name !== 'Tamu');
-            setAgencies(filteredAgencies); // Menyimpan data instansi ke state
+            setAgencies(response.data); // Menyimpan data instansi ke state
         } catch (error) {
             console.error('Error fetching agencies:', error);
         }
@@ -41,7 +39,7 @@ const RegisterForm = () => {
         const { name, value } = e.target;
         setUser (prev => ({
             ...prev,
-            [name]: name === 'agency_id' ? parseInt(value, 10) : value
+            [name]: value
         }));
     };
 
@@ -49,7 +47,7 @@ const RegisterForm = () => {
         e.preventDefault();
 
         // Pastikan semua field diisi
-        if (!user.name || !user.nip || !user.email || !user.password || !user.phone || !user.agency_id) {
+        if (!user.name || !user.nip || !user.email || !user.password || !user.phone) {
             alert('Semua field harus diisi!');
             return;
         }
@@ -74,7 +72,7 @@ const RegisterForm = () => {
                     email: '',
                     phone: '',
                     password: '',
-                    agency_id: '' // Reset agency_id juga
+                    agency_id: 1 // Reset agency_id ke 1 juga
                 });
                 navigate('/'); // Redirect setelah berhasil
             }
@@ -126,13 +124,13 @@ const RegisterForm = () => {
                     REGISTRASI BUKU TAMU
                 </h2>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit ={handleSubmit}>
                     <input
                         type="text"
                         placeholder="Nama *"
                         style={{
                             width: "100%",
- padding: "8px",
+                            padding: "8px",
                             margin: "6px 0",
                             borderRadius: "8px",
                             border: "1px solid #D1D5DB",
@@ -213,7 +211,8 @@ const RegisterForm = () => {
                         required
                     />
                     
-                    <select
+                    {/* Dropdown agency dihapus karena agency_id sudah diatur otomatis */}
+                    {/* <select
                         name="agency_id"
                         value={user.agency_id}
                         onChange={handleInputChange}
@@ -238,7 +237,7 @@ const RegisterForm = () => {
                         ) : (
                             <option value="" disabled>Loading...</option>
                         )}
-                    </select>
+                    </select> */}
 
                     <button
                         type="submit"

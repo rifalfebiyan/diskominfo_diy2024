@@ -160,8 +160,7 @@ function App() {
             <Route path="/edit/:index" element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" replace />} />
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
             <Route path="/add-user" element={<AdminRoute><AddUser   /></AdminRoute>} />
-            <Route path="/user-detail/:id" element={<AdminRoute><User Data /></AdminRoute>} />
-            <Route path="/add-department" element={<AddDepartment />} />
+            <Route path="/user-detail/:id" element={<AdminRoute><UserData /></AdminRoute>} />            <Route path="/add-department" element={<AddDepartment />} />
             <Route 
               path="/user/add-department" 
               element={
@@ -175,7 +174,7 @@ function App() {
             <Route path="/department-data/:id" element={<AdminRoute><DepartmentData /></AdminRoute>} />
             <Route path="/edit-department/:id" element={<EditDepartment />} />
             <Route path="/edit-user/:id" element={<AdminRoute><EditUser   /></AdminRoute>} />
-            <Route path="/add-agency" element={<AdminRoute><AddAgency/></AdminRoute>} />
+            <Route path="/users/edit/:id" element={<EditUser  />} />
             <Route path="/agency-data" element={<AdminRoute><AgencyData/></AdminRoute>} />
             <Route path="/agency-data/:id" element={<AdminRoute><AgencyData /></AdminRoute>} />
             <Route path="/edit-agency/:id" element={<AdminRoute><EditAgency /></AdminRoute>} />

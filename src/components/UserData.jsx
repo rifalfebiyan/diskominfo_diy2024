@@ -8,7 +8,7 @@ const UserData = () => {
   const navigate = useNavigate();
   
   // State Management
-  const [user, setUser] = useState({
+  const [user, setUser ] = useState({
     name: '',
     nip: '',
     email: '',
@@ -22,42 +22,58 @@ const UserData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch User Data
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        
-        // Fetch User Data
-        const userResponse = await axios.get(`http://localhost:8080/api/users/${id}`, {
+// Fetch User Data
+useEffect(() => {
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+
+      // Fetch User Data
+      const userResponse = await axios.get(`http://localhost:8080/api/users/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      // Log the response data
+      console.log('User  Response:', userResponse.data);
+
+      // Set User Data
+      const userData = userResponse.data;
+      setUser  ({
+        name: userData.name,
+        nip: userData.nip || 'Tidak ada NIP', // Pastikan NIP diatur dengan benar
+        email: userData.email || 'Tidak ada email',
+        phone: userData.phone || 'Tidak ada nomor telepon',
+        role: userData.role || 'Tidak memiliki role',
+        profile_picture: userData.profile_picture || '',
+        agency_id: userData.agency_id || null,
+        created_at: userData.created_at || null
+      });
+
+      // Log the user data being set
+      console.log('User  Data:', userData);
+
+      // Fetch Agency Data if agency_id exists
+      if (userData.agency_id) {
+        const agencyResponse = await axios.get(`http://localhost:8080/api/agencies/${userData.agency_id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-
-        // Set User Data
-        setUser(userResponse.data);
-
-        // Fetch Agency Data if agency_id exists
-        if (userResponse.data.agency_id) {
-          const agencyResponse = await axios.get(`http://localhost:8080/api/agencies/${userResponse.data.agency_id}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          setAgency(agencyResponse.data);
-        }
-        
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Gagal memuat data pengguna');
-        setLoading(false);
+        setAgency(agencyResponse.data);
       }
-    };
 
-    fetchUserData();
-  }, [id]);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setError('Gagal memuat data pengguna');
+      setLoading(false);
+    }
+  };
+
+  fetchUserData();
+}, [id]);
 
   // Handler Functions
   const handleEdit = () => {
@@ -138,7 +154,7 @@ const UserData = () => {
                 <DetailRow label="Email Instansi" value={agency.email || 'Tidak ada email'} />
               </Col>
               <Col md={6}>
-                <DetailRow label="No Telepon Instansi" value={agency.phone || 'Tidak ada nomor telepon'} />
+                <DetailRow label ="No Telepon Instansi" value={agency.phone || 'Tidak ada nomor telepon'} />
                 <DetailRow label="Alamat Instansi" value={agency.address || 'Tidak ada alamat'} />
               </Col>
             </Row>

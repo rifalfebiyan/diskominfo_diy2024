@@ -4,6 +4,7 @@ import (
 	"backend/database"
 	"backend/models"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -19,7 +20,6 @@ func GetUsers(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, users)
 }
 
@@ -29,22 +29,24 @@ func GetUser(c *gin.Context) {
 	var user models.User
 
 	result := database.DB.
-		Preload("Agency"). // Preload agency relation
+		Preload("Agency"). // Pastikan relasi Agency di-preload
 		First(&user, id)
 
 	if result.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "User  not found"})
 		return
 	}
 
-	// Transform response if needed
+	// Transform response jika perlu
 	response := map[string]interface{}{
-		"id":     user.ID,
-		"name":   user.Name,
-		"email":  user.Email,
-		"phone":  user.Phone,
-		"agency": user.Agency, // This should include the full agency object
-		// ... other fields
+		"id":         user.ID,
+		"name":       user.Name,
+		"nip":        user.NIP, // Pastikan NIP diambil
+		"email":      user.Email,
+		"phone":      user.Phone,
+		"role":       user.Role,      // Pastikan role diambil
+		"agency":     user.Agency,    // Ini harus mencakup objek agency penuh
+		"created_at": user.CreatedAt, // Tambahkan tanggal dibuat
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -88,7 +90,7 @@ func UpdateUser(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
 	if err := database.DB.First(&user, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User  not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "User   not found"})
 		return
 	}
 
@@ -98,35 +100,19 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	// Validasi role
-	validRoles := map[string]bool{
-		"admin":     true,
-		"user":      true,
-		"spectator": true,
-	}
+	// Debugging log
+	log.Printf("Received data for update: %+v", updateData) // Tambahkan ini
 
-	// Validasi agency_id
-	if user.AgencyID != nil {
-		var agency models.Agency
-		if err := database.DB.First(&agency, *user.AgencyID).Error; err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid agency_id"})
-			return
-		}
-	}
-
-	if !validRoles[updateData.Role] {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role"})
-		return
-	}
-
+	// Update fields
 	user.Name = updateData.Name
+	user.NIP = updateData.NIP // Pastikan NIP diupdate
 	user.Email = updateData.Email
 	user.Phone = updateData.Phone
-	user.AgencyID = updateData.AgencyID // Update AgencyID
 	user.Role = updateData.Role
 	if updateData.Password != "" {
-		user.Password = updateData.Password
+		user.Password = updateData.Password // Pastikan password dienkripsi saat menyimpan
 	}
+	user.AgencyID = updateData.AgencyID // Update AgencyID
 
 	if err := database.DB.Save(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

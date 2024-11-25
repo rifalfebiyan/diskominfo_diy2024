@@ -225,43 +225,22 @@ const Profile = () => {
 
               <Row className="mb-3">
                 <Col sm={4}>
-                  <strong>ROLE</strong>
+                    <strong>ROLE</strong>
                 </Col>
                 <Col sm={8}>
-                  {user.role || '-'}
+                    {user.role || '-'}
                 </Col>
-              </Row>
+            </Row>
 
-              <Row className="mb-3">
+            <Row className="mb-3">
                 <Col sm={4}>
-                  <strong>INSTANSI</strong>
+                    <strong>INSTANSI</strong>
                 </Col>
                 <Col sm={8}>
-                  {agency ? agency.name : '-'}
+                    {agency ? agency.name : '-'}
                 </Col>
-              </Row>
-
-              {agency && (
-                <>
-                  <Row className="mb-3">
-                    <Col sm={4}>
-                      <strong>ALAMAT INSTANSI</strong>
-                    </Col>
-                    <Col sm={8}>
-                      {agency.address || '-'}
-                    </Col>
-                  </Row>
-
-                  <Row className="mb-3">
-                    <Col sm={4}>
-                      <strong>TELEPON INSTANSI</strong>
-                    </Col>
-                    <Col sm={8}>
-                      {agency.phone || '-'}
-                    </Col>
-                  </Row>
-                </>
-              )}
+            </Row>
+            
             </div>
           </div>
         </Col>

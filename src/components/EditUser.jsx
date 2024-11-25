@@ -2,29 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
-const EditUser = () => {
-  const [user, setUser] = useState({
+const EditUser  = () => {
+  const [user, setUser ] = useState({
     name: '',
     nip: '',
     email: '',
     phone: '',
     password: '',
     role: '',
-    agency_id: null
+    agency_id: ''
   });
   const [agencies, setAgencies] = useState([]);
   const navigate = useNavigate();
   const { id } = useParams();
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUser  = async () => {
       try {
         const response = await axios.get(`http://localhost:8080/api/users/${id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        setUser(response.data);
+        setUser (response.data);
       } catch (error) {
         console.error('Error fetching user:', error);
       }
@@ -43,38 +43,43 @@ const EditUser = () => {
       }
     };
 
-    fetchUser();
+    fetchUser ();
     fetchAgencies();
   }, [id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUser(prevUser => ({
-      ...prevUser,
+    setUser (prev => ({
+      ...prev,
       [name]: name === 'agency_id' ? parseInt(value, 10) : value
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    console.log('Data yang akan disimpan:', user); // Debugging untuk memeriksa NIP
+  
+    // Validasi input
+    if (!user.name || !user.phone || !user.email || !user.agency_id) {
+      alert('Semua field harus diisi!');
+      return;
+    }
+  
     try {
       const response = await axios.put(`http://localhost:8080/api/users/${id}`, user, {
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
-      if (response.status === 200) {
-        alert('User updated successfully');
-        navigate('/admin');
-      }
+  
+      console.log('Response dari server:', response.data); // Debugging
+      alert('User   berhasil diperbarui');
+      navigate(`/admin`);
     } catch (error) {
-      console.error('Error updating user:', error);
-      alert('Failed to update user: ' + (error.response?.data?.error || error.message));
+      console.error('Error updating user:', error); // Debugging
+      alert('Gagal memperbarui user: ' + error.message);
     }
-  };
+};
 
   return (
     <div className="container my-4">
@@ -102,7 +107,7 @@ const EditUser = () => {
               type="text"
               className="form-control border border-dark"
               name="nip"
-              value={user.nip}
+              value={user.nip} // Pastikan ini terhubung dengan state
               onChange={handleInputChange}
               required
             />
@@ -136,17 +141,18 @@ const EditUser = () => {
 
           {/* Password Input */}
           <div className="mb-2">
-            <label className="form-label">Password (Kosongkan jika tidak diubah)</label>
-            <input
+            <label className="form-label">Password*</label>
+            < input
               type="password"
               className="form-control border border-dark"
               name="password"
               value={user.password}
               onChange={handleInputChange}
+              required
             />
           </div>
 
-          {/* Role Dropdown */}
+          {/* Role Input */}
           <div className="mb-2">
             <label className="form-label">Role*</label>
             <select
@@ -158,22 +164,23 @@ const EditUser = () => {
             >
               <option value="">Pilih Role</option>
               <option value="admin">Admin</option>
-              <option value="user">User</option>
+              <option value="user">User </option>
               <option value="spectator">Spectator</option>
             </select>
           </div>
 
-          {/* Agency Dropdown */}
+          {/* Agency Selection */}
           <div className="mb-2">
-            <label className="form-label">Instansi*</label>
+            <label htmlFor="agency_id" className="form-label">Pilih Agency*</label>
             <select
               className="form-select border border-dark"
+              id="agency_id"
               name="agency_id"
-              value={user.agency_id || ''}
+              value={user.agency_id}
               onChange={handleInputChange}
               required
             >
-              <option value="">Pilih Instansi</option>
+              <option value="">Pilih Agency</option>
               {agencies.map((agency) => (
                 <option key={agency.id} value={agency.id}>
                   {agency.name}
@@ -183,8 +190,8 @@ const EditUser = () => {
           </div>
 
           {/* Submit Button */}
-          <button type="submit" className="btn btn-danger w-100">
-            Simpan Perubahan
+          <button type="submit" className="btn btn-primary mt-3">
+            Simpan
           </button>
         </form>
       </div>
@@ -192,4 +199,4 @@ const EditUser = () => {
   );
 };
 
-export default EditUser;
+export default EditUser ;

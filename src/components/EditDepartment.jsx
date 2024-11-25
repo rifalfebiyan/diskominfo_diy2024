@@ -160,7 +160,9 @@ const EditDepartment = () => {
             >
               <option value="">Pilih Agency</option>
               {agencies.map(agency => (
-                <option key={agency.id} value={agency.id}>{agency.name}</option>
+                <option key={agency.id} value={agency.id}>
+                  {agency.name}
+                </option>
               ))}
             </select>
           </div>
