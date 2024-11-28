@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const AddUser = () => {
+const AddUser  = () => {
   const navigate = useNavigate();
   const [agencies, setAgencies] = useState([]);
-  const [user, setUser] = useState({
+  const [user, setUser ] = useState({
     name: '',
     nip: '',
     email: '',
@@ -34,7 +34,7 @@ const AddUser = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUser(prev => ({
+    setUser (prev => ({
       ...prev,
       [name]: name === 'agency_id' ? parseInt(value, 10) : value
     }));
@@ -48,6 +48,12 @@ const AddUser = () => {
         return;
       }
 
+      // Pastikan NIP tidak kosong
+      if (!user.nip) {
+        alert('NIP harus diisi');
+        return;
+      }
+
       const response = await axios.post('http://localhost:8080/api/users', user, {
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +62,7 @@ const AddUser = () => {
       });
 
       if (response.status === 201) {
-        alert('User berhasil ditambahkan');
+        alert('User  berhasil ditambahkan');
         navigate('/admin');
       }
     } catch (error) {
@@ -78,7 +84,7 @@ const AddUser = () => {
               className="form-control border border-dark"
               name="name"
               value={user.name}
-              onChange={handleInputChange}
+              onChange={handleInputChange} // Event handler untuk menangani input
               required
             />
           </div>
@@ -90,7 +96,7 @@ const AddUser = () => {
               className="form-control border border-dark"
               name="nip"
               value={user.nip}
-              onChange={handleInputChange}
+              onChange={handleInputChange} // Event handler untuk menangani input
               required
             />
           </div>
@@ -102,7 +108,7 @@ const AddUser = () => {
               className="form-control border border-dark"
               name="email"
               value={user.email}
-              onChange={handleInputChange}
+              onChange={handleInputChange} // Event handler untuk menangani input
               required
             />
           </div>
@@ -114,7 +120,7 @@ const AddUser = () => {
               className="form-control border border-dark"
               name="password"
               value={user.password}
-              onChange={handleInputChange}
+              onChange={handleInputChange} // Event handler untuk menangani input
               required
             />
           </div>
@@ -126,8 +132,8 @@ const AddUser = () => {
               className="form-control border border-dark"
               name="phone"
               value={user.phone}
-              onChange={handleInputChange}
-              required
+              onChange={handleInputChange} // Event handler untuk menangani input
+ required
             />
           </div>
 
@@ -137,7 +143,7 @@ const AddUser = () => {
               name="agency_id"
               className="form-select border border-dark"
               value={user.agency_id}
-              onChange={handleInputChange}
+              onChange={handleInputChange} // Event handler untuk menangani input
               required
             >
               <option value="">Pilih Instansi</option>
@@ -152,26 +158,24 @@ const AddUser = () => {
           <div className="mb-2">
             <label className="form-label">Role*</label>
             <select
-              className="form-select border border-dark"
               name="role"
+              className="form-select border border-dark"
               value={user.role}
-              onChange={handleInputChange}
+              onChange={handleInputChange} // Event handler untuk menangani input
               required
             >
               <option value="">Pilih Role</option>
               <option value="admin">Admin</option>
-              <option value="user">User</option>
+              <option value="user">User </option>
               <option value="spectator">Spectator</option>
             </select>
           </div>
 
-          <button type="submit" className="btn btn-danger w-100">
-            Simpan
-          </button>
+          <button type="submit" className="btn btn-primary">Tambah User</button>
         </form>
       </div>
     </div>
   );
 };
 
-export default AddUser;
+export default AddUser ;

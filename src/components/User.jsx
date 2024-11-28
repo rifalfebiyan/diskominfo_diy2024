@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaUserPlus, FaClipboardList } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { FaUserPlus } from 'react-icons/fa';
 
 const User = () => {
   const navigate = useNavigate();
@@ -10,10 +9,9 @@ const User = () => {
   const [departments, setDepartments] = useState([]);
   const [agencies, setAgencies] = useState([]);
   
-  // Ubah state default menjadi true untuk menampilkan tabel saat pertama kali dimuat
+  // State untuk menampilkan tabel
   const [showDepartmentsTable, setShowDepartmentsTable] = useState(true);
   const [showUsersTable, setShowUsersTable] = useState(true);
-  const [showAgenciesTable, setShowAgenciesTable] = useState(true);
   
   const [isHovered, setIsHovered] = useState(false);
   const [stats, setStats] = useState({
@@ -81,7 +79,7 @@ const User = () => {
     }
   };
 
-  const handleDeleteUser = async (id) => {
+  const handleDeleteUser  = async (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
       try {
         const response = await axios.delete(`http://localhost:8080/api/users/${id}`, {
@@ -93,7 +91,7 @@ const User = () => {
         if (response.status === 200) {
           setUsers(users.filter(user => user.id !== id));
           fetchStats();
-          alert('User deleted successfully');
+          alert('User  deleted successfully');
         } else {
           throw new Error('Failed to delete user');
         }
@@ -131,193 +129,172 @@ const User = () => {
     }
   };
   
-const handleShowDepartments = () => {
-  setShowDepartmentsTable(!showDepartmentsTable);
-};
+  const handleShowDepartments = () => {
+    setShowDepartmentsTable(!showDepartmentsTable);
+  };
 
   const handleShowUsers = () => {
     setShowUsersTable(!showUsersTable);
-  };
-
-  const handleShowAgencies = () => {
-    setShowAgenciesTable(!showAgenciesTable);
   };
 
   return (
     <div className="container mt-4">
       <h4>User Dashboard</h4>
       <div className="row mb-4 justify-content-center">
-    <div className="col-md-3">
-      <div
-        className="card text-center shadow-sm mb-3"
-        style={{
-          backgroundColor: '#F8EDED',
-          cursor: 'pointer',
-        }}
-        onClick={handleShowDepartments}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <div className="card-body">
-          <h3>Jumlah Bidang</h3>
-          <h1>{departments.length}</h1>
+        <div className="col-md-3">
+          <div
+            className="card text-center shadow-sm mb-3"
+            style={{
+              backgroundColor: '#F8EDED',
+              cursor: 'pointer',
+            }}
+            onClick={handleShowDepartments}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <div className="card-body">
+              <h3>Jumlah Bidang</h3>
+              <h1>{departments.length}</h1>
+            </div>
+          </div>
+        </div>
+        
+        <div className="col-md-3">
+          <div 
+            className="card text-center shadow-sm mb-3" 
+            style={{
+              backgroundColor: '#F8EDED',
+              cursor: 'pointer',
+            }}
+            onClick={handleShowUsers}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <div className="card-body">
+              <h3>Jumlah User</h3>
+              <h1>{users.length}</h1>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <div className="col-md-3">
-      <div 
-        className="card text-center shadow-sm mb-3" 
-        style={{
-          backgroundColor: '#F8EDED',
-          cursor: 'pointer',
-        }}
-        onClick={handleShowUsers}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <div className="card-body">
-          <h3>Jumlah User</h3>
-          <h1>{users.length}</h1>
+
+      {/* Baris untuk tombol tambah user dan tambah bidang */}
+      <div className="row mb-4 justify-content-center">
+        <div className="col-md-4">
+          <button className="btn btn-danger w-100 mb-3" onClick={() => navigate('/add-user')}>
+            <FaUserPlus /> Tambah User
+          </button>
+        </div>
+        <div className="col-md-4">
+          <button className="btn btn-danger w-100 mb-3" onClick={handleAddDepartment}>
+            <FaUserPlus /> Tambah Bidang
+          </button>
         </div>
       </div>
-    </div>
-  </div>
 
-  {/* Baris untuk tombol tambah user dan tambah bidang */}
-  <div className="row mb-4 justify-content-center">
-    <div className="col-md-4">
-      <button className="btn btn-danger w-100 mb-3" onClick={() => navigate('/add-user')}>
-        <FaUserPlus /> Tambah User
-      </button>
-    </div>
-    <div className="col-md-4">
-      <button className="btn btn-danger w-100 mb-3" onClick={() => navigate('/add-department')}>
-        <FaUserPlus /> Tambah Bidang
-      </button>
-    </div>
-  </div>
-
-{/* Tabel Departemen dengan kondisi showDepartmentsTable */}
-{showDepartmentsTable && (
-  <div className="card mb-4">
-    <div className="card-header">
-      <h5 className="card-title">Daftar Departemen</h5>
-    </div>
-    <div className="card-body">
-      <table className="table table-bordered table-hover">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Nama</th>
-            <th>No Telepon</th>
-            <th>Alamat</th>
-            <th>Status</th>
-            <th>Email</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {departments.map((department, index) => (
-            <tr key={department.id}>
-              <td>{index + 1}</td>
-              <td>{department.name}</td>
-              <td>{department.phone}</td>
-              <td>{department.address}</td>
-              <td>{department.status}</td>
-              <td>{department.email}</td>
-              <td>
-                <button
-                  className="btn btn-warning btn-sm me-2"
-                  onClick={() => handleEditDepartment(department.id)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => handleDeleteDepartment(department.id)}
-                >
-                  Hapus
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
+      {/* Tabel Departemen dengan kondisi showDepartmentsTable */}
+      {showDepartmentsTable && (
+        <div className="card mb-4">
+          <div className="card-header">
+            <h5 className="card-title">Daftar Departemen</h5>
+          </div>
+          <div className="card-body">
+            <table className="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Nama</th>
+                  <th>No Telepon</th>
+                  <th>Alamat</th>
+                  <th>Status</th>
+                  <th>Email</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {departments.map((department, index) => (
+                  <tr key={department.id}>
+                    <td>{index + 1}</td>
+                    <td>{department.name}</td>
+                    <td>{department.phone}</td>
+                    <td>{department.address}</td>
+                    <td>{department.status}</td>
+                    <td>{department.email}</td>
+                    <td>
+                      <button
+                        className="btn btn-warning btn-sm me-2"
+                        onClick={() => handleEditDepartment(department.id)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDeleteDepartment(department.id)}
+                      >
+                        Hapus
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Tabel Pengguna dengan kondisi showUsersTable */}
       {showUsersTable && (
-  <div className="card mb-4">
-    <div className="card-header">
-      <h5 className="card-title">Daftar Pengguna</h5>
-    </div>
-    <div className="card-body">
-      <div className="table-responsive">
-        <table className="table table-bordered table-hover">
-          <thead className="table-light">
-            <tr>
-              <th>No</th>
-              <th>Nama</th>
-              <th>NIP</th>
-              <th>Email</th>
-              <th>No Telepon</th>
-              <th>Role</th>
-              <th>Tanggal Dibuat</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user, index) => (
-              <tr key={user.id}>
-                <td>{index + 1}</td>
-                <td>{user.name || '-'}</td>
-                <td>{user.nip || '-'}</td>
-                <td>
-                  <a 
-                    href={`mailto:${user.email}`} 
-                    style={{ color: '#9F2C2C' }}
-                  >
-                    {user.email || '-'}
-                  </a>
-                </td>
-                <td>{user.phone || '-'}</td>
-                <td>{user.role || '-'}</td>
-                <td>
-                  {user.created_at 
-                    ? new Date(user.created_at).toLocaleDateString() 
-                    : '-'}
-                </td>
-                <td>
-    <button
-        className="btn btn-warning btn-sm me-2"
-        onClick={() => navigate(`/edit-user/${user.id}`)}
-    >
-        Edit
-    </button>
-    <button
-        className="btn btn-danger btn-sm me-2"
-        onClick={() => handleDeleteUser(user.id)}
-    >
-        Hapus
-    </button>
-    <button
-        className="btn btn-info btn-sm"
-        onClick={() => navigate(`/user-detail/${user.id}`)}
-    >
-        Detail
-    </button>
-</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-)}
+        <div className="card mb-4">
+          <div className="card-header">
+            <h5 className="card-title">Daftar Pengguna</h5>
+          </div>
+          <div className="card-body">
+            <div className="table-responsive">
+              <table className="table table-bordered table-hover">
+                <thead className="table-light">
+                  <tr>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>NIP</th>
+                    <th>Email</th>
+                    <th>No Telepon</th>
+                    <th>Role</th>
+                    <th>Instansi ID</th> {/* Kolom untuk Instansi ID */}
+                    <th>Instansi</th> {/* Kolom untuk nama instansi */}
+                    <th>Tanggal Dibuat</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user, index) => (
+                    <tr key={user.id}>
+                      <td>{index + 1}</td>
+                      <td>{user.name || '-'}</td>
+                      <td>{user.nip || '-'}</td>
+                      <td>
+                        <a 
+                          href={`mailto:${user.email}`}
+                          style={{ color: '#9F2C2C' }}
+                        >
+                          {user.email || '-'}
+                        </a>
+                      </td>
+                      <td>{user.phone || '-'}</td>
+                      <td>{user.role || '-'}</td>
+                      <td>{user.agency_id || '-'}</td> {/* Tampilkan agency_id */}
+                      <td>{user.agency ? user.agency.name : '-'}</td> {/* Menampilkan nama instansi */}
+                      <td>
+                        {user.created_at 
+                          ? new Date(user.created_at).toLocaleDateString() 
+                          : '-'}
+                      </td>                     
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

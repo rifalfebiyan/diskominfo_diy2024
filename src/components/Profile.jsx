@@ -8,66 +8,76 @@ const Profile = () => {
     nip: '',
     email: '',
     phone: '',
-    agency_id: null,
     profilePicture: '',
-    role: ''
+    role: '',
+    agencyName: '' // State untuk nama instansi
   });
-  const [agency, setAgency] = useState(null);
   const [newProfilePicture, setNewProfilePicture] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [agencies, setAgencies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    fetchUserData();
+    const fetchData = async () => {
+      try {
+        await fetchAgencies(); // Fetch agencies first
+        await fetchUserData(); // Then fetch user data
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError('Failed to load data');
+      }
+    };
+    fetchData();
   }, []);
 
-  const fetchAgencyData = async (agencyId) => {
+  const fetchAgencies = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/agencies/${agencyId}`, {
+      const response = await axios.get('http://localhost:8080/api/agencies', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      setAgency(response.data);
+      setAgencies(response.data);
     } catch (error) {
-      console.error('Error fetching agency data:', error);
+      console.error('Error fetching agencies:', error);
+      setError('Failed to load agencies');
     }
   };
 
-  const fetchUserData = async () => {
-    try {
-      const userId = localStorage.getItem('userId');
-      const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      
-      const { name, nip, email, phone, role, profile_picture, agency_id } = response.data;
-      
-      setUser ({
-        name,
-        nip,
-        email,
-        phone,
-        role,
-        profilePicture: profile_picture,
-        agency_id
-      });
-
-      if (agency_id) {
-        fetchAgencyData(agency_id);
+// Fetch user data should look like this
+const fetchUserData = async () => {
+  try {
+    const userId = localStorage.getItem('userId');
+    const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
-      
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      setError('Failed to load user data');
-      setLoading(false);
-    }
-  };
+    });
+
+    const { name, nip, email, phone, role, profile_picture, agency_id } = response.data;
+
+    // Ensure agencies are loaded before finding agency name
+    const agency = agencies.find(agency => agency.id === agency_id);
+    const agencyName = agency ? agency.name : 'Tidak ada instansi';
+
+    setUser ({
+      name,
+      nip,
+      email,
+      phone,
+      role,
+      profilePicture: profile_picture,
+      agencyName // Set agency name here
+    });
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    setError('Failed to load user data');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
@@ -98,7 +108,7 @@ const Profile = () => {
         }
       );
 
-      setUser ({ ...user, profilePicture: newProfilePicture });
+      setUser (prevUser    => ({ ...prevUser  , profilePicture: newProfilePicture }));
       setShowModal(false);
       alert('Profile picture updated successfully');
       window.location.reload();
@@ -225,22 +235,21 @@ const Profile = () => {
 
               <Row className="mb-3">
                 <Col sm={4}>
-                    <strong>ROLE</strong>
+                  <strong>ROLE</strong>
                 </Col>
                 <Col sm={8}>
-                    {user.role || '-'}
+                  {user.role || '-'}
                 </Col>
-            </Row>
+              </Row>
 
-            <Row className="mb-3">
+              <Row className="mb-3">
                 <Col sm={4}>
-                    <strong>INSTANSI</strong>
+                  <strong>INSTANSI</strong>
                 </Col>
                 <Col sm={8}>
-                    {agency ? agency.name : '-'}
+                  {user.agencyName || '-'} {/* Menampilkan nama instansi */}
                 </Col>
-            </Row>
-            
+              </Row>
             </div>
           </div>
         </Col>

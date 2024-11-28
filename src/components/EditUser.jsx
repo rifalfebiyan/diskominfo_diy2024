@@ -58,28 +58,28 @@ const EditUser  = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Data yang akan disimpan:', user); // Debugging untuk memeriksa NIP
-  
+
     // Validasi input
-    if (!user.name || !user.phone || !user.email || !user.agency_id) {
+    if (!user.name || !user.nip || !user.phone || !user.email || !user.agency_id) {
       alert('Semua field harus diisi!');
       return;
     }
-  
+
     try {
       const response = await axios.put(`http://localhost:8080/api/users/${id}`, user, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-  
+
       console.log('Response dari server:', response.data); // Debugging
-      alert('User   berhasil diperbarui');
+      alert('User  berhasil diperbarui');
       navigate(`/admin`);
     } catch (error) {
       console.error('Error updating user:', error); // Debugging
       alert('Gagal memperbarui user: ' + error.message);
     }
-};
+  };
 
   return (
     <div className="container my-4">
@@ -142,7 +142,7 @@ const EditUser  = () => {
           {/* Password Input */}
           <div className="mb-2">
             <label className="form-label">Password*</label>
-            < input
+            <input
               type="password"
               className="form-control border border-dark"
               name="password"

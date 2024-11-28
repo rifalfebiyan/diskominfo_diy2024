@@ -35,14 +35,10 @@ useEffect(() => {
         }
       });
 
-      // Log the response data
-      console.log('User  Response:', userResponse.data);
-
-      // Set User Data
       const userData = userResponse.data;
-      setUser  ({
+      setUser ({
         name: userData.name,
-        nip: userData.nip || 'Tidak ada NIP', // Pastikan NIP diatur dengan benar
+        nip: userData.nip || 'Tidak ada NIP',
         email: userData.email || 'Tidak ada email',
         phone: userData.phone || 'Tidak ada nomor telepon',
         role: userData.role || 'Tidak memiliki role',
@@ -50,9 +46,6 @@ useEffect(() => {
         agency_id: userData.agency_id || null,
         created_at: userData.created_at || null
       });
-
-      // Log the user data being set
-      console.log('User  Data:', userData);
 
       // Fetch Agency Data if agency_id exists
       if (userData.agency_id) {
@@ -121,10 +114,8 @@ useEffect(() => {
             </Col>
             <Col md={6}>
               <DetailRow label="Role" value={user.role || 'Tidak memiliki role'} />
-              <DetailRow 
-                label="Instansi" 
-                value={agency ? agency.name : 'Tidak terdaftar di instansi manapun'} 
-              />
+              <DetailRow label="Agency ID" value={user.agency_id || 'Tidak terdaftar di instansi manapun'} /> {/* Menampilkan agency_id */}
+
               <DetailRow 
                 label="Tanggal Dibuat" 
                 value={user.created_at 

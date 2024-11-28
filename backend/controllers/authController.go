@@ -68,7 +68,6 @@ func Register(c *gin.Context) {
 		Password string `json:"password" binding:"required,min=6"`
 		Role     string `json:"role" binding:"required,oneof=admin user spectator"`
 		AgencyID uint   `json:"agency_id" binding:"required"`
-		N_IP     string `json:"n_ip"` // Tambahkan ini untuk n_ip
 	}
 
 	// Mengikat JSON ke struct input
@@ -97,7 +96,6 @@ func Register(c *gin.Context) {
 		Password: input.Password, // Pastikan password dienkripsi saat menyimpan
 		Role:     input.Role,
 		AgencyID: &input.AgencyID,
-		N_IP:     input.N_IP, // Simpan n_ip ke database
 	}
 
 	// Menyimpan pengguna baru ke dalam database

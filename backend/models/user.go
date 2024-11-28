@@ -7,7 +7,7 @@ import (
 type User struct {
 	ID             uint      `json:"id" gorm:"primaryKey"`
 	Name           string    `json:"name"`
-	NIP            string    `json:"nip"` // Pastikan ini tidak unik jika Anda ingin mengizinkan perubahan
+	NIP            string    `json:"nip"` // Pastikan ini ada
 	Email          string    `json:"email" gorm:"unique"`
 	Phone          string    `json:"phone"`
 	Password       string    `json:"password"`
@@ -15,6 +15,5 @@ type User struct {
 	Role           string    `json:"role"`
 	ProfilePicture string    `json:"profile_picture"`
 	AgencyID       *uint     `json:"agency_id"`
-	N_IP           string    `json:"n_ip"`
 	Agency         Agency    `gorm:"foreignKey:AgencyID" json:"agency"`
 }

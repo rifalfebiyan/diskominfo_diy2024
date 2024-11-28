@@ -55,7 +55,6 @@ const RegisterForm = () => {
         try {
             const response = await axios.post('http://localhost:8080/api/register', {
                 ...user,
-                n_ip: user.nip, // Pastikan n_ip diisi dengan nilai yang sesuai
                 role: 'spectator' // Pastikan role tetap 'spectator'
             }, {
                 headers: {

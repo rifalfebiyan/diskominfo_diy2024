@@ -4,7 +4,6 @@ import (
 	"backend/database"
 	"backend/models"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -60,6 +59,12 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
+	// Pastikan NIP tidak kosong
+	if user.NIP == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "NIP is required"})
+		return
+	}
+
 	// Validate role
 	validRoles := map[string]bool{
 		"admin":     true,
@@ -69,6 +74,12 @@ func CreateUser(c *gin.Context) {
 
 	if !validRoles[user.Role] {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role"})
+		return
+	}
+
+	// Pastikan NIP tidak kosong
+	if user.NIP == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "NIP is required"})
 		return
 	}
 
@@ -90,7 +101,7 @@ func UpdateUser(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
 	if err := database.DB.First(&user, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User   not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "User  not found"})
 		return
 	}
 
@@ -100,12 +111,15 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	// Debugging log
-	log.Printf("Received data for update: %+v", updateData) // Tambahkan ini
+	// Pastikan NIP tidak kosong
+	if updateData.NIP == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "NIP is required"})
+		return
+	}
 
 	// Update fields
 	user.Name = updateData.Name
-	user.NIP = updateData.NIP // Pastikan NIP diupdate
+	user.NIP = updateData.NIP
 	user.Email = updateData.Email
 	user.Phone = updateData.Phone
 	user.Role = updateData.Role
