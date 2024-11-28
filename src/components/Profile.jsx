@@ -31,7 +31,7 @@ const Profile = () => {
     };
     fetchData();
   }, []);
-
+  
   const fetchAgencies = async () => {
     try {
       const response = await axios.get('http://localhost:8080/api/agencies', {
@@ -45,39 +45,37 @@ const Profile = () => {
       setError('Failed to load agencies');
     }
   };
-
-// Fetch user data should look like this
-const fetchUserData = async () => {
-  try {
-    const userId = localStorage.getItem('userId');
-    const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-
-    const { name, nip, email, phone, role, profile_picture, agency_id } = response.data;
-
-    // Ensure agencies are loaded before finding agency name
-    const agency = agencies.find(agency => agency.id === agency_id);
-    const agencyName = agency ? agency.name : 'Tidak ada instansi';
-
-    setUser ({
-      name,
-      nip,
-      email,
-      phone,
-      role,
-      profilePicture: profile_picture,
-      agencyName // Set agency name here
-    });
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    setError('Failed to load user data');
-  } finally {
-    setLoading(false);
-  }
-};
+  
+  const fetchUserData = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+  
+      const { name, nip, email, phone, role, profile_picture, agency } = response.data;
+  
+      // Ambil nama instansi dari objek agency
+      const agencyName = agency ? agency.name : 'Tidak ada instansi';
+  
+      setUser ({
+        name,
+        nip,
+        email,
+        phone,
+        role,
+        profilePicture: profile_picture,
+        agencyName // Set agency name here
+      });
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setError('Failed to load user data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
