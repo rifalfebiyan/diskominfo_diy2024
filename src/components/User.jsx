@@ -8,6 +8,7 @@ const User = () => {
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [agencies, setAgencies] = useState([]);
+  const [currentUser , setCurrentUser ] = useState(null); // State untuk menyimpan data pengguna saat ini
   
   // State untuk menampilkan tabel
   const [showDepartmentsTable, setShowDepartmentsTable] = useState(true);
@@ -25,6 +26,7 @@ const User = () => {
     fetchUsers();
     fetchAgencies();
     fetchStats();
+    fetchCurrentUser (); // Ambil data pengguna saat ini
   }, []);
 
   const fetchDepartments = async () => {
@@ -50,6 +52,20 @@ const User = () => {
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
+    }
+  };
+
+  const fetchCurrentUser  = async () => {
+    try {
+      const userId = localStorage.getItem('userId'); // Ambil ID pengguna dari local storage
+      const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setCurrentUser (response.data); // Simpan data pengguna saat ini
+    } catch (error) {
+      console.error('Error fetching current user:', error);
     }
   };
 
@@ -196,7 +212,7 @@ const User = () => {
       {showDepartmentsTable && (
         <div className="card mb-4">
           <div className="card-header">
-            <h5 className="card-title">Daftar Departemen</h5>
+            <h5 className="card-title">Daftar Departemen {currentUser?.agency ? currentUser.agency.name : '-'}</h5>
           </div>
           <div className="card-body">
             <table className="table table-bordered table-hover">

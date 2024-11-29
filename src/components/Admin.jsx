@@ -8,10 +8,13 @@ const Admin = () => {
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [agencies, setAgencies] = useState([]);
-  const [currentUser , setCurrentUser ] = useState(null); // State untuk menyimpan data pengguna saat ini
+  
+  // State to hold the selected agency name
   const [selectedAgency, setSelectedAgency] = useState(null);
+
   const [showUsersTable, setShowUsersTable] = useState(true);
   const [showAgenciesTable, setShowAgenciesTable] = useState(true);
+  
   const [isHovered, setIsHovered] = useState(false);
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -24,7 +27,6 @@ const Admin = () => {
     fetchUsers();
     fetchAgencies();
     fetchStats();
-    fetchCurrentUser (); // Ambil data pengguna saat ini
   }, []);
 
   const fetchDepartments = async () => {
@@ -63,8 +65,6 @@ const Admin = () => {
       setAgencies(response.data);
       if (response.data.length > 0) {
         setSelectedAgency(response.data[0].name); // Set the first agency's name as selected
-      } else {
-        setSelectedAgency(null); // Reset if no agencies are available
       }
     } catch (error) {
       console.error('Error fetching agencies:', error);
@@ -84,20 +84,6 @@ const Admin = () => {
     }
   };
 
-  const fetchCurrentUser  = async () => {
-    try {
-      const userId = localStorage.getItem('userId'); // Ambil ID pengguna dari local storage
-      const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      setCurrentUser (response.data); // Simpan data pengguna saat ini
-    } catch (error) {
-      console.error('Error fetching current user:', error);
-    }
-  };
-
   const handleDeleteUser  = async (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
       try {
@@ -106,7 +92,7 @@ const Admin = () => {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-
+        
         if (response.status === 200) {
           setUsers(users.filter(user => user.id !== id));
           fetchStats();
@@ -124,8 +110,10 @@ const Admin = () => {
   const handleEditDepartment = (id) => {
     navigate(`/edit-department/${id}`);
   };
-
-  const handleAddDepartment = () => navigate('/add-department');
+  
+  const handleAddDepartment = () => {
+    navigate('/add-department');
+  };
 
   const handleDeleteDepartment = async (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus bidang ini?')) {
@@ -147,27 +135,27 @@ const Admin = () => {
   };
 
   const handleDeleteAgency = async (id) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus instansi ini?')) {
+  if (window.confirm('Apakah Anda yakin ingin menghapus instansi ini?')) {
       try {
-        const response = await axios.delete(`http://localhost:8080/api/agencies/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          const response = await axios.delete(`http://localhost:8080/api/agencies/${id}`, {
+              headers: {
+                  'Authorization': `Bearer ${localStorage.getItem('token')}`
+              }
+          });
+          
+          if (response.status === 200) {
+              setAgencies(agencies.filter(agency => agency.id !== id));
+              fetchStats();
+              alert('Instansi berhasil dihapus');
+          } else {
+              throw new Error('Failed to delete agency');
           }
-        });
-
-        if (response.status === 200) {
-          setAgencies(agencies.filter(agency => agency.id !== id));
-          fetchStats();
-          alert('Instansi berhasil dihapus');
-        } else {
-          throw new Error('Failed to delete agency');
-        }
       } catch (error) {
-        console.error('Error deleting agency:', error);
-        alert('Gagal menghapus instansi: ' + (error.response?.data?.error || error.message));
+          console.error('Error deleting agency:', error);
+          alert('Gagal menghapus instansi: ' + (error.response?.data?.error || error.message));
       }
-    }
-  };
+  }
+};
 
   const handleShowUsers = () => {
     setShowUsersTable(!showUsersTable);
@@ -255,7 +243,7 @@ const Admin = () => {
       {showAgenciesTable && (
         <div className="card mb-4">
           <div className="card-header">
-            <h5 className="card-title">Daftar Instansi {currentUser?.agency ? currentUser.agency.name : '-'}</h5> {/* Display agency name here */}
+            <h5 className="card-title">Daftar Instansi {selectedAgency ? selectedAgency : ''}</h5> {/* Display agency name here */}
           </div>
           <div className="card-body">
             <div className="table-responsive">
@@ -366,7 +354,7 @@ const Admin = () => {
                         </button>
                         <button
                           className="btn btn-danger btn-sm me-2"
-                          onClick={() => handleDeleteUser(user.id)}
+                          onClick={() => handleDeleteUser (user.id)}
                         >
                           Hapus
                         </button>
