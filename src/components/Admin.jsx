@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaUserPlus, FaClipboardList } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { FaUserPlus } from 'react-icons/fa';
 
 const Admin = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [agencies, setAgencies] = useState([]);
-  
-  // Ubah state default menjadi true untuk menampilkan tabel saat pertama kali dimuat
+  const [currentUser , setCurrentUser ] = useState(null); // State untuk menyimpan data pengguna saat ini
+  const [selectedAgency, setSelectedAgency] = useState(null);
   const [showUsersTable, setShowUsersTable] = useState(true);
   const [showAgenciesTable, setShowAgenciesTable] = useState(true);
-  
   const [isHovered, setIsHovered] = useState(false);
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -26,6 +24,7 @@ const Admin = () => {
     fetchUsers();
     fetchAgencies();
     fetchStats();
+    fetchCurrentUser (); // Ambil data pengguna saat ini
   }, []);
 
   const fetchDepartments = async () => {
@@ -35,7 +34,7 @@ const Admin = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      setDepartments(response.data); // Menyimpan data ke state
+      setDepartments(response.data);
     } catch (error) {
       console.error('Error fetching departments:', error);
     }
@@ -62,6 +61,11 @@ const Admin = () => {
         }
       });
       setAgencies(response.data);
+      if (response.data.length > 0) {
+        setSelectedAgency(response.data[0].name); // Set the first agency's name as selected
+      } else {
+        setSelectedAgency(null); // Reset if no agencies are available
+      }
     } catch (error) {
       console.error('Error fetching agencies:', error);
     }
@@ -80,7 +84,21 @@ const Admin = () => {
     }
   };
 
-  const handleDeleteUser = async (id) => {
+  const fetchCurrentUser  = async () => {
+    try {
+      const userId = localStorage.getItem('userId'); // Ambil ID pengguna dari local storage
+      const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setCurrentUser (response.data); // Simpan data pengguna saat ini
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+    }
+  };
+
+  const handleDeleteUser  = async (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
       try {
         const response = await axios.delete(`http://localhost:8080/api/users/${id}`, {
@@ -88,11 +106,11 @@ const Admin = () => {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        
+
         if (response.status === 200) {
           setUsers(users.filter(user => user.id !== id));
           fetchStats();
-          alert('User deleted successfully');
+          alert('User  deleted successfully');
         } else {
           throw new Error('Failed to delete user');
         }
@@ -106,10 +124,8 @@ const Admin = () => {
   const handleEditDepartment = (id) => {
     navigate(`/edit-department/${id}`);
   };
-  
-  const handleAddDepartment = () => {
-    navigate('/add-department');
-  };
+
+  const handleAddDepartment = () => navigate('/add-department');
 
   const handleDeleteDepartment = async (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus bidang ini?')) {
@@ -130,29 +146,28 @@ const Admin = () => {
     }
   };
 
-const handleDeleteAgency = async (id) => {
-  if (window.confirm('Apakah Anda yakin ingin menghapus instansi ini?')) {
+  const handleDeleteAgency = async (id) => {
+    if (window.confirm('Apakah Anda yakin ingin menghapus instansi ini?')) {
       try {
-          const response = await axios.delete(`http://localhost:8080/api/agencies/${id}`, {
-              headers: {
-                  'Authorization': `Bearer ${localStorage.getItem('token')}`
-              }
-          });
-          
-          if (response.status === 200) {
-              // Mengupdate state agencies setelah berhasil dihapus
-              setAgencies(agencies.filter(agency => agency.id !== id));
-              fetchStats(); // Memperbarui statistik
-              alert('Instansi berhasil dihapus');
-          } else {
-              throw new Error('Failed to delete agency');
+        const response = await axios.delete(`http://localhost:8080/api/agencies/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
+        });
+
+        if (response.status === 200) {
+          setAgencies(agencies.filter(agency => agency.id !== id));
+          fetchStats();
+          alert('Instansi berhasil dihapus');
+        } else {
+          throw new Error('Failed to delete agency');
+        }
       } catch (error) {
-          console.error('Error deleting agency:', error);
-          alert('Gagal menghapus instansi: ' + (error.response?.data?.error || error.message));
+        console.error('Error deleting agency:', error);
+        alert('Gagal menghapus instansi: ' + (error.response?.data?.error || error.message));
       }
-  }
-};
+    }
+  };
 
   const handleShowUsers = () => {
     setShowUsersTable(!showUsersTable);
@@ -240,7 +255,7 @@ const handleDeleteAgency = async (id) => {
       {showAgenciesTable && (
         <div className="card mb-4">
           <div className="card-header">
-            <h5 className="card-title">Daftar Instansi</h5>
+            <h5 className="card-title">Daftar Instansi {currentUser?.agency ? currentUser.agency.name : '-'}</h5> {/* Display agency name here */}
           </div>
           <div className="card-body">
             <div className="table-responsive">
@@ -248,7 +263,7 @@ const handleDeleteAgency = async (id) => {
                 <thead className="table-light">
                   <tr>
                     <th>No</th>
-                    <th>Id Instansi</th> {/* Kolom Id Instansi */}
+                    <th>Id Instansi</th>
                     <th>Nama Instansi</th>
                     <th>Email</th>
                     <th>No Telp</th>
@@ -261,7 +276,7 @@ const handleDeleteAgency = async (id) => {
                   {agencies.map((agency, index) => (
                     <tr key={agency.id}>
                       <td>{index + 1}</td>
-                      <td>{agency.id}</td> {/* Menampilkan Id Instansi */}
+                      <td>{agency.id}</td>
                       <td>{agency.name}</td>
                       <td><a href={`mailto:${agency.email}`} style={{ color: '#9F2C2C' }}>{agency.email}</a></td>
                       <td>{agency.phone}</td>
@@ -298,78 +313,78 @@ const handleDeleteAgency = async (id) => {
 
       {/* Tabel Pengguna dengan kondisi showUsersTable */}
       {showUsersTable && (
-  <div className="card mb-4">
-    <div className="card-header">
-      <h5 className="card-title">Daftar Pengguna</h5>
-    </div>
-    <div className="card-body">
-      <div className="table-responsive">
-        <table className="table table-bordered table-hover">
-          <thead className="table-light">
-            <tr>
-              <th>No</th>
-              <th>Nama</th>
-              <th>NIP</th>
-              <th>Email</th>
-              <th>No Telepon</th>
-              <th>Role</th>
-              <th>Instansi ID</th> {/* Kolom untuk Instansi ID */}
-              <th>Instansi</th> {/* Kolom untuk nama instansi */}
-              <th>Tanggal Dibuat</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user, index) => (
-              <tr key={user.id}>
-                <td>{index + 1}</td>
-                <td>{user.name || '-'}</td>
-                <td>{user.nip || '-'}</td>
-                <td>
-                  <a 
-                    href={`mailto:${user.email}`} 
-                    style={{ color: '#9F2C2C' }}
-                  >
-                    {user.email || '-'}
-                  </a>
-                </td>
-                <td>{user.phone || '-'}</td>
-                <td>{user.role || '-'}</td>
-                <td>{user.agency_id || '-'}</td> {/* Tampilkan agency_id */}
-                <td>{user.agency ? user.agency.name : '-'}</td> {/* Menampilkan nama instansi */}
-                <td>
-                  {user.created_at 
-                    ? new Date(user.created_at).toLocaleDateString() 
-                    : '-'}
-                </td>
-                <td>
-                  <button
-                    className="btn btn-warning btn-sm me-2"
-                    onClick={() => navigate(`/edit-user/${user.id}`)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="btn btn-danger btn-sm me-2"
-                    onClick={() => handleDeleteUser (user.id)}
-                  >
-                    Hapus
-                  </button>
-                  <button
-                    className="btn btn-info btn-sm"
-                    onClick={() => navigate(`/user-detail/${user.id}`)}
-                  >
-                    Detail
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-)}
+        <div className="card mb-4">
+          <div className="card-header">
+            <h5 className="card-title">Daftar Pengguna</h5>
+          </div>
+          <div className="card-body">
+            <div className="table-responsive">
+              <table className="table table-bordered table-hover">
+                <thead className="table-light">
+                  <tr>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>NIP</th>
+                    <th>Email</th>
+                    <th>No Telepon</th>
+                    <th>Role</th>
+                    <th>Instansi ID</th>
+                    <th>Instansi</th>
+                    <th>Tanggal Dibuat</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user, index) => (
+                    <tr key={user.id}>
+                      <td>{index + 1}</td>
+                      <td>{user.name || '-'}</td>
+                      <td>{user.nip || '-'}</td>
+                      <td>
+                        <a 
+                          href={`mailto:${user.email}`} 
+                          style={{ color: '#9F2C2C' }}
+                        >
+                          {user.email || '-'}
+                        </a>
+                      </td>
+                      <td>{user.phone || '-'}</td>
+                      <td>{user.role || '-'}</td>
+                      <td>{user.agency_id || '-'}</td>
+                      <td>{user.agency ? user.agency.name : '-'}</td>
+                      <td>
+                        {user.created_at 
+                          ? new Date(user.created_at).toLocaleDateString() 
+                          : '-'}
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-warning btn-sm me-2"
+                          onClick={() => navigate(`/edit-user/${user.id}`)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm me-2"
+                          onClick={() => handleDeleteUser(user.id)}
+                        >
+                          Hapus
+                        </button>
+                        <button
+                          className="btn btn-info btn-sm"
+                          onClick={() => navigate(`/user-detail/${user.id}`)}
+                        >
+                          Detail
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
