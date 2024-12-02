@@ -10,8 +10,6 @@ const Admin = () => {
   const [agencies, setAgencies] = useState([]);
   
   // State to hold the selected agency name
-  const [selectedAgency, setSelectedAgency] = useState(null);
-
   const [showUsersTable, setShowUsersTable] = useState(true);
   const [showAgenciesTable, setShowAgenciesTable] = useState(true);
   
@@ -64,7 +62,6 @@ const Admin = () => {
       });
       setAgencies(response.data);
       if (response.data.length > 0) {
-        setSelectedAgency(response.data[0].name); // Set the first agency's name as selected
       }
     } catch (error) {
       console.error('Error fetching agencies:', error);
@@ -243,7 +240,7 @@ const Admin = () => {
       {showAgenciesTable && (
         <div className="card mb-4">
           <div className="card-header">
-            <h5 className="card-title">Daftar Instansi {selectedAgency ? selectedAgency : ''}</h5> {/* Display agency name here */}
+            <h5 className="card-title">Daftar Instansi</h5> {/* Display agency name here */}
           </div>
           <div className="card-body">
             <div className="table-responsive">

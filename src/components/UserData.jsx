@@ -3,70 +3,58 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Row, Col, Card, Button, Spinner, Alert } from 'react-bootstrap';
 
+// Komponen pembantu untuk menampilkan baris detail
+const DetailRow = ({ label, value }) => (
+  <div className="mb-2">
+    <strong>{label}:</strong> {value}
+  </div>
+);
+
 const UserData = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   
   // State Management
-  const [user, setUser ] = useState({
-    name: '',
-    nip: '',
-    email: '',
-    phone: '',
-    role: '',
-    profile_picture: '',
-    agency_id: null,
-    created_at: null
-  });
+  const [user, setUser ] = useState(null);
   const [agency, setAgency] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-// Fetch User Data
-useEffect(() => {
-  const fetchUserData = async () => {
-    try {
-      const token = localStorage.getItem('token');
+  // Fetch User Data
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('token');
 
-      // Fetch User Data
-      const userResponse = await axios.get(`http://localhost:8080/api/users/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const userData = userResponse.data;
-      setUser ({
-        name: userData.name,
-        nip: userData.nip || 'Tidak ada NIP',
-        email: userData.email || 'Tidak ada email',
-        phone: userData.phone || 'Tidak ada nomor telepon',
-        role: userData.role || 'Tidak memiliki role',
-        profile_picture: userData.profile_picture || '',
-        agency_id: userData.agency_id || null,
-        created_at: userData.created_at || null
-      });
-
-      // Fetch Agency Data if agency_id exists
-      if (userData.agency_id) {
-        const agencyResponse = await axios.get(`http://localhost:8080/api/agencies/${userData.agency_id}`, {
+        // Fetch User Data
+        const userResponse = await axios.get(`http://localhost:8080/api/users/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        setAgency(agencyResponse.data);
+
+        setUser (userResponse.data);
+
+        // Fetch Agency Data if agency_id exists
+        if (userResponse.data.agency_id) {
+          const agencyResponse = await axios.get(`http://localhost:8080/api/agencies/${userResponse.data.agency_id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          setAgency(agencyResponse.data);
+        }
+
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError('Gagal memuat data pengguna');
+        setLoading(false);
       }
+    };
 
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setError('Gagal memuat data pengguna');
-      setLoading(false);
-    }
-  };
-
-  fetchUserData();
-}, [id]);
+    fetchUserData();
+  }, [id]);
 
   // Handler Functions
   const handleEdit = () => {
@@ -96,6 +84,17 @@ useEffect(() => {
     );
   }
 
+  // Helper function to format date safely
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Tanggal tidak tersedia';
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? 'Tanggal tidak valid' : date.toLocaleDateString('id-ID', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   return (
     <Container className="mt-4">
       <h4 className="mb-4">Detail Pengguna</h4>
@@ -114,18 +113,10 @@ useEffect(() => {
             </Col>
             <Col md={6}>
               <DetailRow label="Role" value={user.role || 'Tidak memiliki role'} />
-              <DetailRow label="Agency ID" value={user.agency_id || 'Tidak terdaftar di instansi manapun'} /> {/* Menampilkan agency_id */}
-
+              <DetailRow label="Agency ID" value={user.agency_id || 'Tidak terdaftar di instansi manapun'} />
               <DetailRow 
                 label="Tanggal Dibuat" 
-                value={user.created_at 
-                  ? new Date(user.created_at).toLocaleDateString('id-ID', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    }) 
-                  : 'Tanggal tidak tersedia'
-                } 
+                value={formatDate(user.created_at)} 
               />
             </Col>
           </Row>
@@ -142,48 +133,24 @@ useEffect(() => {
             <Row>
               <Col md={6}>
                 <DetailRow label="Nama Instansi" value={agency.name} />
-                <DetailRow label="Email Instansi" value={agency.email || 'Tidak ada email'} />
+                <DetailRow label="Email Instansi" value ={agency.email || 'Tidak ada email instansi'} />
+                <DetailRow label="No Telepon Instansi" value={agency.phone || 'Tidak ada nomor telepon instansi'} />
               </Col>
               <Col md={6}>
-                <DetailRow label ="No Telepon Instansi" value={agency.phone || 'Tidak ada nomor telepon'} />
-                <DetailRow label="Alamat Instansi" value={agency.address || 'Tidak ada alamat'} />
+                <DetailRow label="Alamat Instansi" value={agency.address || 'Tidak ada alamat instansi'} />
               </Col>
             </Row>
           </Card.Body>
         </Card>
       )}
 
-      {/* Profile Picture */}
-      {user.profile_picture && (
-        <Card className="mb-4">
-          <Card.Header>
-            <h5 className="card-title">Foto Profil</h5>
-          </Card.Header>
-          <Card.Body className="text-center">
-            <img 
-              src={`http://localhost:8080${user.profile_picture}`} 
-              alt="Profile" 
-              className="img-fluid rounded"
-              style={{ maxHeight: '300px' }}
-            />
-          </Card.Body>
-        </Card>
-      )}
-
       {/* Action Buttons */}
-      <div className="d-flex gap-2">
-        <Button variant="danger" onClick={handleEdit}>Edit</Button>
+      <div className="d-flex justify-content-between">
         <Button variant="secondary" onClick={handleBack}>Kembali</Button>
+        <Button variant="primary" onClick={handleEdit}>Edit Pengguna</Button>
       </div>
     </Container>
   );
 };
-
-// Komponen pembantu untuk menampilkan baris detail
-const DetailRow = ({ label, value }) => (
-  <div className="mb-2">
-    <strong>{label}:</strong> {value}
-  </div>
-);
 
 export default UserData;
