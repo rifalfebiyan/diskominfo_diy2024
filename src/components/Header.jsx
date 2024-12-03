@@ -2,10 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Dropdown } from 'react-bootstrap';
+import axios from 'axios';
 
 function Header({ onLogout }) {
   const [show, setShow] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [userName, setUserName] = useState('User'); 
+  const [userRole, setUserRole] = useState('User');// State for storing the user's name
   const sidebarRef = useRef(null);
   const navigate = useNavigate();
 
@@ -39,14 +42,48 @@ function Header({ onLogout }) {
     };
   }, [sidebarVisible]);
 
+  // Fetch user data from API
+  useEffect(() => {
+    const userId = localStorage.getItem('userId'); // Get user ID from localStorage
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        setUserName(response.data.name); // Store the user's name in state
+        setUserRole( response.data.role);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    if (userId) {
+      fetchUserData(); // Call function to fetch user data
+    }
+  }, []);
+
   return (
-    <header style={{ position: 'sticky', top: '0', zIndex: '1000', backgroundColor: '#A83427', width: '100%' }}>
+    <header
+      style={{
+        position: 'sticky',
+        top: '0',
+        zIndex: '1000',
+        backgroundColor: '#A83427',
+        width: '100%',
+      }}
+    >
       <nav className="navbar navbar-expand-lg">
         <div className="container-fluid">
-          <a className="navbar-brand" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
-            <img 
+          <a
+            className="navbar-brand"
+            onClick={handleLogoClick}
+            style={{ cursor: 'pointer' }}
+          >
+            <img
               src="/logo_diskominfo.png"
-              alt="Logo" 
+              alt="Logo"
               style={{ width: '200px', height: '40px' }}
             />
           </a>
@@ -62,36 +99,72 @@ function Header({ onLogout }) {
           </button>
 
           <div className={`collapse navbar-collapse`} id="navbarNav">
-  <ul className="navbar-nav ms-auto">
-    <li className="nav-item dropdown">
-      <Dropdown>
-        <Dropdown.Toggle variant="link" id="dropdown-basic" className="nav-link d-flex align-items-center" style={{ color: 'white' }}>
-          <i className="bi bi-person-circle" style={{ fontSize: '20px', color: 'white' }}></i>
-          <span className="ms-2">
-            {localStorage.getItem('userRole') || 'User'}
-          </span>
-        </Dropdown.Toggle>
-        <Dropdown.Menu align="end">
-          <Dropdown.Item href="/profile">Profile</Dropdown.Item>
-          <Dropdown.Item onClick={handleShow}>Logout</Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
-    </li>
-  </ul>
-</div>
+            <ul className="navbar-nav ms-auto">
+              <li className="nav-item dropdown">
+                <Dropdown>
+                  <Dropdown.Toggle
+                    variant="link"
+                    id="dropdown-basic"
+                    className="nav-link d-flex align-items-center"
+                    style={{ color: 'white' }}
+                  >
+                    <i
+                      className="bi bi-person-circle"
+                      style={{ fontSize: '20px', color: 'white' }}
+                    ></i>
+                    <span className="ms-2">{userName || ''} ({userRole})</span>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu align="end">
+                    <Dropdown.Item href="/profile">Profile</Dropdown.Item>
+                    <Dropdown.Item onClick={handleShow}>Logout</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </li>
+            </ul>
+          </div>
         </div>
       </nav>
 
       {/* Sidebar */}
-      <div className={`sidebar2 ${sidebarVisible ? 'visible' : ''}`} ref={sidebarRef}>
-        <button className="close-btn" onClick={() => setSidebarVisible(false)}>&times;</button>
+      <div
+        className={`sidebar2 ${sidebarVisible ? 'visible' : ''}`}
+        ref={sidebarRef}
+      >
+        <button
+          className="close-btn"
+          onClick={() => setSidebarVisible(false)}
+        >
+          &times;
+        </button>
         <ul className="list-unstyled p-3">
-          <li><a href="/dashboard" className="sidebar-link">Home</a></li>
-          <li><a href="/admin" className="sidebar-link">Admin Dashboard</a></li>
-          <li><a href="/guest" className="sidebar-link">Data Tamu</a></li>
-          <li><a href="/add" className="sidebar-link">Formulir Tamu</a></li>
-          <li><a href="/profile" className="sidebar-link">Profile</a></li>
-          <li onClick={handleShow}><a className="sidebar-link">Logout</a></li>
+          <li>
+            <a href="/dashboard" className="sidebar-link">
+              Home
+            </a>
+          </li>
+          <li>
+            <a href="/admin" className="sidebar-link">
+              Admin Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="/guest" className="sidebar-link">
+              Data Tamu
+            </a>
+          </li>
+          <li>
+            <a href="/add" className="sidebar-link">
+              Formulir Tamu
+            </a>
+          </li>
+          <li>
+            <a href="/profile" className="sidebar-link">
+              Profile
+            </a>
+          </li>
+          <li onClick={handleShow}>
+            <a className="sidebar-link">Logout</a>
+          </li>
         </ul>
       </div>
 

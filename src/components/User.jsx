@@ -8,10 +8,10 @@ const User = () => {
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [agencies, setAgencies] = useState([]);
-  const [currentUser , setCurrentUser ] = useState(null);
+  const [currentUser  , setCurrentUser  ] = useState(null);
   const [showDepartmentsTable, setShowDepartmentsTable] = useState(true);
   const [showUsersTable, setShowUsersTable] = useState(true);
-  const [isHovered, setIsHovered] = useState(false); // Definisikan state isHovered
+  const [isHovered, setIsHovered] = useState(false);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalDepartments: 0,
@@ -40,59 +40,57 @@ const User = () => {
     }
   };
 
-  const fetchCurrentUser = async () => {
-    try {
-      const userId = localStorage.getItem('userId');
-      const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      setCurrentUser(response.data);
-      console.log("Current User:", response.data);
-      console.log("Agency ID:", response.data.agency_id);
-      
-      // Pastikan agency_id ada sebelum memanggil fetchDepartments
-      if (response.data.agency_id) {
-        await fetchDepartments(response.data.agency_id);
-      } else {
-        console.warn("Agency ID tidak ditemukan untuk pengguna saat ini.");
-        setDepartments([]); // Set departments kosong jika tidak ada agency_id
+ const fetchCurrentUser  = async () => {
+  try {
+    const userId = localStorage.getItem('userId');
+    const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
-    } catch (error) {
-      console.error('Error fetching current user:', error);
+    });
+    setCurrentUser (response.data);
+    console.log("Current User:", response.data);
+    
+    // Pastikan agency_id ada sebelum memanggil fetchDepartments
+    if (response.data.agency_id) {
+      await fetchDepartments(response.data.agency_id);
+    } else {
+      console.warn("Agency ID tidak ditemukan untuk pengguna saat ini.");
+      setDepartments([]); // Set departments kosong jika tidak ada agency_id
     }
-  };
-  
+  } catch (error) {
+    console.error('Error fetching current user:', error);
+    alert('Gagal mengambil data pengguna: ' + error.message);
+  }
+};
 
-  const fetchAgencies = async () => {
+const fetchAgencies = async () => {
+  try {
+    const response = await axios.get('http://localhost:8080/api/agencies', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    setAgencies(response.data);
+  } catch (error) {
+    console.error('Error fetching agencies:', error);
+  }
+};
+
+  const fetchDepartments = async (agencyId) => {
     try {
-      const response = await axios.get('http://localhost:8080/api/agencies', {
+      const response = await axios.get(`http://localhost:8080/api/departments?agency_id=${agencyId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      setAgencies(response.data);
-    } catch (error) {
-      console.error('Error fetching agencies:', error);
-    }
-  };
-
-  const fetchDepartments = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/departments', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      console.log("Departments fetched (no filter):", response.data);
+      console.log("Departments fetched for agency:", response.data);
       setDepartments(response.data);
     } catch (error) {
       console.error('Error fetching departments:', error);
+      alert('Failed to fetch departments data: ' + error.message);
     }
   };
-  
-  
 
   const fetchStats = async () => {
     try {
@@ -220,66 +218,65 @@ const User = () => {
         </div>
       </div>
 
-        {/* Tabel Departemen dengan kondisi showDepartmentsTable */}
-        {showDepartmentsTable && (
-    <div className="card mb-4">
-    <div className="card-header">
-      <h5 className="card-title">
-        {currentUser  && currentUser .agency ? 
-          `Daftar Departemen ${currentUser .agency.name}` : 
-          'Loading...'}
-      </h5>
-    </div>
-    <div className="card-body">
-    <table className="table table-bordered table-hover">
-  <thead>
-    <tr>
-      <th>No</th>
-      <th>Nama</th>
-      <th>No Telepon</th>
-      <th>Alamat</th>
-      <th>Status</th>
-      <th>Email</th>
-      <th>Aksi</th>
-    </tr>
-  </thead>
-  <tbody>
-    {departments.length > 0 ? (
-      departments.map((department, index) => (
-        <tr key={department.id}>
-          <td>{index + 1}</td>
-          <td>{department.name || 'Tidak ada nama'}</td>
-          <td>{department.phone || 'Tidak ada nomor telepon'}</td>
-          <td>{department.address || 'Tidak ada alamat'}</td>
-          <td>{department.status || 'Tidak ada status'}</td>
-          <td>{department.email || 'Tidak ada email'}</td>
-          <td>
-            <button
-              className="btn btn-warning btn-sm me-2"
-              onClick={() => handleEditDepartment(department.id)}
-            >
-              Edit
-            </button>
-            <button
-              className="btn btn-danger btn-sm"
-              onClick={() => handleDeleteDepartment(department.id)}
-            >
-              Hapus
-            </button>
-          </td>
-        </tr>
-      ))
-    ) : (
-      <tr>
-        <td colSpan="7" className="text-center">Tidak ada departemen yang terdaftar</td>
-      </tr>
-    )}
-  </tbody>
-</table>
-                    </div>
-                </div>
-
-)}
+      {/* Tabel Departemen dengan kondisi showDepartmentsTable */}
+      {showDepartmentsTable && (
+        <div className="card mb-4">
+          <div className="card-header">
+            <h5 className="card-title">
+              {currentUser  && currentUser .agency ? 
+                `Daftar Departemen ${currentUser .agency.name}` : 
+                'Loading...'}
+            </h5>
+          </div>
+          <div className="card-body">
+            <table className="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Nama</th>
+                  <th>No Telepon</th>
+                  <th>Alamat</th>
+                  <th>Status</th>
+                  <th>Email</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {departments.length > 0 ? (
+                  departments.map((department, index) => (
+                    <tr key={department.id}>
+                      <td>{index + 1}</td>
+                      <td>{department.name || 'Tidak ada nama'}</td>
+                      <td>{department.phone || 'Tidak ada nomor telepon'}</td>
+                      <td>{department.address || 'Tidak ada alamat'}</td>
+                      <td>{department.status || 'Tidak ada status'}</td>
+                      <td>{department.email || 'Tidak ada email'}</td>
+                      <td>
+                        <button
+                          className="btn btn-warning btn-sm me-2"
+                          onClick={() => handleEditDepartment(department.id)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleDeleteDepartment(department.id)}
+                        >
+                          Hapus
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="text-center">Tidak ada departemen yang terdaftar</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Tabel Pengguna dengan kondisi showUsersTable */}
       {showUsersTable && (
