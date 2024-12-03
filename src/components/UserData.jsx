@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Row, Col, Card, Button, Spinner, Alert } from 'react-bootstrap';
 
-// Komponen pembantu untuk menampilkan baris detail
+// Component to display detail rows
 const DetailRow = ({ label, value }) => (
   <div className="mb-2">
     <strong>{label}:</strong> {value}
@@ -16,7 +16,6 @@ const UserData = () => {
   
   // State Management
   const [user, setUser ] = useState(null);
-  const [agency, setAgency] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -34,17 +33,6 @@ const UserData = () => {
         });
 
         setUser (userResponse.data);
-
-        // Fetch Agency Data if agency_id exists
-        if (userResponse.data.agency_id) {
-          const agencyResponse = await axios.get(`http://localhost:8080/api/agencies/${userResponse.data.agency_id}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          setAgency(agencyResponse.data);
-        }
-
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -113,31 +101,28 @@ const UserData = () => {
             </Col>
             <Col md={6}>
               <DetailRow label="Role" value={user.role || 'Tidak memiliki role'} />
-              <DetailRow label="Agency ID" value={user.agency_id || 'Tidak terdaftar di instansi manapun'} />
-              <DetailRow 
-                label="Tanggal Dibuat" 
-                value={formatDate(user.created_at)} 
-              />
+              <DetailRow label="Instansi" value={user.agency ? user.agency.name : 'Tidak terdaftar di instansi manapun'} />
+              <DetailRow label="Tanggal Dibuat" value={formatDate(user.created_at)} />
             </Col>
           </Row>
         </Card.Body>
       </Card>
 
       {/* Agency Details */}
-      {agency && (
+      {user.agency && (
         <Card className="mb-4">
           <Card.Header>
             <h5 className="card-title">Informasi Instansi</h5>
           </Card.Header>
           <Card.Body>
             <Row>
-              <Col md={6}>
-                <DetailRow label="Nama Instansi" value={agency.name} />
-                <DetailRow label="Email Instansi" value ={agency.email || 'Tidak ada email instansi'} />
-                <DetailRow label="No Telepon Instansi" value={agency.phone || 'Tidak ada nomor telepon instansi'} />
+              < Col md={6}>
+                <DetailRow label="Nama Instansi" value={user.agency.name} />
+                <DetailRow label="Email Instansi" value={user.agency.email || 'Tidak ada email instansi'} />
+                <DetailRow label="No Telepon Instansi" value={user.agency.phone || 'Tidak ada nomor telepon instansi'} />
               </Col>
               <Col md={6}>
-                <DetailRow label="Alamat Instansi" value={agency.address || 'Tidak ada alamat instansi'} />
+                <DetailRow label="Alamat Instansi" value={user.agency.address || 'Tidak ada alamat instansi'} />
               </Col>
             </Row>
           </Card.Body>
