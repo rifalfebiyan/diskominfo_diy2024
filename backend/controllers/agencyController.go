@@ -11,10 +11,14 @@ import (
 
 func GetAgencies(c *gin.Context) {
 	var agencies []models.Agency
-	if err := database.DB.Find(&agencies).Error; err != nil {
+	if err := database.DB.Preload("Departments").Find(&agencies).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Log untuk debugging
+	fmt.Println(agencies) // Menampilkan data agencies di console
+
 	c.JSON(http.StatusOK, agencies)
 }
 
@@ -83,4 +87,18 @@ func DeleteAgency(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Agency deleted successfully"})
+}
+
+func GetAgencyWithDepartments(c *gin.Context) {
+	id := c.Param("id")
+	var agency models.Agency
+	if err := database.DB.Preload("Departments").First(&agency, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Agency not found"})
+		return
+	}
+
+	// Log untuk memeriksa isi agency
+	fmt.Printf("Agency: %+v\n", agency)
+
+	c.JSON(http.StatusOK, agency)
 }

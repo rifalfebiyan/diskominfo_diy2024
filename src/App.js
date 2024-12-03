@@ -175,6 +175,7 @@ function App() {
             <Route path="/edit-department/:id" element={<EditDepartment />} />
             <Route path="/edit-user/:id" element={<AdminRoute><EditUser   /></AdminRoute>} />
             <Route path="/users/edit/:id" element={<EditUser  />} />
+            <Route path="/add-agency" element={<AdminRoute><AddAgency  /></AdminRoute>} />
             <Route path="/agency-data" element={<AdminRoute><AgencyData/></AdminRoute>} />
             <Route path="/agency-data/:id" element={<AdminRoute><AgencyData /></AdminRoute>} />
             <Route path="/edit-agency/:id" element={<AdminRoute><EditAgency /></AdminRoute>} />

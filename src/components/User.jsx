@@ -8,13 +8,10 @@ const User = () => {
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [agencies, setAgencies] = useState([]);
-  const [currentUser , setCurrentUser ] = useState(null); // State untuk menyimpan data pengguna saat ini
-  
-  // State untuk menampilkan tabel
+  const [currentUser , setCurrentUser ] = useState(null);
   const [showDepartmentsTable, setShowDepartmentsTable] = useState(true);
   const [showUsersTable, setShowUsersTable] = useState(true);
-  
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(false); // Definisikan state isHovered
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalDepartments: 0,
@@ -25,25 +22,10 @@ const User = () => {
     fetchUsers();
     fetchAgencies();
     fetchStats();
-    fetchCurrentUser (); // Ambil data pengguna saat ini
+    fetchDepartments();
+    fetchCurrentUser ();
+    console.log("Departments State:", departments);
   }, []);
-
-  const fetchDepartments = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/departments', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-  
-      // Misalkan 13 adalah ID untuk Kominfo
-      const kominfoAgencyId = 13;
-      const filteredDepartments = response.data.filter(department => department.agency_id === kominfoAgencyId);
-      setDepartments(filteredDepartments);
-    } catch (error) {
-      console.error('Error fetching departments:', error);
-    }
-  };
 
   const fetchUsers = async () => {
     try {
@@ -58,7 +40,7 @@ const User = () => {
     }
   };
 
-  const fetchCurrentUser  = async () => {
+  const fetchCurrentUser = async () => {
     try {
       const userId = localStorage.getItem('userId');
       const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
@@ -66,14 +48,22 @@ const User = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      setCurrentUser (response.data); // Simpan data pengguna saat ini
-
-      // Panggil fetchDepartments setelah mendapatkan currentUser 
-      fetchDepartments();
+      setCurrentUser(response.data);
+      console.log("Current User:", response.data);
+      console.log("Agency ID:", response.data.agency_id);
+      
+      // Pastikan agency_id ada sebelum memanggil fetchDepartments
+      if (response.data.agency_id) {
+        await fetchDepartments(response.data.agency_id);
+      } else {
+        console.warn("Agency ID tidak ditemukan untuk pengguna saat ini.");
+        setDepartments([]); // Set departments kosong jika tidak ada agency_id
+      }
     } catch (error) {
       console.error('Error fetching current user:', error);
     }
   };
+  
 
   const fetchAgencies = async () => {
     try {
@@ -87,6 +77,22 @@ const User = () => {
       console.error('Error fetching agencies:', error);
     }
   };
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/departments', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      console.log("Departments fetched (no filter):", response.data);
+      setDepartments(response.data);
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+    }
+  };
+  
+  
 
   const fetchStats = async () => {
     try {
@@ -214,57 +220,65 @@ const User = () => {
         </div>
       </div>
 
-      {/* Tabel Departemen dengan kondisi showDepartmentsTable */}
-      {showDepartmentsTable && (
-  <div className="card mb-4">
+        {/* Tabel Departemen dengan kondisi showDepartmentsTable */}
+        {showDepartmentsTable && (
+    <div className="card mb-4">
     <div className="card-header">
-    <h5 className="card-title">
+      <h5 className="card-title">
         {currentUser  && currentUser .agency ? 
           `Daftar Departemen ${currentUser .agency.name}` : 
           'Loading...'}
-      </h5>    </div>
-    <div className="card-body">
-      <table className="table table-bordered table-hover">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Nama</th>
-            <th>No Telepon</th>
-            <th>Alamat</th>
-            <th>Status</th>
-            <th>Email</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {departments.map((department, index) => (
-            <tr key={department.id}>
-              <td>{index + 1}</td>
-              <td>{department.name}</td>
-              <td>{department.phone}</td>
-              <td>{department.address}</td>
-              <td>{department.status}</td>
-              <td>{department.email}</td>
-              <td>
-                <button
-                  className="btn btn-warning btn-sm me-2"
-                  onClick={() => handleEditDepartment(department.id)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => handleDeleteDepartment(department.id)}
-                >
-                  Hapus
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      </h5>
     </div>
-  </div>
+    <div className="card-body">
+    <table className="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th>No</th>
+      <th>Nama</th>
+      <th>No Telepon</th>
+      <th>Alamat</th>
+      <th>Status</th>
+      <th>Email</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    {departments.length > 0 ? (
+      departments.map((department, index) => (
+        <tr key={department.id}>
+          <td>{index + 1}</td>
+          <td>{department.name || 'Tidak ada nama'}</td>
+          <td>{department.phone || 'Tidak ada nomor telepon'}</td>
+          <td>{department.address || 'Tidak ada alamat'}</td>
+          <td>{department.status || 'Tidak ada status'}</td>
+          <td>{department.email || 'Tidak ada email'}</td>
+          <td>
+            <button
+              className="btn btn-warning btn-sm me-2"
+              onClick={() => handleEditDepartment(department.id)}
+            >
+              Edit
+            </button>
+            <button
+              className="btn btn-danger btn-sm"
+              onClick={() => handleDeleteDepartment(department.id)}
+            >
+              Hapus
+            </button>
+          </td>
+        </tr>
+      ))
+    ) : (
+      <tr>
+        <td colSpan="7" className="text-center">Tidak ada departemen yang terdaftar</td>
+      </tr>
+    )}
+  </tbody>
+</table>
+                    </div>
+                </div>
+
 )}
 
       {/* Tabel Pengguna dengan kondisi showUsersTable */}

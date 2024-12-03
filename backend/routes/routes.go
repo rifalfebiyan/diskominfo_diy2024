@@ -35,7 +35,8 @@ func SetupRoutes(router *gin.Engine) {
 		protected.DELETE("/departments/:id", controllers.DeleteDepartment)
 		// Agency routes
 		protected.GET("/agencies", controllers.GetAgencies)
-		protected.GET("/agencies/:id", controllers.GetAgency)
+		// protected.GET("/agencies/:id", controllers.GetAgency)
+		protected.GET("/agencies/:id", controllers.GetAgencyWithDepartments)
 		protected.POST("/agencies", controllers.CreateAgency)
 		protected.PUT("/agencies/:id", controllers.UpdateAgency)
 		protected.DELETE("/agencies/:id", controllers.DeleteAgency)
