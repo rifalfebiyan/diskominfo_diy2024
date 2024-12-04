@@ -45,7 +45,7 @@ function MiniSidebar({ onLogout }) {
 
   const sidebarStyle = {
     backgroundColor: '#A8332A',
-    width: isHovered ? '120px' : '40px',
+    width: isHovered ? '110px' : '40px',
     height: '60vh',
     position: 'fixed',
     left: 0,
@@ -70,23 +70,23 @@ function MiniSidebar({ onLogout }) {
     gap: '10px',
   };
 
-  const linkStyle = (isHovered) => ({
+  const linkStyle = (isActive) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: isHovered ? 'flex-start' : 'center',
-    color: 'white',
+    color: isActive ? 'yellow' : 'white',
     textDecoration: 'none',
     fontSize: '15px',
-    padding: '12px 20px',
+    padding: '12px 15px',
+    gap: '12px', // Consistent spacing between icon and text
     transition: 'all 0.3s ease',
   });
 
-  const iconStyle = (isHovered, isActive) => ({
+  const iconStyle = (isActive) => ({
     fontFamily: 'FontAwesome',
-    fontSize: '22px',
-    marginRight: isHovered ? '10px' : '0',
+    fontSize: '18px',
     transition: 'color 0.3s ease',
-    color: isActive || isHovered ? 'yellow' : 'white',
+    color: isActive ? 'yellow' : 'white',
   });
 
   return (
@@ -98,44 +98,35 @@ function MiniSidebar({ onLogout }) {
       >
         <ul style={menuStyle}>
           {/* Home Link - Visible to all */}
-          <li
-            onMouseEnter={() => handleMouseEnter('home')}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Link to="/" style={linkStyle(hoveredItem === 'home')}>
-              <span style={iconStyle(hoveredItem === 'home', location.pathname === '/')}>
+          <li onMouseEnter={() => handleMouseEnter('home')} onMouseLeave={handleMouseLeave}>
+            <Link to="/" style={linkStyle(location.pathname === '/')}>
+              <span style={iconStyle(location.pathname === '/')}>
                 &#xf015;
               </span>
-              {hoveredItem === 'home' && <span>Home</span>}
+              {isHovered && <span>Home</span>}
             </Link>
           </li>
 
           {/* Admin Dashboard - Only visible to admin */}
           {role === 'admin' && (
-            <li
-              onMouseEnter={() => handleMouseEnter('admin')}
-              onMouseLeave={handleMouseLeave}
-            >
-              <Link to="/admin" style={linkStyle(hoveredItem === 'admin')}>
-                <span style={iconStyle(hoveredItem === 'admin', location.pathname === '/admin')}>
+            <li onMouseEnter={() => handleMouseEnter('admin')} onMouseLeave={handleMouseLeave}>
+              <Link to="/admin" style={linkStyle(location.pathname === '/admin')}>
+                <span style={iconStyle(location.pathname === '/admin')}>
                   &#xf013;
                 </span>
-                {hoveredItem === 'admin' && <span>Dashboard Admin</span>}
+                {isHovered && <span>Dashboard Admin</span>}
               </Link>
             </li>
           )}
 
           {/* User Dashboard - Only visible to user */}
           {role === 'user' && (
-            <li
-              onMouseEnter={() => handleMouseEnter('user')}
-              onMouseLeave={handleMouseLeave}
-            >
-              <Link to="/user" style={linkStyle(hoveredItem === 'user')}>
-                <span style={iconStyle(hoveredItem === 'user', location.pathname === '/user')}>
+            <li onMouseEnter={() => handleMouseEnter('user')} onMouseLeave={handleMouseLeave}>
+              <Link to="/user" style={linkStyle(location.pathname === '/user')}>
+                <span style={iconStyle(location.pathname === '/user')}>
                   &#xf007;
                 </span>
-                {hoveredItem === 'user' && <span>Dashboard User</span>}
+                {isHovered && <span >Dashboard User</span>}
               </Link>
             </li>
           )}
@@ -143,92 +134,64 @@ function MiniSidebar({ onLogout }) {
           {/* Spectator Dashboard - Only visible to spectator */}
           {role === 'spectator' && (
             <>
-                <li
-                onMouseEnter={() => handleMouseEnter('guest')}
-                onMouseLeave={handleMouseLeave}
-              >
-                <Link to="/visitor-data-spectator" style={linkStyle(hoveredItem === 'guest')}>
-                <span
-                  style={iconStyle(
-                    hoveredItem === 'guest',
-                    location.pathname === '/visitor-data-spectator'
-                  )}
-                >
-                  &#xf02d;
-                </span>
-                  {hoveredItem === 'guest' && <span>Tamu</span>}
+              <li onMouseEnter={() => handleMouseEnter('guest')} onMouseLeave={handleMouseLeave}>
+                <Link to="/visitor-data-spectator" style={linkStyle(location.pathname === '/visitor-data-spectator')}>
+                  <span style={iconStyle(location.pathname === '/visitor-data-spectator')}>
+                    &#xf02d;
+                  </span>
+                  {isHovered && <span>Tamu</span>}
                 </Link>
               </li>
-              
-              <li
-                onMouseEnter={() => handleMouseEnter('add')}
-                onMouseLeave={handleMouseLeave}
-              >
-                <Link to="/add" style={linkStyle(hoveredItem === 'add')}>
-                  <span style={iconStyle(hoveredItem === 'add', location.pathname === '/add')}>
+              <li onMouseEnter={() => handleMouseEnter('add')} onMouseLeave={handleMouseLeave}>
+                <Link to="/add" style={linkStyle(location.pathname === '/add')}>
+                  <span style={iconStyle(location.pathname === '/add')}>
                     &#xf044;
                   </span>
-                  {hoveredItem === 'add' && <span>Form Tamu</span>}
+                  {isHovered && <span>Form Tamu</span>}
                 </Link>
               </li>
             </>
           )}
-          
+
           {/* Guest and Add Form Links - Not visible to spectator */}
           {role !== 'spectator' && (
             <>
-              <li
-                onMouseEnter={() => handleMouseEnter('guest')}
-                onMouseLeave={handleMouseLeave}
-              >
-                <Link to="/guest" style={linkStyle(hoveredItem === 'guest')}>
-                  <span style={iconStyle(hoveredItem === 'guest', location.pathname === '/guest')}>
+              <li onMouseEnter={() => handleMouseEnter('guest')} onMouseLeave={handleMouseLeave}>
+                <Link to="/guest" style={linkStyle(location.pathname === '/guest')}>
+                  <span style={iconStyle(location.pathname === '/guest')}>
                     &#xf02d;
                   </span>
-                  {hoveredItem === 'guest' && <span>Tamu</span>}
+                  {isHovered && <span>Tamu</span>}
                 </Link>
               </li>
-
-              <li
-                onMouseEnter={() => handleMouseEnter('add')}
-                onMouseLeave={handleMouseLeave}
-              >
-                <Link to="/add" style={linkStyle(hoveredItem === 'add')}>
-                  <span style={iconStyle(hoveredItem === 'add', location.pathname === '/add')}>
+              <li onMouseEnter={() => handleMouseEnter('add')} onMouseLeave={handleMouseLeave}>
+                <Link to="/add" style={linkStyle(location.pathname === '/add')}>
+                  <span style={iconStyle(location.pathname === '/add')}>
                     &#xf044;
                   </span>
-                  {hoveredItem === 'add' && <span>Form Tamu</span>}
+                  {isHovered && <span>Form Tamu</span>}
                 </Link>
               </li>
             </>
           )}
 
           {/* Profile Link - Visible to all */}
-          <li
-            onMouseEnter={() => handleMouseEnter('profile')}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Link to="/profile" style={linkStyle(hoveredItem === 'profile')}>
-              <span style={iconStyle(hoveredItem === 'profile', location.pathname === '/profile')}>
+          <li onMouseEnter={() => handleMouseEnter('profile')} onMouseLeave={handleMouseLeave}>
+            <Link to="/profile" style={linkStyle(location.pathname === '/profile')}>
+              <span style={iconStyle(location.pathname === '/profile')}>
                 &#xf2bd;
               </span>
-              {hoveredItem === 'profile' && <span>Profile</span>}
+              {isHovered && <span>Profile</span>}
             </Link>
           </li>
 
           {/* Logout Link - Visible to all */}
-          <li
-            onMouseEnter={() => handleMouseEnter('logout')}
-            onMouseLeave={handleMouseLeave}
-          >
-            <div
-              onClick={handleShow}
-              style={{ ...linkStyle(hoveredItem === 'logout'), cursor: 'pointer' }}
-            >
-              <span style={iconStyle(hoveredItem === 'logout')}>
+          <li onMouseEnter={() => handleMouseEnter('logout')} onMouseLeave={handleMouseLeave}>
+            <div onClick={handleShow} style={{ ...linkStyle(false), cursor: 'pointer' }}>
+              <span style={iconStyle(false)}>
                 &#xf08b;
               </span>
-              {hoveredItem === 'logout' && <span>Logout</span>}
+              {isHovered && <span>Logout</span>}
             </div>
           </li>
         </ul>

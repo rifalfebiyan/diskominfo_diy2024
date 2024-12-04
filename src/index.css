@@ -64,3 +64,85 @@
   color: #871D15;
   transform: scale(1.1);
 }
+
+
+/* Custom CSS for Admin Dashboard */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card {
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+  padding: 30px 20px;
+}
+
+.card h3 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.card h1 {
+  font-size: 48px;
+  font-weight: 600;
+  color: #b52711; /* Tomato Color */
+}
+
+.card-header {
+  background-color: #FF6347;
+  color: white;
+  padding: 15px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.card-body {
+  background-color: #FFF4F4;
+  padding: 25px;
+}
+
+.table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table th {
+  background-color: #FF6347;
+  color: white;
+}
+
+.table td {
+  background-color: #FFF4F4;
+}
+
+.table a {
+  text-decoration: none;
+  color: #2c9f58;
+  font-weight: bold;
+}
+
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+.table td button {
+  margin: 5px;
+  
+}
+
