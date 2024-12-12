@@ -50,7 +50,7 @@ function App() {
         }
       }
       setLoading(false);
-    };  
+    };
 
     checkAuth();
   }, [navigate]);
@@ -99,12 +99,13 @@ function App() {
 
   return (
     <div className="d-flex flex-column flex-lg-row">
-      {isLoggedIn && <MiniSidebar onLogout={handleLogout} />}
+      {isLoggedIn && userRole !== 'spectator' && <MiniSidebar onLogout={handleLogout} />}
       <div className="d-flex flex-column flex-grow-1 min-vh-100">
         {isLoggedIn && <Header onLogout={handleLogout} />}
         {isLoggedIn && (
           <marquee behavior="scroll" direction="left">
-            Selamat Datang di Buku Tamu Dinas Komunikasi dan Informatika Daerah Istimewa Yogyakarta </marquee>
+            Selamat Datang di Buku Tamu Dinas Komunikasi dan Informatika Daerah Istimewa Yogyakarta
+          </marquee>
         )}
         <div className="container-fluid flex-grow-1 p-0">
           <Routes>
@@ -115,6 +116,7 @@ function App() {
                   <Login onLogin={handleLogin} />
                 ) : (
                   <Navigate to={userRole === 'admin' ? '/admin' : '/'} replace />
+                
                 )
               }
             />
@@ -128,7 +130,7 @@ function App() {
               path="/user" 
               element={
                 isLoggedIn && userRole === 'user' ? (
-                  <User   />
+                  <User  />
                 ) : (
                   <Navigate to="/login" replace />
                 )
@@ -142,7 +144,7 @@ function App() {
                   console.log('isLoggedIn:', isLoggedIn);
                   console.log('userRole:', userRole);
                   return isLoggedIn && userRole === 'spectator' ? 
-                    <SpectatorDashboard /> : 
+                    <VisitorForm /> : 
                     <Navigate to="/login" replace />;
                 })()
               } 
@@ -159,23 +161,26 @@ function App() {
             <Route path="/profile" element={isLoggedIn ? <Profile onNavigate={handleNavigation} /> : <Navigate to="/login" replace />} />
             <Route path="/edit/:index" element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" replace />} />
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
-            <Route path="/add-user" element={<AdminRoute><AddUser   /></AdminRoute>} />
-            <Route path="/user-detail/:id" element={<AdminRoute><UserData /></AdminRoute>} />            <Route path="/add-department" element={<AddDepartment />} />
+            <Route path="/add-user" element={<AdminRoute><AddUser  /></AdminRoute>} />
+            <Route path="/user-detail/:id" element={<AdminRoute><UserData /></AdminRoute>} />
+            <Route path="/add-department" element={<AddDepartment />} />
             <Route 
               path="/user/add-department" 
               element={
                 isLoggedIn && userRole === 'user' ? (
-                  <User AddDepartment />
+                  <User  AddDepartment />
                 ) : (
                   <Navigate to="/login" replace />
                 )
               } 
+
+              
             />
             <Route path="/department-data/:id" element={<AdminRoute><DepartmentData /></AdminRoute>} />
             <Route path="/edit-department/:id" element={<EditDepartment />} />
-            <Route path="/edit-user/:id" element={<AdminRoute><EditUser   /></AdminRoute>} />
+            <Route path="/edit-user/:id" element={<AdminRoute><EditUser  /></AdminRoute>} />
             <Route path="/users/edit/:id" element={<EditUser  />} />
-            <Route path="/add-agency" element={<AdminRoute><AddAgency  /></AdminRoute>} />
+            <Route path="/add-agency" element={<AdminRoute><AddAgency /></AdminRoute>} />
             <Route path="/agency-data" element={<AdminRoute><AgencyData/></AdminRoute>} />
             <Route path="/agency-data/:id" element={<AdminRoute><AgencyData /></AdminRoute>} />
             <Route path="/edit-agency/:id" element={<AdminRoute><EditAgency /></AdminRoute>} />

@@ -8,7 +8,7 @@ const User = () => {
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [agencies, setAgencies] = useState([]);
-  const [currentUser  , setCurrentUser  ] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [showDepartmentsTable, setShowDepartmentsTable] = useState(true);
   const [showUsersTable, setShowUsersTable] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
@@ -19,12 +19,10 @@ const User = () => {
   });
 
   useEffect(() => {
+    fetchCurrentUser();
     fetchUsers();
     fetchAgencies();
     fetchStats();
-    fetchDepartments();
-    fetchCurrentUser ();
-    console.log("Departments State:", departments);
   }, []);
 
   const fetchUsers = async () => {
@@ -40,55 +38,70 @@ const User = () => {
     }
   };
 
- const fetchCurrentUser  = async () => {
-  try {
-    const userId = localStorage.getItem('userId');
-    const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+  // Fetch current user data
+  const fetchCurrentUser = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      const userData = response.data;
+      console.log('User Data:', userData);
+      setCurrentUser(userData);
+
+      // Fetch departments berdasarkan agency dari user
+      const agency = userData.agency;
+      if (agency && agency.id) {
+        fetchDepartments(agency.id);
+      } else {
+        console.warn('No agency found for the user');
       }
-    });
-    setCurrentUser (response.data);
-    console.log("Current User:", response.data);
-    
-    // Pastikan agency_id ada sebelum memanggil fetchDepartments
-    if (response.data.agency_id) {
-      await fetchDepartments(response.data.agency_id);
-    } else {
-      console.warn("Agency ID tidak ditemukan untuk pengguna saat ini.");
-      setDepartments([]); // Set departments kosong jika tidak ada agency_id
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+      alert('Gagal mengambil data pengguna: ' + error.message);
     }
-  } catch (error) {
-    console.error('Error fetching current user:', error);
-    alert('Gagal mengambil data pengguna: ' + error.message);
-  }
-};
+  };
 
-const fetchAgencies = async () => {
-  try {
-    const response = await axios.get('http://localhost:8080/api/agencies', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-    setAgencies(response.data);
-  } catch (error) {
-    console.error('Error fetching agencies:', error);
-  }
-};
-
+  // Fetch departments berdasarkan agency ID
   const fetchDepartments = async (agencyId) => {
     try {
+      if (!agencyId) {
+        console.warn('Agency ID is undefined.');
+        return;
+      }
+  
+      // Gunakan query parameter untuk filter departments
       const response = await axios.get(`http://localhost:8080/api/departments?agency_id=${agencyId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      console.log("Departments fetched for agency:", response.data);
+
+
+      // Debug: tambahkan log untuk memeriksa response
+      console.log('Fetched departments:', response.data);
       setDepartments(response.data);
     } catch (error) {
       console.error('Error fetching departments:', error);
-      alert('Failed to fetch departments data: ' + error.message);
+      alert('Gagal mengambil departemen: ' + error.message);
+    }
+  };
+  
+  
+
+  const fetchAgencies = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/agencies', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setAgencies(response.data);
+    } catch (error) {
+      console.error('Error fetching agencies:', error);
     }
   };
 
@@ -105,7 +118,7 @@ const fetchAgencies = async () => {
     }
   };
 
-  const handleDeleteUser  = async (id) => {
+  const handleDeleteUser = async (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
       try {
         const response = await axios.delete(`http://localhost:8080/api/users/${id}`, {
@@ -113,11 +126,11 @@ const fetchAgencies = async () => {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        
+
         if (response.status === 200) {
           setUsers(users.filter(user => user.id !== id));
           fetchStats();
-          alert('User  deleted successfully');
+          alert('User deleted successfully');
         } else {
           throw new Error('Failed to delete user');
         }
@@ -131,7 +144,7 @@ const fetchAgencies = async () => {
   const handleEditDepartment = (id) => {
     navigate(`/edit-department/${id}`);
   };
-  
+
   const handleAddDepartment = () => {
     navigate('/add-department');
   };
@@ -144,6 +157,7 @@ const fetchAgencies = async () => {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
+
         if (response.status === 200) {
           setDepartments(departments.filter(department => department.id !== id));
           alert('Departemen berhasil dihapus');
@@ -154,7 +168,7 @@ const fetchAgencies = async () => {
       }
     }
   };
-  
+
   const handleShowDepartments = () => {
     setShowDepartmentsTable(!showDepartmentsTable);
   };
@@ -184,7 +198,7 @@ const fetchAgencies = async () => {
             </div>
           </div>
         </div>
-        
+
         <div className="col-md-3">
           <div 
             className="card text-center shadow-sm mb-3" 
@@ -218,17 +232,30 @@ const fetchAgencies = async () => {
         </div>
       </div>
 
-      {/* Tabel Departemen dengan kondisi showDepartmentsTable */}
       {showDepartmentsTable && (
         <div className="card mb-4">
           <div className="card-header">
             <h5 className="card-title">
               {currentUser  && currentUser .agency ? 
-                `Daftar Departemen ${currentUser .agency.name}` : 
+                `Daftar Departemen ${currentUser ?.agency.name}` : 
                 'Loading...'}
             </h5>
           </div>
           <div className="card-body">
+           {/* untuk melihat informasi debugg */}
+            
+              
+              {/* <strong>Debug Informasi:</strong>
+              <p>Current User Agency ID: {currentUser ?.agency_id}</p>
+              <p>Current User Agency Name: {currentUser ?.agency?.name}</p>
+              <p>Departments Count: {departments.length}</p> */}
+              {departments.length === 0 && (
+                <p className="text-danger">
+                  Tidak ada departemen ditemukan. Periksa konfigurasi backend.
+                </p>
+              )}
+            
+
             <table className="table table-bordered table-hover">
               <thead>
                 <tr>
@@ -238,6 +265,7 @@ const fetchAgencies = async () => {
                   <th>Alamat</th>
                   <th>Status</th>
                   <th>Email</th>
+                  <th>Agency ID</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
@@ -251,6 +279,7 @@ const fetchAgencies = async () => {
                       <td>{department.address || 'Tidak ada alamat'}</td>
                       <td>{department.status || 'Tidak ada status'}</td>
                       <td>{department.email || 'Tidak ada email'}</td>
+                      <td>{department.agency_id}</td>
                       <td>
                         <button
                           className="btn btn-warning btn-sm me-2"
@@ -269,7 +298,9 @@ const fetchAgencies = async () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center">Tidak ada departemen yang terdaftar</td>
+                    <td colSpan="8" className="text-center">
+                      Tidak ada departemen yang terdaftar
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -278,7 +309,6 @@ const fetchAgencies = async () => {
         </div>
       )}
 
-      {/* Tabel Pengguna dengan kondisi showUsersTable */}
       {showUsersTable && (
         <div className="card mb-4">
           <div className="card-header">

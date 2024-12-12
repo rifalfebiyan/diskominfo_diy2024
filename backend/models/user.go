@@ -14,6 +14,6 @@ type User struct {
 	CreatedAt      time.Time `json:"created_at"`
 	Role           string    `json:"role"`
 	ProfilePicture string    `json:"profile_picture"`
-	AgencyID       *uint     `json:"agency_id"`
+	AgencyID       *uint     `json:"agency_id"` // Pastikan ini ada dan sesuai
 	Agency         Agency    `gorm:"foreignKey:AgencyID" json:"agency"`
 }

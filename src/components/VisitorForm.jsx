@@ -5,95 +5,97 @@ import axios from 'axios';
 function VisitorForm() {
   const navigate = useNavigate();
   const [departments, setDepartments] = useState([]);
-  const [agencies, setAgencies] = useState([]);
-  const [selectedAgency, setSelectedAgency] = useState('');
-  const [filteredDepartments, setFilteredDepartments] = useState([]);
-  
   const [formData, setFormData] = useState({
     name: '',
     gender: '',
     purpose: '',
     address: '',
-    institution: '',
+    institution: '', // This will be set based on the user's agency
     phone: '',
     department: '',
     visitDate: new Date().toISOString().split('T')[0]
   });
 
   useEffect(() => {
-    fetchDepartments();
-    fetchAgencies();
+    const fetchData = async () => {
+      try {
+        const userId = localStorage.getItem('userId'); // Assuming user ID is stored in localStorage
+        const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        const agency = response.data.agency; // Get the agency object from the user data
+        console.log('User agency:', agency); // Debugging
+  
+        if (agency) {
+          setFormData(prev => ({
+            ...prev,
+            institution: agency.name // Set the agency name in the form data
+          }));
+          // Fetch departments only if agency.id exists
+          if (agency.id) {
+            fetchDepartments(agency.id);
+          }
+        } else {
+          console.warn('No agency found for the user.');
+        }
+      } catch (error) {
+        console.error('Error fetching user agency:', error);
+      }
+    };
+  
+    fetchData();
   }, []);
+  
 
-  // Fetch departments
-  const fetchDepartments = async () => {
+  // Fetch user's agency and departments
+  const fetchUserAgency = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/departments', {
+      const userId = localStorage.getItem('userId'); // Assuming user ID is stored in localStorage
+      const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
+      const agency = response.data.agency; // Get the agency object from the user data
+      if (agency) {
+        setFormData(prev => ({
+          ...prev,
+          institution: agency.name // Set the agency name in the form data
+        }));
+        fetchDepartments(agency.id); // Fetch departments based on the user's agency
+      }
+    } catch (error) {
+      console.error('Error fetching user agency:', error);
+    }
+  };
+
+  // Fetch departments based on the selected agency
+  const fetchDepartments = async (agencyId) => {
+    try {
+      if (!agencyId) {
+        console.warn('Agency ID is undefined.');
+        return;
+      }
+      const response = await axios.get(`http://localhost:8080/api/departments?agency_id=${agencyId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      console.log('Fetched departments for agency ID:', agencyId, response.data); // Debugging
       setDepartments(response.data);
     } catch (error) {
       console.error('Error fetching departments:', error);
     }
   };
 
-  // Fetch agencies
-  const fetchAgencies = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/agencies', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      setAgencies(response.data);
-    } catch (error) {
-      console.error('Error fetching agencies:', error);
-    }
-  };
-
-  // Handle agency selection
-  const handleAgencyChange = (e) => {
-    const selectedAgencyId = e.target.value;
-    setSelectedAgency(selectedAgencyId);
-    setFormData(prev => ({
-      ...prev,
-      institution: e.target.options[e.target.selectedIndex].text
-    }));
-
-    // Filter departments based on selected agency
-    const filtered = departments.filter(
-      dept => dept.agency_id === parseInt(selectedAgencyId)
-    );
-    setFilteredDepartments(filtered);
-    // Reset department selection
-    setFormData(prev => ({
-      ...prev,
-      department: ''
-    }));
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'visitDate') {
-      try {
-        const date = new Date(value + 'T00:00:00Z');
-        if (!isNaN(date.getTime())) {
-          setFormData({
-            ...formData,
-            [name]: date.toISOString().split('T')[0]
-          });
-        }
-      } catch (error) {
-        console.error('Invalid date:', error);
-      }
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value
-      });
-    }
+    setFormData({
+      ...formData,
+      [name]: value
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -191,20 +193,13 @@ function VisitorForm() {
 
           <div className="mb-2">
             <label className="form-label">Instansi*</label>
-            <select
+            <input
+              type="text"
+              className="form-control border border-dark"
               name="institution"
-              className="form-select border border-dark"
-              value={selectedAgency}
-              onChange={handleAgencyChange}
-              required
-            >
-              <option value="">Pilih Instansi</option>
-              {agencies.map((agency) => (
-                <option key={agency.id} value={agency.id}>
-                  {agency.name}
-                </option>
-              ))}
-            </select>
+              value={formData.institution}
+              readOnly
+            />
           </div>
 
           <div className="mb-2">
@@ -220,29 +215,35 @@ function VisitorForm() {
           </div>
 
           <div className="mb-2">
-            <label className="form-label">Departemen*</label>
+            <label className="form-label">Bidang Dituju*</label>
             <select
-              name="department"
-              className="form-select border border-dark"
-              value={formData.department}
-              onChange={handleChange}
-              required
-              disabled={!selectedAgency}
-            >
-              <option value="">Pilih Bidang</option>
-              {filteredDepartments.map((department) => (
-                <option key={department.id} value={department.name}>
-                  {department.name}
-                </option>
-              ))}
-            </select>
+  name="department"
+  className="form-select border border-dark"
+  value={formData.department}
+  onChange={handleChange}
+  required
+>
+  <option value="">Pilih Bidang</option>
+  {departments.length > 0 ? (
+    departments.map((department) => (
+      <option key={department.id} value={department.id}>
+        {department.name}
+      </option>
+    ))
+  ) : (
+    <option value="" disabled>
+      Tidak ada departemen tersedia
+    </option>
+  )}
+</select>
+
           </div>
 
           <div className="mb-2">
             <label className="form-label">Tanggal Kunjungan*</label>
             <input
               type="date"
-               className="form-control border border-dark"
+              className="form-control border border-dark"
               name="visitDate"
               value={formData.visitDate}
               onChange={handleChange}
@@ -251,8 +252,8 @@ function VisitorForm() {
           </div>
 
           <button type="submit" className="btn btn-danger w-100">
-          Simpan
-        </button>
+            Simpan
+          </button>
         </form>
       </div>
     </div>

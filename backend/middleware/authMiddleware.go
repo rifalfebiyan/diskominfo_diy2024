@@ -44,8 +44,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		c.Set("user_id", claims["user_id"])
-		c.Set("role", claims["role"])
+		c.Set("userID", claims["user_id"]) // Simpan userID di context
 		c.Next()
 	}
 }

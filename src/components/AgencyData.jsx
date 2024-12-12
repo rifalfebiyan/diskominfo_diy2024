@@ -82,6 +82,7 @@ const AgencyData = () => {
           <p><strong>Email:</strong> {agency.email || 'N/A'}</p>
           <p><strong>No Telepon:</strong> {agency.phone || 'N/A'}</p>
           <p><strong>Alamat:</strong> {agency.address || 'N/A'}</p>
+          <p><strong>Jumlah Bidang:</strong> {departments.length || 'N/A'}</p>
           <p><strong>Tanggal dibuat:</strong> {agency.created_at ? new Date(agency.created_at).toLocaleDateString('id-ID') : 'N/A'}</p>
         </div>
       </div>

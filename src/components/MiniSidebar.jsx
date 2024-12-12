@@ -1,7 +1,15 @@
-// src/components/MiniSidebar.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
+import { 
+  FaHome, 
+  FaTachometerAlt, 
+  FaUser, 
+  FaClipboardList, 
+  FaEdit, 
+  FaUserCircle, 
+  FaSignOutAlt 
+} from 'react-icons/fa';
 
 function MiniSidebar({ onLogout }) {
   const [isHovered, setIsHovered] = useState(false);
@@ -45,7 +53,7 @@ function MiniSidebar({ onLogout }) {
 
   const sidebarStyle = {
     backgroundColor: '#A8332A',
-    width: isHovered ? '110px' : '40px',
+    width: isHovered ? '180px' : '70px', // Lebar sidebar yang lebih lebar saat hover
     height: '60vh',
     position: 'fixed',
     left: 0,
@@ -56,9 +64,10 @@ function MiniSidebar({ onLogout }) {
     alignItems: 'center',
     flexDirection: 'column',
     paddingTop: '20px',
-    borderRadius: '0 50px 50px 0',
+    borderRadius: '0 20px 20px 0',
     transition: 'width 0.3s ease-in-out',
     overflow: 'hidden',
+    boxShadow: '2px 0 10px rgba(0,0,0,0.1)',
   };
 
   const menuStyle = {
@@ -67,27 +76,39 @@ function MiniSidebar({ onLogout }) {
     margin: 0,
     display: 'flex',
     flexDirection: 'column',
-    gap: '10px',
+    gap: '15px',
+    width: '100%',
   };
 
   const linkStyle = (isActive) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: isHovered ? 'flex-start' : 'center',
-    color: isActive ? 'yellow' : 'white',
+    color: isActive ? '#FFD700' : 'white',
     textDecoration: 'none',
-    fontSize: '15px',
-    padding: '12px 15px',
-    gap: '12px', // Consistent spacing between icon and text
+    fontSize: '14px',
+    padding: '10px 15px',
+    gap: '15px',
+    borderRadius: '10px',
     transition: 'all 0.3s ease',
+    width: '100%',
+    opacity: isHovered ? 1 : 0.7,
   });
 
   const iconStyle = (isActive) => ({
-    fontFamily: 'FontAwesome',
-    fontSize: '18px',
+    fontSize: '22px', // Ukuran ikon yang lebih besar
+    color: isActive ? '#FFD700' : 'white',
     transition: 'color 0.3s ease',
-    color: isActive ? 'yellow' : 'white',
+    marginRight: '10px',
+    minWidth: '25px',
+    textAlign: 'center',
   });
+
+  const labelStyle = {
+    opacity: isHovered ? 1 : 0,
+    transition: 'opacity 0.3s ease',
+    whiteSpace: 'nowrap',
+  };
 
   return (
     <>
@@ -100,10 +121,8 @@ function MiniSidebar({ onLogout }) {
           {/* Home Link - Visible to all */}
           <li onMouseEnter={() => handleMouseEnter('home')} onMouseLeave={handleMouseLeave}>
             <Link to="/" style={linkStyle(location.pathname === '/')}>
-              <span style={iconStyle(location.pathname === '/')}>
-                &#xf015;
-              </span>
-              {isHovered && <span>Home</span>}
+              <FaHome style={iconStyle(location.pathname === '/')} />
+              {isHovered && <span>Beranda</span>}
             </Link>
           </li>
 
@@ -111,10 +130,8 @@ function MiniSidebar({ onLogout }) {
           {role === 'admin' && (
             <li onMouseEnter={() => handleMouseEnter('admin')} onMouseLeave={handleMouseLeave}>
               <Link to="/admin" style={linkStyle(location.pathname === '/admin')}>
-                <span style={iconStyle(location.pathname === '/admin')}>
-                  &#xf013;
-                </span>
-                {isHovered && <span>Dashboard Admin</span>}
+                <FaTachometerAlt style={iconStyle(location.pathname === '/admin')} />
+                {isHovered && <span>Dashboard</span>}
               </Link>
             </li>
           )}
@@ -123,10 +140,8 @@ function MiniSidebar({ onLogout }) {
           {role === 'user' && (
             <li onMouseEnter={() => handleMouseEnter('user')} onMouseLeave={handleMouseLeave}>
               <Link to="/user" style={linkStyle(location.pathname === '/user')}>
-                <span style={iconStyle(location.pathname === '/user')}>
-                  &#xf007;
-                </span>
-                {isHovered && <span >Dashboard User</span>}
+                <FaUser style={iconStyle(location.pathname === '/user')} />
+                {isHovered && <span>Dashboard</span>}
               </Link>
             </li>
           )}
@@ -136,17 +151,13 @@ function MiniSidebar({ onLogout }) {
             <>
               <li onMouseEnter={() => handleMouseEnter('guest')} onMouseLeave={handleMouseLeave}>
                 <Link to="/visitor-data-spectator" style={linkStyle(location.pathname === '/visitor-data-spectator')}>
-                  <span style={iconStyle(location.pathname === '/visitor-data-spectator')}>
-                    &#xf02d;
-                  </span>
-                  {isHovered && <span>Tamu</span>}
+                  <FaClipboardList style={iconStyle(location.pathname === '/visitor-data-spectator')} />
+                  {isHovered && <span>Daftar Tamu</span>}
                 </Link>
               </li>
               <li onMouseEnter={() => handleMouseEnter('add')} onMouseLeave={handleMouseLeave}>
                 <Link to="/add" style={linkStyle(location.pathname === '/add')}>
-                  <span style={iconStyle(location.pathname === '/add')}>
-                    &#xf044;
-                  </span>
+                  <FaEdit style={iconStyle(location.pathname === '/add')} />
                   {isHovered && <span>Form Tamu</span>}
                 </Link>
               </li>
@@ -158,17 +169,13 @@ function MiniSidebar({ onLogout }) {
             <>
               <li onMouseEnter={() => handleMouseEnter('guest')} onMouseLeave={handleMouseLeave}>
                 <Link to="/guest" style={linkStyle(location.pathname === '/guest')}>
-                  <span style={iconStyle(location.pathname === '/guest')}>
-                    &#xf02d;
-                  </span>
-                  {isHovered && <span>Tamu</span>}
+                  <FaClipboardList style={iconStyle(location.pathname === '/guest')} />
+                  {isHovered && <span>Daftar Tamu</span>}
                 </Link>
               </li>
               <li onMouseEnter={() => handleMouseEnter('add')} onMouseLeave={handleMouseLeave}>
                 <Link to="/add" style={linkStyle(location.pathname === '/add')}>
-                  <span style={iconStyle(location.pathname === '/add')}>
-                    &#xf044;
-                  </span>
+                  <FaEdit style={iconStyle(location.pathname === '/add')} />
                   {isHovered && <span>Form Tamu</span>}
                 </Link>
               </li>
@@ -176,32 +183,36 @@ function MiniSidebar({ onLogout }) {
           )}
 
           {/* Profile Link - Visible to all */}
-          <li onMouseEnter={() => handleMouseEnter('profile')} onMouseLeave={handleMouseLeave}>
-            <Link to="/profile" style={linkStyle(location.pathname === '/profile')}>
-              <span style={iconStyle(location.pathname === '/profile')}>
-                &#xf2bd;
-              </span>
-              {isHovered && <span>Profile</span>}
-            </Link>
-          </li>
+          <li onMouseEnter={() => handleMouseEnter('profile')} onMouseLeave={handleMouseLeave}> <Link to="/profile" style={linkStyle(location.pathname === '/profile')}>
+                <FaUser Circle style={iconStyle(location.pathname === '/profile')} />
+                {isHovered && <span>Profil</span>}
+              </Link>
+            </li>
 
           {/* Logout Link - Visible to all */}
           <li onMouseEnter={() => handleMouseEnter('logout')} onMouseLeave={handleMouseLeave}>
-            <div onClick={handleShow} style={{ ...linkStyle(false), cursor: 'pointer' }}>
-              <span style={iconStyle(false)}>
-                &#xf08b;
-              </span>
+            <div 
+              onClick={handleShow} 
+              style={{ 
+                ...linkStyle(false), 
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <FaSignOutAlt style={iconStyle(false)} />
               {isHovered && <span>Logout</span>}
             </div>
           </li>
         </ul>
       </div>
 
+      {/* Modal logout tetap sama */}
       <Modal show={showLogoutModal} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Konfirmasi Logout</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Apakah Anda yakin ingin logout?</Modal.Body>
+        <Modal.Body>Apakah Anda yakin ingin keluar?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Batal

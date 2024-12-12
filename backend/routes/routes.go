@@ -33,6 +33,8 @@ func SetupRoutes(router *gin.Engine) {
 		protected.GET("/departments/:id", controllers.GetDepartment)
 		protected.PUT("/departments/:id", controllers.UpdateDepartment)
 		protected.DELETE("/departments/:id", controllers.DeleteDepartment)
+
+		// protected.GET("/departmentss", middleware.AdminOnly(), controllers.GetDepartments)
 		// Agency routes
 		protected.GET("/agencies", controllers.GetAgencies)
 		// protected.GET("/agencies/:id", controllers.GetAgency)

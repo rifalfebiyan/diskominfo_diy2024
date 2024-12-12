@@ -90,11 +90,13 @@ const UserData = () => {
       {/* User Details Card */}
       <Card className="mb-4">
         <Card.Header className="bg-danger text-white">
-          <h5 className="card-title mb-0">{user.name}</h5>
+          {/* <h5 className="card-title mb-0">{user.name}</h5> */}
+          <h5 className="card-title mb-0">Informasi Pengguna</h5>
         </Card.Header>
         <Card.Body>
           <Row>
             <Col md={6}>
+              <DetailRow label="Nama" value={user.name || 'Tidak ada Nama'} />
               <DetailRow label="NIP" value={user.nip || 'Tidak ada NIP'} />
               <DetailRow label="Email" value={user.email || 'Tidak ada email'} />
               <DetailRow label="No Telepon" value={user.phone || 'Tidak ada nomor telepon'} />

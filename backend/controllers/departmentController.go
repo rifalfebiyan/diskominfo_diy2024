@@ -8,12 +8,33 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// MENAMPILKAN SEMUA DEPARTMENTS
+// func GetDepartmentss(c *gin.Context) {
+// 	var departmentss []models.Department
+// 	if err := database.DB.Preload("Agency").Find(&departmentss).Error; err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, departmentss)
+// }
+
+// UNTUK FILTERING AGENCIES DENGAN BIDANG
 func GetDepartments(c *gin.Context) {
+	agencyID := c.Query("agency_id")
+
 	var departments []models.Department
-	if err := database.DB.Preload("Agency").Find(&departments).Error; err != nil {
+	// Preload Agency dan filter berdasarkan agency_id
+	query := database.DB.Preload("Agency")
+
+	if agencyID != "" {
+		query = query.Where("agency_id = ?", agencyID)
+	}
+
+	if err := query.Find(&departments).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusOK, departments)
 }
 
