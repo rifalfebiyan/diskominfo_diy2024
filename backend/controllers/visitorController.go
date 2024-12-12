@@ -13,16 +13,38 @@ import (
 )
 
 // Fungsi untuk mendapatkan semua visitor
+// func GetVisitors(c *gin.Context) {
+// 	var visitors []models.Visitor
+// 	if err := database.DB.Find(&visitors).Error; err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+// 	// Debug print
+// 	for _, v := range visitors {
+// 		fmt.Printf("Visitor ID: %d, Visit Date: %v\n", v.ID, v.VisitDate)
+// 	}
+
+// 	c.JSON(http.StatusOK, visitors)
+// }
+
+// FUNGSI UNTUK FILTERING VISITOR BERDASARKAN INSTANSI
 func GetVisitors(c *gin.Context) {
+	agencyID := c.Query("agency_id")
+
 	var visitors []models.Visitor
-	if err := database.DB.Find(&visitors).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+	query := database.DB
+
+	if agencyID != "" {
+		// Gabungkan dengan tabel departments atau langsung filter berdasarkan agency_id
+		query = query.Joins("Department").Where("departments.agency_id = ?", agencyID)
 	}
 
-	// Debug print
-	for _, v := range visitors {
-		fmt.Printf("Visitor ID: %d, Visit Date: %v\n", v.ID, v.VisitDate)
+	result := query.Find(&visitors)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, visitors)
