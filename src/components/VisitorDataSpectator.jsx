@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-function VisitorData() {
+function VisitorDataSpectator() {
   const [visitors, setVisitors] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('');
@@ -11,42 +11,60 @@ function VisitorData() {
   const [visitorsPerPage, setVisitorsPerPage] = useState(5);
   const [loading, setLoading] = useState(true);
   const [departments, setDepartments] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchVisitors = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/visitors', {
+        const userId = localStorage.getItem('userId');
+        const userResponse = await axios.get(`http://localhost:8080/api/users/${userId}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
 
-        const visitorsData = response.data;
-        setVisitors(visitorsData);
-      } catch (error) {
-        console.error('Error fetching visitors:', error);
-      } finally {
+        const userData = userResponse.data;
+        console.log('User Data:', userData);
+        setCurrentUser(userData);
+
+        // Pastikan agency tersedia
+        if (!userData.agency || !userData.agency.name) {
+          console.error('No agency found for user');
+          setLoading(false);
+          return;
+        }
+
+        // Fetch departments untuk agency ini
+        const departmentsResponse = await axios.get(`http://localhost:8080/api/departments?agency_id=${userData.agency.id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        setDepartments(departmentsResponse.data);
+
+        // Fetch visitors untuk agency ini
+        const visitorsResponse = await axios.get(`http://localhost:8080/api/visitors`, {
+          params: { 
+            institution: userData.agency.name 
+          },
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        console.log('Visitors Response:', visitorsResponse.data);
+        setVisitors(visitorsResponse.data);
         setLoading(false);
-      }
-    };
 
-    const fetchDepartments = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/api/departments', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-
-        setDepartments(response.data);
       } catch (error) {
-        console.error('Error fetching departments:', error);
+        console.error('Error fetching data:', error);
+        setLoading(false);
+        alert('Gagal mengambil data: ' + error.message);
       }
     };
 
-    fetchVisitors();
-    fetchDepartments();
+    fetchData();
   }, []);
 
   const handleSearch = (e) => {
@@ -86,7 +104,9 @@ function VisitorData() {
   const filteredVisitors = visitors.filter((visitor) => {
     return (
       visitor.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedDepartment ? visitor.department === selectedDepartment : true)
+      (selectedDepartment ? visitor.department === selectedDepartment : true) &&
+      // Tambahkan filter untuk instansi
+      visitor.institution === currentUser?.agency?.name
     );
   });
 
@@ -106,19 +126,18 @@ function VisitorData() {
     }
   };
 
+  const handleEdit = (id) => {
+    navigate(`/edit-visitor/${id}`);
+  };
+
   const handleDelete = async (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus data tamu ini?')) {
       try {
-        const response = await fetch(`http://localhost:8080/api/visitors/${id}`, {
-          method: 'DELETE',
+        await axios.delete(`http://localhost:8080/api/visitors/${id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-
-        if (!response.ok) {
-          throw new Error('Failed to delete visitor');
-        }
 
         setVisitors(visitors.filter(visitor => visitor.id !== id));
         alert('Data tamu berhasil dihapus');
@@ -134,11 +153,14 @@ function VisitorData() {
     setCurrentPage(1);
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="container mt-3">
-      {/* Positioned text at the top-left corner */}
       <h5 className="position-absolute" style={{ top: 0, left: 0, margin: '10px' }}>
-        Data Tamu 
+        Data Tamu / Edit Tamu - {currentUser?.agency?.name || 'Instansi Tidak Diketahui'}
       </h5>
 
       <h5>Data Tamu</h5>
@@ -160,7 +182,7 @@ function VisitorData() {
             onChange={handleDepartmentFilter}
             required
           >
-            <option value="">Pilih Bidang</option>
+            <option value="">Semua Bidang</option>
             {departments.map((dept) => (
               <option key={dept.id} value={dept.name}>
                 {dept.name}
@@ -203,6 +225,7 @@ function VisitorData() {
                   <th>Bidang</th>
                   <th>Keperluan</th>
                   <th>Tanggal Kunjungan</th>
+                  {/* <th>Aksi</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -217,6 +240,16 @@ function VisitorData() {
                     <td>{visitor.department}</td>
                     <td>{visitor.purpose}</td>
                     <td>{formatDate(visitor.visitDate)}</td>
+                    {/* <td>
+                      <div className="d-flex">
+                        <button className="btn btn-warning btn-sm me-2" onClick={() => handleEdit(visitor.id)}>
+                          Edit
+                        </button>
+                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(visitor.id)}>
+                          Hapus
+                        </button>
+                      </div>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
@@ -242,4 +275,4 @@ function VisitorData() {
   );
 }
 
-export default VisitorData;
+export default VisitorDataSpectator;

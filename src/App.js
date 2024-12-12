@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Login from './components/Login';
@@ -34,7 +35,33 @@ function App() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  //MEMANGGIL INSTANSI
+  const [agencyName, setAgencyName] = useState('Dinas Komunikasi dan Informatika DIY');
+
+
+
   useEffect(() => {
+
+    const fetchUserAgency = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        const userResponse = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        const userAgency = userResponse.data.agency;
+        if (userAgency && userAgency.name) {
+          setAgencyName(userAgency.name);
+        }
+      } catch (error) {
+        console.error('Gagal mengambil nama instansi:', error);
+      }
+    };
+
+    fetchUserAgency();
+
     const checkAuth = () => {
       const token = localStorage.getItem('token');
       const role = localStorage.getItem('userRole');
@@ -104,8 +131,8 @@ function App() {
         {isLoggedIn && <Header onLogout={handleLogout} />}
         {isLoggedIn && (
           <marquee behavior="scroll" direction="left">
-            Selamat Datang di Buku Tamu Dinas Komunikasi dan Informatika Daerah Istimewa Yogyakarta
-          </marquee>
+          Selamat Datang di Buku Tamu {agencyName}
+        </marquee>
         )}
         <div className="container-fluid flex-grow-1 p-0">
           <Routes>

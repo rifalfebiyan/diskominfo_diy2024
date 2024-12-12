@@ -182,7 +182,7 @@ function VisitorData() {
             onChange={handleDepartmentFilter}
             required
           >
-            <option value="">Pilih Bidang</option>
+            <option value="">Semua Bidang</option>
             {departments.map((dept) => (
               <option key={dept.id} value={dept.name}>
                 {dept.name}
@@ -194,7 +194,7 @@ function VisitorData() {
           <button className="btn btn-primary me-2" onClick={handleSort}>
             Sortir Nama A-Z {sortOrder === 'asc' ? '↑' : '↓'}
           </button>
-          <button className="btn btn-success" onClick={() => navigate('/add-visitor')}>Tambah Tamu</button>
+          <button className="btn btn-success" onClick={() => navigate('/add')}>Tambah Tamu</button>
         </div>
       </div>
 

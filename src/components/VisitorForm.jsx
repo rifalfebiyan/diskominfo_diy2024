@@ -226,7 +226,7 @@ function VisitorForm() {
   <option value="">Pilih Bidang</option>
   {departments.length > 0 ? (
     departments.map((department) => (
-      <option key={department.id} value={department.id}>
+      <option key={department.id} value={department.name}>
         {department.name}
       </option>
     ))
