@@ -311,7 +311,7 @@ const handleAddDepartment = () => {
       {showDepartmentsTable && (
         <div className="card mb-4">
           <div className="card-header">
-            <h5 className="card-title">Department List</h5>
+            <h5 className="card-title">Daftar Bidang</h5>
           </div>
           <div className="card-body">
             <table className="table table-bordered table-hover">
