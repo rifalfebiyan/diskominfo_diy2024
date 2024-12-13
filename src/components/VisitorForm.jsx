@@ -152,7 +152,7 @@ function VisitorForm() {
             />
           </div>
 
-          <div className="mb-2">
+          {/* <div className="mb-2">
             <label className="form-label">Instansi*</label>
             <input
               type="text"
@@ -160,6 +160,18 @@ function VisitorForm() {
               name="institution"
               value={formData.institution}
               readOnly
+            />
+          </div> */}
+
+          <div className="mb-2">
+            <label className="form-label">Asal Instansi*</label>
+            <input
+              type="asal"
+              className="form-control border border-dark"
+              name="asal" // Tambahkan input Asal Instansi/Kampus
+              value={formData.asal}
+              onChange={handleChange}
+              required
             />
           </div>
 

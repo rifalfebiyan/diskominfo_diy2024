@@ -248,7 +248,7 @@ const User = () => {
           <div className="card-header">
             <h5 className="card-title">
               {currentUser  && currentUser .agency ? 
-                `Daftar Departemen ${currentUser ?.agency.name}` : 
+                `Daftar Bidang ${currentUser ?.agency.name}` : 
                 'Loading...'}
             </h5>
           </div>
@@ -292,12 +292,12 @@ const User = () => {
                       <td>{department.email || 'Tidak ada email'}</td>
                       <td>{department.agency_id}</td>
                       <td>
-                        <button
-                          className="btn btn-warning btn-sm me-2"
-                          onClick={() => handleEditDepartment(department.id)}
-                        >
-                          Edit
-                        </button>
+                      <button
+                        className="btn btn-warning btn-sm me-2"
+                        onClick={() => handleEditDepartment(department.id)}
+                      >
+                        Edit
+                      </button>
                         <button
                           className="btn btn-danger btn-sm"
                           onClick={() => handleDeleteDepartment(department.id)}
@@ -378,11 +378,11 @@ const User = () => {
                         >
                           Hapus
                         </button>
-                        <button
-                          className="btn btn-info btn-sm"
-                          onClick={() => navigate(`/user-detail/${user.id}`)}
+                          <button
+                            className="btn btn-info btn-sm"
+                            onClick={() => navigate(`/user-detail/${user.id}`)}
                         >
-                          Detail
+                            Detail
                         </button>
                       </td>                     
                     </tr>

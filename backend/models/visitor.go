@@ -12,6 +12,7 @@ type Visitor struct {
 	Phone       string    `json:"phone"`
 	Email       string    `json:"email"` // Tambahkan field email
 	Department  string    `json:"department"`
+	Asal        string    `json:"asal"`
 	VisitDate   time.Time `json:"visitDate" gorm:"column:visit_date"`
 	CreatedAt   time.Time `json:"createdAt" gorm:"column:created_at"`
 }

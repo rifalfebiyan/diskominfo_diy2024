@@ -127,7 +127,7 @@ function VisitorData() {
   };
 
   const handleEdit = (id) => {
-    navigate(`/edit-visitor/${id}`);
+    navigate(`/edit/${id}`);
   };
 
   const handleDelete = async (id) => {
@@ -218,7 +218,7 @@ function VisitorData() {
                 <tr>
                   <th>No.</th>
                   <th>Nama</th>
-                  <th>Instansi</th>
+                  <th>Asal Instansi</th>
                   <th>No HP</th>
                   <th>Email</th>
                   <th>Alamat</th>
@@ -234,7 +234,7 @@ function VisitorData() {
                   <tr key={visitor.id}>
                     <td>{indexOfFirstVisitor + index + 1}</td>
                     <td>{visitor.name}</td>
-                    <td>{visitor.institution}</td>
+                    <td>{visitor.asal}</td>
                     <td>{visitor.phone}</td>
                     <td>{visitor.email}</td>
                     <td>{visitor.address}</td>

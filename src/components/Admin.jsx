@@ -241,137 +241,135 @@ const Admin = () => {
 
       {/* Tabel Instansi dengan kondisi showAgenciesTable */}
       {showAgenciesTable && (
-        <div className="card mb-4">
-          <div className="card-header">
-            <h5 className="card-title">Daftar Instansi</h5> {/* Display agency name here */}
-          </div>
-          <div className="card-body">
-            <div className="table-responsive">
-              <table className="table table-bordered table-hover">
-                <thead className="table-light">
-                  <tr>
-                    <th>No</th>
-                    <th>Id Instansi</th>
-                    <th>Nama Instansi</th>
-                    <th>Email</th>
-                    <th>No Telp</th>
-                    <th>Alamat</th>
-                    <th>Tanggal dibuat</th>
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {agencies.map((agency, index) => (
-                    <tr key={agency.id}>
-                      <td>{index + 1}</td>
-                      <td>{agency.id}</td>
-                      <td>{agency.name}</td>
-                      <td><a href={`mailto:${agency.email}`} style={{ color: '#9F2C2C' }}>{agency.email}</a></td>
-                      <td>{agency.phone}</td>
-                      <td>{agency.address}</td>
-                      <td>{new Date(agency.created_at).toLocaleDateString()}</td>
-                      <td>
-                        <button
-                          className="btn btn-warning btn-sm me-2"
-                          onClick={() => navigate(`/edit-agency/${agency.id}`)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="btn btn-danger btn-sm me-2"
-                          onClick={() => handleDeleteAgency(agency.id)}
-                        >
-                          Hapus
-                        </button>
-                        <button
-                          className="btn btn-info btn-sm"
-                          onClick={() => navigate(`/agency-data/${agency.id}`)}
-                        >
-                          Detail
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
+  <div className="card mb-4">
+    <div className="card-header">
+      <h5 className="card-title">Daftar Instansi</h5>
+    </div>
+    <div className="card-body">
+      <div className="table-responsive">
+        <table className="table table-bordered table-hover">
+          <thead className="table-light">
+            <tr>
+              <th className="text-center fw-bold align-middle">No</th>
+              <th className="text-center fw-bold align-middle">Id Instansi</th>
+              <th className="text-center fw-bold align-middle">Nama Instansi</th>
+              <th className="text-center fw-bold align-middle">Email</th>
+              <th className="text-center fw-bold align-middle">No Telepon</th>
+              <th className="text-center fw-bold align-middle">Alamat</th>
+              <th className="text-center fw-bold align-middle">Tanggal dibuat</th>
+              <th className="text-center fw-bold align-middle">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {agencies.map((agency, index) => (
+              <tr key={agency.id}>
+                <td className="text-center">{index + 1}</td>
+                <td className="text-center">{agency.id}</td>
+                <td>{agency.name}</td>
+                <td><a href={`mailto:${agency.email}`} style={{ color: '#9F2C2C' }}>{agency.email}</a></td>
+                <td>{agency.phone}</td>
+                <td>{agency.address}</td>
+                <td>{new Date(agency.created_at).toLocaleDateString()}</td>
+                <td className="d-flex justify-content-center">
+                  <button
+                    className="btn btn-info btn-sm w-50 mb-2 me-2"
+                    onClick={() => navigate(`/agency-data/${agency.id}`)}
+                  >
+                    Detail
+                  </button>
+                  <button
+                    className="btn btn-warning btn-sm w-50 mb-2 me-2"
+                    onClick={() => navigate(`/edit-agency/${agency.id}`)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger btn-sm w-50 mb-2"
+                    onClick={() => handleDeleteAgency(agency.id)}
+                  >
+                    Hapus
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+)}
 
-      {/* Tabel Pengguna dengan kondisi showUsersTable */}
-      {showUsersTable && (
-        <div className="card mb-4">
-          <div className="card-header">
-            <h5 className="card-title">Daftar Pengguna</h5>
-          </div>
-          <div className="card-body">
-            <div className="table-responsive">
-              <table className="table table-bordered table-hover">
-                <thead className="table-light">
-                  <tr>
-                    <th>No</th>
-                    <th>Nama</th>
-                    <th>NIP</th>
-                    <th>Email</th>
-                    <th>No Telepon</th>
-                    <th>Role</th>
-                    <th>Instansi ID</th>
-                    <th>Instansi</th>
-                    <th>Tanggal Dibuat</th>
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((user, index) => (
-                    <tr key={user.id}>
-                      <td>{index + 1}</td>
-                      <td>{user.name || '-'}</td>
-                      <td>{user.nip || '-'}</td>
-                      <td>
-                        <a 
-                          href={`mailto:${user.email}`} 
-                          style={{ color: '#9F2C2C' }}
-                        >
-                          {user.email || '-'}
-                        </a>
-                      </td>
-                      <td>{user.phone || '-'}</td>
-                      <td>{user.role || '-'}</td>
-                      <td>{user.agency_id || '-'}</td>
-                      <td>{user.agency ? user.agency.name : '-'}</td>
-                      <td>
-                        {user.created_at 
-                          ? new Date(user.created_at).toLocaleDateString() 
-                          : '-'}
-                      </td>
-                      <td>
-                        <button
-                          className="btn btn-warning btn-sm me-2"
-                          onClick={() => navigate(`/edit-user/${user.id}`)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="btn btn-danger btn-sm me-2"
-                          onClick={() => handleDeleteUser (user.id)}
-                        >
-                          Hapus
-                        </button>
-                        <button
-                          className="btn btn-info btn-sm"
-                          onClick={() => navigate(`/user-detail/${user.id}`)}
-                        >
-                          Detail
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+     {/* Tabel Pengguna dengan kondisi showUsersTable */}
+     {showUsersTable && (
+  <div className="card mb-4">
+    <div className="card-header">
+      <h5 className="card-title">Daftar Pengguna</h5>
+    </div>
+    <div className="card-body">
+      <div className="table-responsive">
+        <table className="table table-bordered table-hover">
+          <thead className="table-light">
+            <tr>
+              <th className="text-center fw-bold align-middle">No</th>
+              <th className="text-center fw-bold align-middle">Nama</th>
+              <th className="text-center fw-bold align-middle">NIP</th>
+              <th className="text-center fw-bold align-middle">Email</th>
+              <th className="text-center fw-bold align-middle">No Telepon</th>
+              <th className="text-center fw-bold align-middle">Role</th>
+              <th className="text-center fw-bold align-middle">Instansi ID</th>
+              <th className="text-center fw-bold align-middle">Instansi</th>
+              <th className="text-center fw-bold align-middle">Tanggal Dibuat</th>
+              <th className="text-center fw-bold align-middle">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user, index) => (
+              <tr key={user.id}>
+                <td className="text-center">{index + 1}</td>
+                <td>{user.name || '-'}</td>
+                <td>{user.nip || '-'}</td>
+                <td>
+                  <a href={`mailto:${user.email}`} style={{ color: '#9F2C2C' }}>
+                    {user.email || '-'}
+                  </a>
+                </td>
+                <td>{user.phone || '-'}</td>
+                <td>{user.role || '-'}</td>
+                <td>{user.agency_id || '-'}</td>
+                <td>{user.agency ? user.agency.name : '-'}</td>
+                <td>
+                  {user.created_at
+                    ? new Date(user.created_at).toLocaleDateString()
+                    : '-'}
+                </td>
+                <td className="d-flex justify-content-center">
+                  <button
+                    className="btn btn-info btn-sm w-30 mb-2 me-2"
+                    onClick={() => navigate(`/user-detail/${user.id}`)}
+                  >
+                    Detail
+                  </button>
+                  <button
+                    className="btn btn-warning btn-sm w-50 mb-2 me-2"
+                    onClick={() => navigate(`/edit-user/${user.id}`)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger btn-sm w-50 mb-2"
+                    onClick={() => handleDeleteUser(user.id)}
+                  >
+                    Hapus
+                  </button>
+                </td>
+              </tr>
+            ))}
+         </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
       )}
     </div>
   );
