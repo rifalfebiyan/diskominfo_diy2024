@@ -138,7 +138,7 @@ function VisitorForm() {
     <div className="container my-4">
       <div className="p-3 border rounded shadow" style={{ maxWidth: '700px', margin: '0 auto' }}>
         <form onSubmit={handleSubmit}>
-          <p className="fw-bold text-center">FORM TAMU</p>
+          <p className="fw-bold text-center">Data Tamu</p>
 
           <div className="mb-2">
             <label className="form-label">Nama*</label>
@@ -147,45 +147,6 @@ function VisitorForm() {
               className="form-control border border-dark"
               name="name"
               value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="mb-2">
-            <label className="form-label">Jenis Kelamin*</label>
-            <select
-              name="gender"
-              className="form-select border border-dark"
-              value={formData.gender}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Pilih Jenis Kelamin</option>
-              <option value="Laki-laki">Laki-Laki</option>
-              <option value="Perempuan">Perempuan</option>
-            </select>
-          </div>
-
-          <div className="mb-2">
-            <label className="form-label">Keperluan*</label>
-            <input
-              type="text"
-              className="form-control border border-dark"
-              name="purpose"
-              value={formData.purpose}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="mb-2">
-            <label className="form-label">Alamat*</label>
-            <input
-              type="text"
-              className="form-control border border-dark"
-              name="address"
-              value={formData.address}
               onChange={handleChange}
               required
             />
@@ -215,29 +176,87 @@ function VisitorForm() {
           </div>
 
           <div className="mb-2">
+            <label className="form-label">Email*</label>
+            <input
+              type="email"
+              className="form-control border border-dark"
+              name="email" // Tambahkan input email
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="mb-2">
+            <label className="form-label">Alamat*</label>
+            <input
+              type="text"
+              className="form-control border border-dark"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="mb-2">
+            <label className="form-label">Jenis Kelamin*</label>
+            <select
+              name="gender"
+              className="form-select border border-dark"
+              value={formData.gender}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Pilih Jenis Kelamin</option>
+              <option value="Laki-laki">Laki-Laki</option>
+              <option value="Perempuan">Perempuan</option>
+            </select>
+          </div>
+
+          <div className="mb-2">
             <label className="form-label">Bidang Dituju*</label>
             <select
-  name="department"
-  className="form-select border border-dark"
-  value={formData.department}
-  onChange={handleChange}
-  required
+            name="department"
+            className="form-select border border-dark"
+            value={formData.department}
+            onChange={handleChange}
+            required
 >
-  <option value="">Pilih Bidang</option>
-  {departments.length > 0 ? (
-    departments.map((department) => (
-      <option key={department.id} value={department.name}>
-        {department.name}
-      </option>
-    ))
-  ) : (
-    <option value="" disabled>
-      Tidak ada departemen tersedia
-    </option>
-  )}
-</select>
+        <option value="">Pilih Bidang</option>
+        {departments.length > 0 ? (
+          departments.map((department) => (
+            <option key={department.id} value={department.name}>
+              {department.name}
+            </option>
+            ))
+          ) : (
+            <option value="" disabled>
+              Tidak ada departemen tersedia
+            </option>
+          )}
+        </select>
+        </div>
 
+
+          <div className="mb-2">
+            <label className="form-label">Keperluan*</label>
+            <input
+              type="text"
+              className="form-control border border-dark"
+              name="purpose"
+              value={formData.purpose}
+              onChange={handleChange}
+              required
+            />
           </div>
+
+         
+
+         
+
+    
+          
 
           <div className="mb-2">
             <label className="form-label">Tanggal Kunjungan*</label>

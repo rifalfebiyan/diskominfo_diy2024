@@ -89,7 +89,8 @@ const UserData = () => {
       
       {/* User Details Card */}
       <Card className="mb-4">
-        <Card.Header className="bg-danger text-white">
+      {/* <div className="card-header" style={{ backgroundColor: '#A83427', color: 'white' }}> */}
+        <Card.Header style={{ backgroundColor: '#A83427', color: 'white' }}>
           {/* <h5 className="card-title mb-0">{user.name}</h5> */}
           <h5 className="card-title mb-0">Informasi Pengguna</h5>
         </Card.Header>
@@ -113,7 +114,7 @@ const UserData = () => {
       {/* Agency Details */}
       {user.agency && (
         <Card className="mb-4">
-          <Card.Header>
+          <Card.Header style={{ backgroundColor: '#A83427', color: 'white' }}>
             <h5 className="card-title">Informasi Instansi</h5>
           </Card.Header>
           <Card.Body>

@@ -211,6 +211,7 @@ function App() {
             <Route path="/agency-data" element={<AdminRoute><AgencyData/></AdminRoute>} />
             <Route path="/agency-data/:id" element={<AdminRoute><AgencyData /></AdminRoute>} />
             <Route path="/edit-agency/:id" element={<AdminRoute><EditAgency /></AdminRoute>} />
+            <Route path="/user-detail/:id" element={<AdminRoute><UserData /></AdminRoute>} />
 
             {/* Catch all route */}
             <Route path="*" element={<Navigate to={isLoggedIn ? '/' : '/login'} replace />} />

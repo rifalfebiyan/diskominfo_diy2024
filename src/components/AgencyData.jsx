@@ -18,23 +18,22 @@ const AgencyData = () => {
     try {
       const agencyResponse = await axios.get(`http://localhost:8080/api/agencies/${id}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       });
       setAgency(agencyResponse.data);
 
       const departmentsResponse = await axios.get('http://localhost:8080/api/departments', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       });
-      
-      // Filter departments for this agency
+
       const agencyDepartments = departmentsResponse.data.filter(
-        dept => dept.agency_id === parseInt(id)
+        (dept) => dept.agency_id === parseInt(id)
       );
       setDepartments(agencyDepartments);
-      
+
       setLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -52,11 +51,11 @@ const AgencyData = () => {
       try {
         const response = await axios.delete(`http://localhost:8080/api/departments/${deptId}`, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
         });
         if (response.status === 200) {
-          setDepartments(departments.filter(department => department.id !== deptId));
+          setDepartments(departments.filter((department) => department.id !== deptId));
           alert('Departemen berhasil dihapus');
         }
       } catch (error) {
@@ -70,12 +69,12 @@ const AgencyData = () => {
   if (error) return <div className="alert alert-danger mt-3">{error}</div>;
 
   return (
-    <div className="container mt-4">
-      <h4 className="mb-4">Detail Instansi</h4>
-      
+    <div className="container my-5">
+      <h2 className="mb-4 text-primary">Detail Instansi</h2>
+
       {/* Agency Details Card */}
-      <div className="card mb-4">
-        <div className="card-header bg-danger text-white">
+      <div className="card shadow-sm border-0 mb-5">
+      <div className="card-header" style={{ backgroundColor: '#A83427', color: 'white' }}>
           <h5 className="card-title mb-0">{agency.name}</h5>
         </div>
         <div className="card-body">
@@ -83,29 +82,29 @@ const AgencyData = () => {
           <p><strong>No Telepon:</strong> {agency.phone || 'N/A'}</p>
           <p><strong>Alamat:</strong> {agency.address || 'N/A'}</p>
           <p><strong>Jumlah Bidang:</strong> {departments.length || 'N/A'}</p>
-          <p><strong>Tanggal dibuat:</strong> {agency.created_at ? new Date(agency.created_at).toLocaleDateString('id-ID') : 'N/A'}</p>
+          <p><strong>Tanggal Dibuat:</strong> {agency.created_at ? new Date(agency.created_at).toLocaleDateString('id-ID') : 'N/A'}</p>
         </div>
       </div>
 
       {/* Departments Table */}
-      <div className="card mb-4">
-        <div className="card-header bg-danger text-white">
+      <div className="card shadow-sm border-0 mb-4">
+      <div className="card-header" style={{ backgroundColor: '#A83427', color: 'white' }}>
           <h5 className="card-title mb-0">Daftar Bidang</h5>
         </div>
         <div className="card-body">
           {departments.length > 0 ? (
             <div className="table-responsive">
-              <table className="table table-bordered table-hover">
+              <table className="table table-striped align-middle">
                 <thead className="table-light">
                   <tr>
-                    <th>No</th>
-                    <th>Nama Bidang</th>
-                    <th>Email</th>
-                    <th>No Telp</th>
-                    <th>Alamat</th>
-                    <th>Status</th>
-                    <th>Tanggal Dibuat</th>
-                    <th>Aksi</th> {/* Kolom Aksi */}
+                    <th scope="col">No</th>
+                    <th scope="col">Nama Bidang</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">No Telepon</th>
+                    <th scope="col">Alamat</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Tanggal Dibuat</th>
+                    <th scope="col">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -118,37 +117,43 @@ const AgencyData = () => {
                       <td>{department.address}</td>
                       <td>{department.status}</td>
                       <td>{new Date(department.created_at).toLocaleDateString('id-ID')}</td>
-                      <td>
-                        <button
-                          className="btn btn-warning btn-sm me-2"
-                          onClick={() => handleEditDepartment(department.id)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={() => handleDeleteDepartment(department.id)}
-                        >
-                          Hapus
-                        </button>
-                      </td>
+                      <td className="d-flex justify-content-end">
+                      <button
+                        className="btn btn-warning btn-sm me-2"
+                        onClick={() => handleEditDepartment(department.id)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDeleteDepartment(department.id)}
+                      >
+                        Hapus
+                      </button>
+</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <p className="text-center mb-0">Tidak ada bidang yang terdaftar</p>
+            <p className="text-center text-muted">Tidak ada bidang yang terdaftar.</p>
           )}
         </div>
       </div>
 
       {/* Action Buttons */}
       <div className="d-flex justify-content-between">
-        <button className="btn btn-primary" onClick={() => navigate('/add-department')}>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate('/add-department')}
+        >
           Tambah Bidang
         </button>
-        <button className="btn btn-secondary" onClick={() => navigate(-1)}>
+        <button
+          className="btn btn-secondary"
+          onClick={() => navigate(-1)}
+        >
           Kembali
         </button>
       </div>

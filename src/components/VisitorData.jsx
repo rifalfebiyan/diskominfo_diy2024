@@ -220,6 +220,7 @@ function VisitorData() {
                   <th>Nama</th>
                   <th>Instansi</th>
                   <th>No HP</th>
+                  <th>Email</th>
                   <th>Alamat</th>
                   <th>Jenis Kelamin</th>
                   <th>Bidang</th>
@@ -235,6 +236,7 @@ function VisitorData() {
                     <td>{visitor.name}</td>
                     <td>{visitor.institution}</td>
                     <td>{visitor.phone}</td>
+                    <td>{visitor.email}</td>
                     <td>{visitor.address}</td>
                     <td>{visitor.gender}</td>
                     <td>{visitor.department}</td>

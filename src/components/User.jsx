@@ -6,6 +6,7 @@ import { FaUserPlus } from 'react-icons/fa';
 const User = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [agencies, setAgencies] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
@@ -25,6 +26,16 @@ const User = () => {
     fetchStats();
   }, []);
 
+   // Tambahkan useEffect untuk memfilter users ketika users berubah
+   useEffect(() => {
+    if (currentUser && currentUser.agency) {
+      const filteredUsers = users.filter(user => 
+        user.agency_id === currentUser.agency.id
+      );
+      setFilteredUsers(filteredUsers);
+    }
+
+  }, [users, currentUser]);
   const fetchUsers = async () => {
     try {
       const response = await axios.get('http://localhost:8080/api/users', {
@@ -309,10 +320,12 @@ const User = () => {
         </div>
       )}
 
-      {showUsersTable && (
+{showUsersTable && (
         <div className="card mb-4">
           <div className="card-header">
-            <h5 className="card-title">Daftar Pengguna</h5>
+            <h5 className="card-title">
+              Daftar Pengguna {currentUser?.agency?.name ? `- ${currentUser.agency.name}` : ''}
+            </h5>
           </div>
           <div className="card-body">
             <div className="table-responsive">
@@ -325,13 +338,13 @@ const User = () => {
                     <th>Email</th>
                     <th>No Telepon</th>
                     <th>Role</th>
-                    <th>Instansi ID</th>
                     <th>Instansi</th>
                     <th>Tanggal Dibuat</th>
+                    <th>Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user, index) => (
+                  {filteredUsers.map((user, index) => (
                     <tr key={user.id}>
                       <td>{index + 1}</td>
                       <td>{user.name || '-'}</td>
@@ -346,12 +359,31 @@ const User = () => {
                       </td>
                       <td>{user.phone || '-'}</td>
                       <td>{user.role || '-'}</td>
-                      <td>{user.agency_id || '-'}</td>
                       <td>{user.agency ? user.agency.name : '-'}</td>
                       <td>
                         {user.created_at 
                           ? new Date(user.created_at).toLocaleDateString() 
                           : '-'}
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-warning btn-sm me-2"
+                          onClick={() => navigate(`/users/edit/${user.id}`)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm me-2"
+                          onClick={() => handleDeleteUser (user.id)}
+                        >
+                          Hapus
+                        </button>
+                        <button
+                          className="btn btn-info btn-sm"
+                          onClick={() => navigate(`/user-detail/${user.id}`)}
+                        >
+                          Detail
+                        </button>
                       </td>                     
                     </tr>
                   ))}
