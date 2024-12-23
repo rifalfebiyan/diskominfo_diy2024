@@ -75,7 +75,7 @@ const AddUser  = () => {
     <div className="container my-4">
       <div className="p-3 border rounded shadow" style={{ maxWidth: '700px', margin: '0 auto' }}>
         <form onSubmit={handleSubmit}>
-          <p className="fw-bold text-center">TAMBAH USER</p>
+          <p className="fw-bold text-center">TAMBAH PENGGUNA</p>
 
           <div className="mb-2">
             <label className="form-label">Nama*</label>
@@ -171,7 +171,9 @@ const AddUser  = () => {
             </select>
           </div>
 
-          <button type="submit" className="btn btn-primary">Tambah User</button>
+          <div class="d-flex justify-content-end">
+  <button type="submit" className="btn btn-success">Tambah Pengguna</button>
+</div>
         </form>
       </div>
     </div>

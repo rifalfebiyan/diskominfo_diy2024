@@ -79,7 +79,7 @@ const EditDepartment = () => {
     <div className="container my-4">
       <div className="p-3 border rounded shadow" style={{ maxWidth: '700px', margin: '0 auto' }}>
         <form onSubmit={handleSubmit}>
-          <p className="fw-bold text-center">EDIT BIDANG</p>
+          <p className="fw-bold text-center" >EDIT BIDANG</p>
 
           <div className="mb-2">
             <label htmlFor="name" className="form-label">Nama Bidang*</label>
@@ -167,7 +167,12 @@ const EditDepartment = () => {
             </select>
           </div>
 
-          <button type="submit" className="btn btn-primary">Simpan Perubahan</button>
+
+
+          <button type="submit" className="btn btn-success w-100">
+          Simpan Perubahan
+        </button>
+          
         </form>
       </div>
     </div>

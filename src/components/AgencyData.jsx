@@ -144,17 +144,17 @@ const AgencyData = () => {
 
       {/* Action Buttons */}
       <div className="d-flex justify-content-between">
+      <button
+          className="btn btn-secondary"
+          onClick={() => navigate(-1)}
+        >
+          Kembali
+        </button>
         <button
           className="btn btn-primary"
           onClick={() => navigate('/add-department')}
         >
           Tambah Bidang
-        </button>
-        <button
-          className="btn btn-secondary"
-          onClick={() => navigate(-1)}
-        >
-          Kembali
         </button>
       </div>
     </div>

@@ -156,6 +156,10 @@ const User = () => {
     navigate(`/edit-department/${id}`);
   };
 
+  const handleAddUser = () => {
+    navigate(`/add-user`);
+  };
+
   const handleAddDepartment = () => {
     navigate('/add-department');
   };
@@ -232,12 +236,12 @@ const User = () => {
       {/* Baris untuk tombol tambah user dan tambah bidang */}
       <div className="row mb-4 justify-content-center">
         <div className="col-md-4">
-          <button className="btn btn-danger w-100 mb-3" onClick={() => navigate('/add-user')}>
-            <FaUserPlus /> Tambah User
+        <button className="btn btn-success w-100 mb-3" onClick={handleAddUser}>
+            <FaUserPlus /> Tambah Pengguna
           </button>
         </div>
         <div className="col-md-4">
-          <button className="btn btn-danger w-100 mb-3" onClick={handleAddDepartment}>
+          <button className="btn btn-success w-100 mb-3" onClick={handleAddDepartment}>
             <FaUserPlus /> Tambah Bidang
           </button>
         </div>
@@ -340,7 +344,7 @@ const User = () => {
                     <th>Role</th>
                     <th>Instansi</th>
                     <th>Tanggal Dibuat</th>
-                    <th>Aksi</th>
+                    {/* <th>Aksi</th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -365,7 +369,7 @@ const User = () => {
                           ? new Date(user.created_at).toLocaleDateString() 
                           : '-'}
                       </td>
-                      <td>
+                      {/* <td>
                         <button
                           className="btn btn-warning btn-sm me-2"
                           onClick={() => navigate(`/users/edit/${user.id}`)}
@@ -384,7 +388,7 @@ const User = () => {
                         >
                             Detail
                         </button>
-                      </td>                     
+                      </td>                      */}
                     </tr>
                   ))}
                 </tbody>

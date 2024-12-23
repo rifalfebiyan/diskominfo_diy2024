@@ -92,7 +92,7 @@ const AddAgency = () => {
             />
           </div>
 
-          <button type="submit" className="btn btn-danger w-100">Simpan</button>
+          <button type="submit" className="btn btn-success w-100">Simpan</button>
         </form>
       </div>
     </div>

@@ -201,7 +201,7 @@ function MiniSidebar({ onLogout }) {
               }}
             >
               <FaSignOutAlt style={iconStyle(false)} />
-              {isHovered && <span>Logout</span>}
+              {isHovered && <span>Keluar</span>}
             </div>
           </li>
         </ul>
@@ -214,11 +214,11 @@ function MiniSidebar({ onLogout }) {
         </Modal.Header>
         <Modal.Body>Apakah Anda yakin ingin keluar?</Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="primary" onClick={handleClose}>
             Batal
           </Button>
-          <Button variant="primary" onClick={handleLogout}>
-            Logout
+          <Button variant="danger" onClick={handleLogout}>
+            Keluar
           </Button>
         </Modal.Footer>
       </Modal>

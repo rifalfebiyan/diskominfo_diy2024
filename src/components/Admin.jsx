@@ -224,7 +224,7 @@ const Admin = () => {
        {/* Tombol Tambah User, Instansi, Bidang */}
         <div className="col-md-4">
           <button className="btn btn-success w-100 mb-3" onClick={() => navigate('/add-user')} >
-            <FaUserPlus /> Tambah User
+            <FaUserPlus /> Tambah Pengguna
           </button>
         </div>
         <div className="col-md-4">
@@ -270,26 +270,29 @@ const Admin = () => {
                 <td>{agency.phone}</td>
                 <td>{agency.address}</td>
                 <td>{new Date(agency.created_at).toLocaleDateString()}</td>
-                <td className="d-flex justify-content-center">
-                  <button
-                    className="btn btn-info btn-sm w-50 mb-2 me-2"
-                    onClick={() => navigate(`/agency-data/${agency.id}`)}
-                  >
-                    Detail
-                  </button>
-                  <button
-                    className="btn btn-warning btn-sm w-50 mb-2 me-2"
-                    onClick={() => navigate(`/edit-agency/${agency.id}`)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="btn btn-danger btn-sm w-50 mb-2"
-                    onClick={() => handleDeleteAgency(agency.id)}
-                  >
-                    Hapus
-                  </button>
-                </td>
+                <td>
+  <div className="d-flex justify-content-center">
+    <button
+      className="btn btn-info btn-sm w-50 me-2"
+      onClick={() => navigate(`/agency-data/${agency.id}`)}
+    >
+      Detail
+    </button>
+    <button
+      className="btn btn-warning btn-sm w-50 me-2"
+      onClick={() => navigate(`/edit-agency/${agency.id}`)}
+    >
+      Edit
+    </button>
+    <button
+      className="btn btn-danger btn-sm w-50"
+      onClick={() => handleDeleteAgency(agency.id)}
+    >
+      Hapus
+    </button>
+  </div>
+</td>
+
               </tr>
             ))}
           </tbody>
@@ -342,26 +345,29 @@ const Admin = () => {
                     ? new Date(user.created_at).toLocaleDateString()
                     : '-'}
                 </td>
-                <td className="d-flex justify-content-center">
-                  <button
-                    className="btn btn-info btn-sm w-30 mb-2 me-2"
-                    onClick={() => navigate(`/user-detail/${user.id}`)}
-                  >
-                    Detail
-                  </button>
-                  <button
-                    className="btn btn-warning btn-sm w-50 mb-2 me-2"
-                    onClick={() => navigate(`/edit-user/${user.id}`)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="btn btn-danger btn-sm w-50 mb-2"
-                    onClick={() => handleDeleteUser(user.id)}
-                  >
-                    Hapus
-                  </button>
-                </td>
+                <td>
+  <div className="d-flex justify-content-center">
+    <button
+      className="btn btn-info btn-sm me-2"
+      onClick={() => navigate(`/user-detail/${user.id}`)}
+    >
+      Detail
+    </button>
+    <button
+      className="btn btn-warning btn-sm me-2"
+      onClick={() => navigate(`/edit-user/${user.id}`)}
+    >
+      Edit
+    </button>
+    <button
+      className="btn btn-danger btn-sm"
+      onClick={() => handleDeleteUser(user.id)}
+    >
+      Hapus
+    </button>
+  </div>
+</td>
+
               </tr>
             ))}
          </tbody>

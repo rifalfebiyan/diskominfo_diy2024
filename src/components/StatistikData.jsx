@@ -73,7 +73,7 @@ function StatistikData() {
 
   return (
     <div className="container mt-5">
-      <h3 className="text-center">Data Statistik Kunjungan Dinas Kominfo</h3>
+      <h3 className="text-center">Data Statistik Kunjungan Pemerintah Daerah Daerah Istimewa Yogyakarta</h3>
       
       <div className="row text-center my-4">
         <div className="col-md-4">

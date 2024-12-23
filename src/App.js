@@ -25,6 +25,7 @@ import User from './components/User';
 import AddAgency from './components/AddAgency';
 import AgencyData from './components/AgencyData';
 import EditAgency from './components/EditAgency';
+import VisitorFormSpectator from './components/VisitorFormSpectator';
 import SpectatorDashboard from './components/SpectatorDashboard';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
@@ -171,7 +172,7 @@ function App() {
                   console.log('isLoggedIn:', isLoggedIn);
                   console.log('userRole:', userRole);
                   return isLoggedIn && userRole === 'spectator' ? 
-                    <VisitorForm /> : 
+                    <VisitorFormSpectator /> : 
                     <Navigate to="/login" replace />;
                 })()
               } 
@@ -185,10 +186,11 @@ function App() {
               element={<VisitorDataSpectator />} 
             />
             <Route path="/add" element={isLoggedIn ? <VisitorForm /> : <Navigate to="/login" replace />} />
+            <Route path="/add-spectator" element={isLoggedIn ? <VisitorFormSpectator /> : <Navigate to="/login" replace />} />
             <Route path="/profile" element={isLoggedIn ? <Profile onNavigate={handleNavigation} /> : <Navigate to="/login" replace />} />
             <Route path="/edit/:index" element={isLoggedIn ? <EditVisitor /> : <Navigate to="/login" replace />} />
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
-            <Route path="/add-user" element={<AdminRoute><AddUser  /></AdminRoute>} />
+            <Route path="/add-user" element={<AddUser  />} />
             <Route path="/user-detail/:id" element={<AdminRoute><UserData /></AdminRoute>} />
             <Route path="/add-department" element={<AddDepartment />} />
             <Route 
@@ -204,6 +206,7 @@ function App() {
               
             />
             <Route path="/department-data/:id" element={<AdminRoute><DepartmentData /></AdminRoute>} />
+            <Route path="/add-user" element={<AdminRoute><AddUser  /></AdminRoute>} />
             <Route path="/edit-department/:id" element={<EditDepartment />} />
             <Route path="/edit-user/:id" element={<AdminRoute><EditUser  /></AdminRoute>} />
             <Route path="/users/edit/:id" element={<EditUser  />} />

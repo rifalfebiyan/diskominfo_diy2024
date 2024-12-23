@@ -158,7 +158,10 @@ const AddDepartment = () => {
             </select>
           </div>
 
-          <button type="submit" className="btn btn-primary">Tambah Departemen</button>
+
+          <div className="row mb-2 justify-content-center">
+          <button type="submit" className="btn btn-success " >Tambah Departemen</button>
+          </div>
         </form>
       </div>
     </div>

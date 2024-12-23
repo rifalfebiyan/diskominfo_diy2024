@@ -191,7 +191,7 @@ const Profile = () => {
         {/* Profile Information Section */}
         <Col md={7}>
           <div className="card border-0 shadow-sm">
-            <div className="card-header bg-primary text-white py-3">
+            <div className="card-header bg-danger text-white py-3 text-center">
               <h5 className="mb-0 fw-bold">PROFILE AKUN</h5>
             </div>
             <div className="card-body p-4">

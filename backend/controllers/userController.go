@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt" // Import bcrypt package
 )
 
 // GetUsers retrieves all users
@@ -52,6 +53,7 @@ func GetUser(c *gin.Context) {
 }
 
 // CreateUser creates a new user
+// CreateUser  creates a new user
 func CreateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -77,11 +79,13 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	// Pastikan NIP tidak kosong
-	if user.NIP == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "NIP is required"})
+	// Hash the password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
 		return
 	}
+	user.Password = string(hashedPassword) // Store the hashed password
 
 	// Create user in database
 	result := database.DB.Create(&user)
@@ -91,7 +95,7 @@ func CreateUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "User created successfully",
+		"message": "User  created successfully",
 		"user":    user,
 	})
 }

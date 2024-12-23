@@ -194,7 +194,7 @@ function VisitorDataSpectator() {
           <button className="btn btn-primary me-2" onClick={handleSort}>
             Sortir Nama A-Z {sortOrder === 'asc' ? '↑' : '↓'}
           </button>
-          <button className="btn btn-success" onClick={() => navigate('/add')}>Tambah Tamu</button>
+          <button className="btn btn-success" onClick={() => navigate('/add-spectator')}>Tambah Tamu</button>
         </div>
       </div>
 
